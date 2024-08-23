@@ -306,7 +306,7 @@ export const subscribe = <T extends object>(store: UseBoundStore<StoreApi<T>>): 
       if (isQuery(value)) {
         const query = value as unknown as Query<T, R>;
         let deps = [] as QueryOrEffect<T>[];
-        if (_opts.followDeps) {
+        if (_opts.followDeps || _opts.followDeps === undefined) {
           deps = query.__deps.flatMap(k => {
             const key = k as keyof T;
             return isQuery(state[key]) || isEffect(state[key]) ? [state[key]] : [];
