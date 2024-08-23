@@ -26,7 +26,7 @@ const validate = <T extends object>(store: UseBoundStore<StoreApi<T>>) => {
     });
 };
 
-const equals = (a: any, b: any): boolean => {
+export const equals = (a: any, b: any): boolean => {
   let aValue;
   let bValue;
   if (isQuery(a)) {

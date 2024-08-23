@@ -6,7 +6,7 @@
   "types": "./build/types.d.ts",
   "scripts": {
     "build": "npx tsc --project tsconfig.json",
-    "test": "test"
+    "test": "jest"
   },
   "peerDependencies": {
     "@types/react": ">=16.8",
