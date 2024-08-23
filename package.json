@@ -1,13 +1,13 @@
 {
   "name": "leo-query",
-  "version": "0.0.1-alpha.7",
+  "version": "0.0.1-alpha.8",
   "description": "A simple library to connect async queries to Zustand stores.",
   "main": "./index.js",
   "types": "./types",
   "scripts": {
     "build": "npx tsc --project tsconfig.json",
     "test": "jest",
-    "prepack": "shx mv dist/* ."
+    "prepack": "cp -r dist/* ."
   },
   "peerDependencies": {
     "@types/react": ">=16.8",
