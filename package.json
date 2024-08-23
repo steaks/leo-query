@@ -1,12 +1,13 @@
 {
   "name": "leo-query",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.4",
   "description": "A simple library to connect async queries to Zustand stores.",
-  "main": "./build/index.js",
-  "types": "./build/types.d.ts",
+  "main": "./index.js",
+  "types": "./types",
   "scripts": {
     "build": "npx tsc --project tsconfig.json",
-    "test": "jest"
+    "test": "jest",
+    "prepack": "shx mv dist/* ."
   },
   "peerDependencies": {
     "@types/react": ">=16.8",
@@ -27,9 +28,21 @@
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "rollup": "^3.28.0",
+    "shx": "^0.3.4",
     "ts-jest": "^28.0.5",
     "tslib": "^2.6.1"
   },
   "author": "Steven Wexler",
-  "license": "MIT"
+  "license": "MIT",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "index.js",
+    "index.js.map",
+    "src.js",
+    "src.js.map",
+    "types.js",
+    "types.js.map",
+    "types"
+  ]
 }

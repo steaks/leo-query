@@ -1,5 +1,5 @@
 import {equals} from "../src";
-import {Effect} from "../types/types";
+import {Effect} from "../src/types";
 
 test("1 equals 1", () => {
   expect(equals(1, 1)).toBe(true);
