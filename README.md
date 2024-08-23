@@ -5,7 +5,7 @@ A simple library to connect async queries to Zustand stores.
   <img src="./assets/leo.png" height="300">
 </div>
 
-Try a live demo [here](https://codesandbox.io/s/leo-1zv3v?file=/src/App.tsx).
+Try a live demo [here](https://codesandbox.io/p/sandbox/leo-query-bears-demo-js-wmwlgt?file=%2Fsrc%2FApp.js).
 
 ```
 npm i leo-query
