@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import {DataGrid, GridColDef} from "@mui/x-data-grid";
-import {Effect, Query} from "./leo/types";
+import {Effect, Query} from "leo-query/types";
 import {create} from "zustand";
 import {
   addTask,
@@ -29,7 +29,7 @@ import {
   updateUser,
   users
 } from "./db/db";
-import {effect, query, subscribe} from "./leo";
+import {effect, query, subscribe} from "leo-query";
 
 export interface TasksState {
   newUser: UserInfo | null;

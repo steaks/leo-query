@@ -1,6 +1,6 @@
 {
   "name": "leo-query",
-  "version": "0.0.1-alpha.4",
+  "version": "0.0.1-alpha.7",
   "description": "A simple library to connect async queries to Zustand stores.",
   "main": "./index.js",
   "types": "./types",
@@ -43,6 +43,7 @@
     "src.js.map",
     "types.js",
     "types.js.map",
-    "types"
+    "types",
+    "src"
   ]
 }
