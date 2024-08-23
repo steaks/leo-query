@@ -1,7 +1,7 @@
 <div style="display:flex; justify-content: center">
   <img src="./assets/leo.png" height="300">
 </div>
-![Tests](https://github.com/steaks/leo-query/actions/workflows/test.yml/badge.svg)
+![test](https://github.com/steaks/leo-query/actions/workflows/test.yml/badge.svg)
 
 A simple library to connect async queries to Zustand stores.
 
