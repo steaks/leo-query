@@ -105,9 +105,11 @@
     "jsx": "react"
   },
   "exclude": [
+    "./assets",
     "./build",
     "./examples",
-    "./types",
-    "./assets"
+    "./node_modules",
+    "./tests",
+    "./types"
   ]
 }
