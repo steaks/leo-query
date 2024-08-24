@@ -183,3 +183,11 @@ function App() {
   );
 }
 ```
+
+## Examples
+
+| Example                                                                                      | Description                        |
+|----------------------------------------------------------------------------------------------|------------------------------------|
+| [Bears JS](https://codesandbox.io/p/sandbox/leo-query-bears-demo-js-wmwlgt?file=/src/App.js) | A simple bear counter (Javascript) |
+| [Bears TS](https://codesandbox.io/p/sandbox/leo-query-bears-demo-ts-7f2c34?file=/src/App.js) | A simple bear counter (Typescript) |
+| [Task Manager](https://codesandbox.io/p/sandbox/task-manager-xsh8c4?file=/src/App.js)        | A more complex task manager app.   |
