@@ -298,9 +298,9 @@ export const subscribe = <T extends object>(store: UseBoundStore<StoreApi<T>>): 
   });
 
   function extractState<R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions): R;
-  function extractState(selector: (state: T) => Effect<T>, opts?: UseBoundAsyncStoreOptions): () => Promise<void>;
+  function extractState(selector: (state: T) => Effect<T>, opts?: UseBoundAsyncStoreOptions): (() => Promise<void>);
   function extractState<R>(selector: (state: T) => Query<T, R> | Effect<T>, opts?: UseBoundAsyncStoreOptions): R | (() => Promise<void>) {
-    const theSelector = (state: T): [Query<T, R>, ...QueryOrEffect<T>[]] | Effect<T> => {
+    const theSelector = (state: T): [Query<T, R>, ...QueryOrEffect<T>[]] | [Effect<T>, ...QueryOrEffect<T>[]] => {
       const value = selector(state);
       const _opts = opts || {};
       if (isQuery(value)) {
@@ -314,16 +314,27 @@ export const subscribe = <T extends object>(store: UseBoundStore<StoreApi<T>>): 
         }
         return [query, ...deps];
       } else if (isEffect(value)) {
-        return value;
+        const effect = value as unknown as Effect<T>;
+        console.log(effect);
+        let deps = [] as QueryOrEffect<T>[];
+        if (_opts.followDeps || _opts.followDeps === undefined) {
+          deps = effect.__deps.flatMap(k => {
+            const key = k as keyof T;
+            return isQuery(state[key]) || isEffect(state[key]) ? [state[key]] : [];
+          }) as (Query<T, any> | Effect<T>)[];
+        }
+        return [effect, ...deps];
       } else {
-        throw new Error("Must Fetch Query");
+        throw new Error("Must return Query or Effect");
       }
     };
     const value = store(theSelector);
-    if (isEffect(value)) {
-      return withSuspense([value])[0];
-    } else {
+    if (isQuery(value[0])) {
       return withSuspense(value as [Query<T, R>, ...QueryOrEffect<T>[]]);
+    } else if (isEffect(value[0])) {
+      return withSuspense(value as [Effect<T>, ...QueryOrEffect<T>[]]);
+    } else {
+      throw new Error("Value must be Query or Effect");
     }
   }
 
@@ -340,8 +351,8 @@ function withSuspense<T>(query: [Query<any, T>, ...QueryOrEffect<any>[]]): T;
  * Hook up your effect(s) so it will trigger <Suspense> when the effect is loading.
  * @param effect
  */
-function withSuspense(effect: [Effect<any>, ...Effect<any>[]]): [() => Promise<void>, ...(() => Promise<void>)[]];
-function withSuspense<T>(values: [Query<any, T>, ...QueryOrEffect<any>[]] | Effect<any>[]): T | (() => Promise<void>)[] {
+function withSuspense(effect: [Effect<any>, ...QueryOrEffect<any>[]]): (() => Promise<void>);
+function withSuspense<T>(values: [Query<any, T>, ...QueryOrEffect<any>[]] | [Effect<any>, ...QueryOrEffect<any>[]]): T | (() => Promise<void>) {
   if (isQuery(values[0])) {
     const v = values[0];
     const needsTrigger = v.value === undefined || v.isLoading;
@@ -356,7 +367,7 @@ function withSuspense<T>(values: [Query<any, T>, ...QueryOrEffect<any>[]] | Effe
       if (isQuery(vv)) {
         return vv.__trigger ? [vv.__trigger] : [];
       } else if (isEffect(vv)) {
-        return vv.__triggers
+        return vv.__triggers;
       } else {
         return [];
       }
@@ -368,11 +379,22 @@ function withSuspense<T>(values: [Query<any, T>, ...QueryOrEffect<any>[]] | Effe
       throw Promise.all(allTriggers);
     }
   } else {
-    const promises = (values as Effect<any>[]).flatMap(vv => vv.isLoading ? vv.__triggers : []);
-    const triggers = (values as Effect<any>[]).map(vv => vv.trigger);
-    if (promises.length) {
-      throw Promise.all(promises);
+    const v = values[0];
+    const effectTriggers = v.__triggers;
+    const depTriggers = values.slice(1).flatMap(vv => {
+      if (isQuery(vv)) {
+        return vv.__trigger ? [vv.__trigger] : [];
+      } else if (isEffect(vv)) {
+        return vv.__triggers;
+      } else {
+        return [];
+      }
+    });
+    const allTriggers = [...effectTriggers, ...depTriggers];
+    if (allTriggers.length === 0) {
+      return v.trigger;
+    } else {
+      throw Promise.all(allTriggers);
     }
-    return triggers;
   }
 }
