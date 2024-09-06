@@ -58,12 +58,10 @@ export const updateUser = (get: () => TasksState, set: (s: Partial<TasksState>) 
   return Promise.resolve();
 };
 
-export const removeUser = (get: () => TasksState, set: (s: Partial<TasksState>) =>  void) => async (): Promise<void> => {
-  const u = get().newUser;
-  set({removedUser: null});
-  if (u) {
+export const removeUser = async (user: User): Promise<void> => {
+  if (user) {
     await delay(500);
-    db.users = db.users.filter(uu => u.id !== uu.id);
+    db.users = db.users.filter(uu => user.id !== uu.id);
   }
   return Promise.resolve();
 };
@@ -97,12 +95,10 @@ export const updateTeam = (get: () => TasksState, set: (s: Partial<TasksState>) 
   return Promise.resolve();
 };
 
-export const removeTeam = (get: () => TasksState, set: (s: Partial<TasksState>) =>  void) => async (): Promise<void> => {
-  const t = get().removedTeam;
-  set({removedTeam: null});
-  if (t) {
+export const removeTeam = async (team: Team): Promise<void> => {
+  if (team) {
     await delay(500);
-    db.teams = db.teams.filter(tt => t.id !== tt.id);
+    db.teams = db.teams.filter(tt => team.id !== tt.id);
   }
   return Promise.resolve();
 };
@@ -143,12 +139,10 @@ export const updateTask = (get: () => TasksState, set: (s: Partial<TasksState>) 
   return Promise.resolve();
 };
 
-export const removeTask = (get: () => TasksState, set: (s: Partial<TasksState>) =>  void) => async (): Promise<void> => {
-  const t = get().removedTask;
-  set({removedTask: null});
-  if (t) {
+export const removeTask = async (task: Task): Promise<void> => {
+  if (task) {
     await delay(500);
-    db.tasks = db.tasks.filter(tt => t.id !== tt.id);
+    db.tasks = db.tasks.filter(tt => task.id !== tt.id);
   }
   return Promise.resolve();
 };

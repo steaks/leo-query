@@ -4,10 +4,10 @@ import {subscribe, effect, query} from "leo-query";
 import {bears, increasePopulation, removeAllBears} from "./db";
 
 
-const useBearStore = create((set, get, store) => ({
-  increasePopulation: effect(store, increasePopulation, []),
-  removeAllBears: effect(store, removeAllBears, []),
-  bears: query(store, bears, ["increasePopulation", "removeAllBears"])
+const useBearStore = create(() => ({
+  increasePopulation: effect(increasePopulation),
+  removeAllBears: effect(removeAllBears),
+  bears: query(bears, s => [s.increasePopulation, s.removeAllBears])
 }));
 
 const useBearStoreAsync = subscribe(useBearStore);

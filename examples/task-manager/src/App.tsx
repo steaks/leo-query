@@ -1,5 +1,5 @@
 import React, {Suspense} from "react";
-import {UserInfo, Team, TaskInfo} from "./types";
+import {UserInfo, Team, TaskInfo, User} from "./types";
 import {
   AppBar,
   Box,
@@ -37,29 +37,26 @@ export interface TasksState {
   removedUser: UserInfo | null;
   setNewUser: (u: UserInfo | null) => void;
   setUpdatedUser: (u: UserInfo | null) => void;
-  setRemovedUser: (u: UserInfo | null) => void;
   users: Query<TasksState, UserInfo[]>;
   addUser: Effect<TasksState>;
   updateUser: Effect<TasksState>;
-  removeUser: Effect<TasksState>;
+  removeUser: Effect<TasksState, [User]>;
 
   newTeam: Team | null;
   updatedTeam: Team | null;
   removedTeam: Team | null;
   setNewTeam: (t: Team | null) => void;
   setUpdatedTeam: (t: Team | null) => void;
-  setRemovedTeam: (t: Team | null) => void;
   teams: Query<TasksState, Team[]>;
   addTeam: Effect<TasksState>;
   updateTeam: Effect<TasksState>;
-  removeTeam: Effect<TasksState>;
+  removeTeam: Effect<TasksState, [Team]>;
 
   newTask: TaskInfo | null;
   updatedTask: TaskInfo | null;
   removedTask: TaskInfo | null;
   setNewTask: (t: TaskInfo | null) => void;
   setUpdatedTask: (t: TaskInfo | null) => void;
-  setRemovedTask: (t: TaskInfo | null) => void;
   tasks: Query<TasksState, TaskInfo[]>;
   addTask: Effect<TasksState>;
   updateTask: Effect<TasksState>;
@@ -69,46 +66,43 @@ export interface TasksState {
   setTab: (t: "users" | "teams") => void;
 }
 
-const userChanges = ["addUser", "updateUser", "removeUser"] as (keyof TasksState)[];
-const existingUserChanges = ["updateUser", "removeUser"] as (keyof TasksState)[];
-const teamChanges = ["addTeam", "updateTeam", "removeTeam"] as (keyof TasksState)[];
-const existingTeamChanges = ["updateTeam", "removeTeam"] as (keyof TasksState)[];
-const taskChanges = ["addTask", "updateTask", "removeTask"] as (keyof TasksState)[];
+const userChanges = (s: TasksState) => [s.addUser, s.updateUser, s.removeUser];
+const existingUserChanges = (s: TasksState) => [s.updateUser, s.removeUser];
+const teamChanges = (s: TasksState) => [s.addTeam, s.updateTeam, s.removeTeam];
+const existingTeamChanges = (s: TasksState) => [s.updateTeam, s.removeTeam];
+const taskChanges = (s: TasksState) => [s.addTask, s.updateTask, s.removeTask];
 
-const useTasksStore = create<TasksState>((set, get, store) => {
+const useTasksStore = create<TasksState>((set, get) => {
   return ({
     newUser: null,
     updatedUser: null,
     removedUser: null,
-    users: query(store, users, userChanges),
+    users: query(users, userChanges),
     setNewUser: newUser => set({newUser}),
     setUpdatedUser: updatedUser => set({updatedUser}),
-    setRemovedUser: removedUser => set({removedUser}),
-    addUser: effect(store, "addUser", addUser(get, set), []),
-    updateUser: effect(store, "updateUser", updateUser(get, set), []),
-    removeUser: effect(store, "removeUser", removeUser(get, set), []),
+    addUser: effect(addUser(get, set)),
+    updateUser: effect(updateUser(get, set)),
+    removeUser: effect(removeUser),
 
     newTeam: null,
     updatedTeam: null,
     removedTeam: null,
-    teams: query(store, teams, [...teamChanges, ...userChanges]),
+    teams: query(teams, s => [...teamChanges(s), ...userChanges(s)]),
     setNewTeam: newTeam => set({newTeam}),
     setUpdatedTeam: updatedTeam => set({updatedTeam}),
-    setRemovedTeam: removedTeam => set({removedTeam}),
-    addTeam: effect(store, "addTeam", addTeam(get, set), []),
-    updateTeam: effect(store, "updateTeam", updateTeam(get, set), []),
-    removeTeam: effect(store, "removeTeam", removeTeam(get, set), []),
+    addTeam: effect(addTeam(get, set)),
+    updateTeam: effect(updateTeam(get, set)),
+    removeTeam: effect(removeTeam),
 
     newTask: null,
     updatedTask: null,
     removedTask: null,
-    tasks: query(store, tasks, [...taskChanges, ...existingTeamChanges, ...existingUserChanges]),
+    tasks: query(tasks, s => [...taskChanges(s), ...existingTeamChanges(s), ...existingUserChanges(s)]),
     setNewTask: newTask => set({newTask}),
     setUpdatedTask: updatedTask => set({updatedTask}),
-    setRemovedTask: removedTask => set({removedTask}),
-    addTask: effect(store, "addTask", addTask(get, set), []),
-    updateTask: effect(store, "updateTask", updateTask(get, set), []),
-    removeTask: effect(store, "removeTask", removeTask(get, set), []),
+    addTask: effect(addTask(get, set)),
+    updateTask: effect(updateTask(get, set)),
+    removeTask: effect(removeTask),
 
     tab: "users",
     setTab: tab => set({tab}),
@@ -145,15 +139,13 @@ const NewUserButton = () => {
 
 const BrowseUsers = () => {
   const users = useTasksStoreAsync(s => s.users);
-  const [setUpdatedUser, setRemovedUser, removeUser] = useTasksStore(s => [
+  const [setUpdatedUser, removeUser] = useTasksStore(s => [
     s.setUpdatedUser,
-    s.setRemovedUser,
     s.removeUser.trigger
   ]);
 
   const onRemove = (user: UserInfo) => {
-    setRemovedUser(user);
-    removeUser();
+    removeUser(user);
   };
 
   const rows = (users || []).map(u => ({...u, edit: u, remove: u}));
@@ -325,11 +317,10 @@ const NewTeamButton = () => {
 
 const BrowseTeams = () => {
   const teams = useTasksStoreAsync(s => s.teams);
-  const [setRemovedTeam, setUpdatedTeam, remove] = useTasksStore(s => [s.setRemovedTeam, s.setUpdatedTeam, s.removeTeam.trigger]);
+  const [setUpdatedTeam, remove] = useTasksStore(s => [s.setUpdatedTeam, s.removeTeam.trigger]);
 
   const onRemove = (team: Team) => {
-    setRemovedTeam(team);
-    remove();
+    remove(team);
   };
 
   const rows = (teams || []).map(t => ({...t, edit: t, remove: t}));
@@ -483,11 +474,10 @@ const EditTask = () => {
 
 const BrowseTasks = () => {
   const tasks = useTasksStoreAsync(s => s.tasks);
-  const [setUpdatedTask, setRemovedTask, remove] = useTasksStore(s => [s.setUpdatedTask, s.setRemovedTask, s.removeTask.trigger]);
+  const [setUpdatedTask, remove] = useTasksStore(s => [s.setUpdatedTask, s.removeTask.trigger]);
 
   const onRemove = (task: TaskInfo) => {
-    setRemovedTask(task);
-    remove();
+    remove(task);
   };
 
   const rows = (tasks || []).map(t => ({...t, edit: t, remove: t}));

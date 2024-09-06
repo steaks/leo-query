@@ -2,19 +2,22 @@ import React, {Suspense} from 'react';
 import {create} from "zustand";
 import {Query, Effect} from "leo-query/types";
 import {subscribe, effect, query} from "leo-query";
-import {bears, increasePopulation, removeAllBears} from "./db";
+import {fetchBears, increaseMultiplePopulation, increasePopulation, removeAllBears} from "./db";
 
 interface BearsState {
   bears: Query<BearsState, number>;
-  increasePopulation: Effect<BearsState>;
-  removeAllBears: Effect<BearsState>;
+  increasePopulation: Effect<BearsState, []>;
+  increaseMultiplePopulation: Effect<BearsState, [number]>;
+  removeAllBears: Effect<BearsState, []>;
 }
 
-const useBearStore = create<BearsState>((set, get, store) => ({
-  increasePopulation: effect<BearsState>(store, increasePopulation, []),
-  removeAllBears: effect<BearsState>(store, removeAllBears, []),
-  bears: query<BearsState, number>(store, bears, ["increasePopulation", "removeAllBears"])
-}));
+const useBearStore = create<BearsState>(() => ({
+    increasePopulation: effect(increasePopulation),
+    removeAllBears: effect(removeAllBears),
+    bears: query(fetchBears, s => [s.increasePopulation, s.increaseMultiplePopulation, s.removeAllBears]),
+    increaseMultiplePopulation: effect(increaseMultiplePopulation)
+  })
+);
 
 const useBearStoreAsync = subscribe(useBearStore);
 
@@ -24,8 +27,8 @@ function BearCounter() {
 }
 
 function Controls() {
-  const increasePopulation = useBearStore(state => state.increasePopulation.trigger)
-  return <button onClick={increasePopulation}>one up</button>;
+  const increasePopulation = useBearStore(state => state.increaseMultiplePopulation.trigger)
+  return <button onClick={() => increasePopulation(2)}>one up</button>;
 }
 
 function App() {
