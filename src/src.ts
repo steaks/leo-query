@@ -134,14 +134,14 @@ const queryParams0 = <State, R>(args: any): QueryParams<State, R> => {
  * @param fn - Function that executes the promise. The function name must match the key of the object tied to the store.
  * @param deps - Dependencies in the store that will trigger the promise.
  */
-export function query<Store extends object, R>(fn: () => Promise<R>, deps: Dependencies<Store>): Query<Store, R>;
+export function query<Store extends object, R>(fn: () => Promise<R>, deps?: Dependencies<Store>): Query<Store, R>;
 export function query<Store extends object, R>(): Query<Store, R> {
   const p = queryParams0<Store, R>(arguments);
   const getStore: () => StoreApi<Store> = () => { throw new Error("Store not set yet"); };
   const q = {
     __id: crypto.randomUUID(),
     __type: "Query" as "Query",
-    __deps: p.deps,
+    __deps: p.deps || (() => []),
     __key: "NOT_YET_SET" as keyof Store,
     __trigger: undefined as undefined | Promise<R>,
     __triggerStart: 0,
