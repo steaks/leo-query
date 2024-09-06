@@ -51,11 +51,11 @@ export const equals = (a: any, b: any): boolean => {
   return aValue === bValue
 };
 
-interface EffectParams<Args extends any[]> {
+interface EffectParams<Args extends any[] = []> {
   fn: (...args: Args) => Promise<void>;
 }
 
-const effectParams0 = <Args extends any[]>(args: any): EffectParams<Args> => {
+const effectParams0 = <Args extends any[] = []>(args: any): EffectParams<Args> => {
   const p = {
     fn: args[0] as (...args: Args) => Promise<void>,
   };
@@ -70,8 +70,8 @@ const effectParams0 = <Args extends any[]>(args: any): EffectParams<Args> => {
  * simple promise. The promise will be executed when a dependency changes or is manually triggered.
  * @param fn - Function that executes the promise. The function name must match the key of the object tied to the store.
  */
-export function effect<Store extends object, Args extends any[]>(fn: (...args: Args) => Promise<void>): Effect<Store, Args>;
-export function effect<Store extends object, Args extends any[]>(): Effect<Store, Args> {
+export function effect<Store extends object, Args extends any[] = []>(fn: (...args: Args) => Promise<void>): Effect<Store, Args>;
+export function effect<Store extends object, Args extends any[] = []>(): Effect<Store, Args> {
   const p = effectParams0<Args>(arguments);
   const getStore: () => StoreApi<Store> = () => { throw new Error("Store not set yet"); };
   const e = {
@@ -218,7 +218,7 @@ export type UseBoundAsyncStore<T> = {
    * @param selector Select the effect from the store.
    * @param opts Options
    */
-  <Args extends any[]>(selector: (state: T) => Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): () => Promise<void>
+  <Args extends any[] = []>(selector: (state: T) => Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): () => Promise<void>
 };
 
 /**
@@ -246,8 +246,8 @@ export const subscribe = <T extends object>(store: UseBoundStore<StoreApi<T>>): 
   });
 
   function extractState<R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions): R;
-  function extractState<Args extends any[]>(selector: (state: T) => Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): (() => Promise<void>);
-  function extractState<R, Args extends any[]>(selector: (state: T) => Query<T, R> | Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): R | (() => Promise<void>) {
+  function extractState<Args extends any[] = []>(selector: (state: T) => Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): (() => Promise<void>);
+  function extractState<R, Args extends any[] = []>(selector: (state: T) => Query<T, R> | Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): R | (() => Promise<void>) {
     const theSelector = (state: T): [Query<T, R>, ...QueryOrEffect<T>[]] | [Effect<T, Args>, ...QueryOrEffect<T>[]] => {
       const value = selector(state);
       const _opts = opts || {};
@@ -290,8 +290,8 @@ function withSuspense<T>(query: [Query<any, T>, ...QueryOrEffect<any>[]]): T;
  * Hook up your effect(s) so it will trigger <Suspense> when the effect is loading.
  * @param effect
  */
-function withSuspense<Args extends any[]>(effect: [Effect<any, Args>, ...QueryOrEffect<any>[]]): (() => Promise<void>);
-function withSuspense<T, Args extends any[]>(values: [Query<any, T>, ...QueryOrEffect<any>[]] | [Effect<any, Args>, ...QueryOrEffect<any>[]]): T | ((...args: Args) => Promise<void>) {
+function withSuspense<Args extends any[] = []>(effect: [Effect<any, Args>, ...QueryOrEffect<any>[]]): (() => Promise<void>);
+function withSuspense<T, Args extends any[] = []>(values: [Query<any, T>, ...QueryOrEffect<any>[]] | [Effect<any, Args>, ...QueryOrEffect<any>[]]): T | ((...args: Args) => Promise<void>) {
   if (isQuery(values[0])) {
     const v = values[0];
     const needsTrigger = v.value === undefined || v.isLoading;

@@ -1,6 +1,6 @@
 import {StoreApi} from "zustand/vanilla";
 
-export interface Effect<State, Args extends any[]> {
+export interface Effect<State, Args extends any[] = []> {
     readonly __id: string;
     readonly __type: "Effect";
     __key: keyof State;
