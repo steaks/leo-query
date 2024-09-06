@@ -32,7 +32,7 @@ effect<Store extends object, Args extends any[] = []>(fn: (...args: Args) => Pro
 ```
 const increaseBearCount = () => fetch('/api/increase', { method: 'POST' });
 
-const useBearStore = create((set, get, store) => ({
+const useBearStore = create(() => ({
   increaseBearCount: effect(increaseBearCount)
 }));
 

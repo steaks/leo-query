@@ -29,7 +29,7 @@ An object representing the query, including methods and state information.
 - **isLoading: boolean**  
   Indicates if the query is currently fetching data.
 
-- **value: R | undefined**  
+- **value: R**  
   Holds the result of the query once it resolves.
 
 ## Example Usage
@@ -37,7 +37,7 @@ An object representing the query, including methods and state information.
 ```
 const fetchBears = () => fetch('/api/bears').then(res => res.json());
 
-const useBearStore = create((set, get, store) => ({
+const useBearStore = create(() => ({
   bears: query(fetchBears)
 }));
 
@@ -52,7 +52,7 @@ const BearCounter = () => {
 const fetchBears = () => fetch('/api/bears').then(res => res.json());
 const increaseBearCount = () => fetch('/api/increase', { method: 'POST' });
 
-const useBearStore = create((set, get, store) => ({
+const useBearStore = create(() => ({
   bears: query(fetchBears, s => [s.increaseBearCount]),
   increaseBearCount: effect(increaseBearCount)
 }));
