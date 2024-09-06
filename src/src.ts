@@ -1,13 +1,17 @@
 import {StoreApi, UseBoundStore} from "zustand";
 import {Dependencies, Effect, Query} from "./types";
 
-const isEffect = (v: any): v is Effect<any> =>
-  v && (v as Effect<any>).__type === "Effect";
+const isEffect = (v: any): v is Effect<any, any> =>
+  v && (v as Effect<any, any>).__type === "Effect";
 
 const isQuery = (v: any): v is Query<any, any> =>
   v && (v as Query<any, any>).__type === "Query"
 
-const validate = <T extends object>(store: UseBoundStore<StoreApi<T>>) => {
+/**
+ * Bind queries and effects to the store so they can be triggered when dependencies change.
+ * @param store
+ */
+const bind = <T extends object>(store: UseBoundStore<StoreApi<T>>) => {
   const init = store.getInitialState();
   Object
     .keys(init)
@@ -15,13 +19,11 @@ const validate = <T extends object>(store: UseBoundStore<StoreApi<T>>) => {
       const key = k as keyof T
       const v = init[key];
       if (isQuery(v)) {
-        if (!(v.__key in init)) {
-          throw new Error(`Query ${v.__key.toString()} not found in store.`);
-        }
+        v.__key = key;
+        v.__store = () => store;
       } else if (isEffect(v)) {
-        if (!(v.__key in init)) {
-          throw new Error(`Effect ${v.__key.toString()} not found in store.`);
-        }
+        v.__key = key;
+        v.__store = () => store;
       }
     });
 };
@@ -29,6 +31,9 @@ const validate = <T extends object>(store: UseBoundStore<StoreApi<T>>) => {
 export const equals = (a: any, b: any): boolean => {
   let aValue;
   let bValue;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    return a.every((v, i) => equals(v, b[i]));
+  }
   if (isQuery(a)) {
     aValue = a.value
   } else if (isEffect(a)) {
@@ -46,34 +51,15 @@ export const equals = (a: any, b: any): boolean => {
   return aValue === bValue
 };
 
-interface EffectParams<State> {
-  store: StoreApi<State>;
-  key: keyof State
-  fn: () => Promise<void>;
-  deps: Dependencies<State>;
+interface EffectParams<Args extends any[]> {
+  fn: (...args: Args) => Promise<void>;
 }
 
-const effectParams0 = <State>(args: any): EffectParams<State> => {
+const effectParams0 = <Args extends any[]>(args: any): EffectParams<Args> => {
   const p = {
-    store: args[0] as StoreApi<State>,
-    key: args[1].name as keyof State,
-    fn: args[1] as () => Promise<void>,
-    deps: args[2] as Dependencies<State>
+    fn: args[0] as (...args: Args) => Promise<void>,
   };
-  if (!p.key || !p.fn || !p.deps) {
-    throw new Error("Invalid arguments");
-  }
-  return p;
-};
-
-const effectParams1 = <State>(args: any): EffectParams<State> => {
-  const p = {
-    store: args[0] as StoreApi<State>,
-    key: args[1] as keyof State,
-    fn: args[2] as () => Promise<void>,
-    deps: args[3] as Dependencies<State>
-  };
-  if (!p.key || !p.fn || !p.deps) {
+  if (!p.fn) {
     throw new Error("Invalid arguments");
   }
   return p;
@@ -82,35 +68,25 @@ const effectParams1 = <State>(args: any): EffectParams<State> => {
 /**
  * Hook up an asynchronous effect to Zustand. An effect may be a POST http requests that updates your database or a
  * simple promise. The promise will be executed when a dependency changes or is manually triggered.
- * @param store - Store that the query will be hooked up to.
  * @param fn - Function that executes the promise. The function name must match the key of the object tied to the store.
- * @param deps - Dependencies in the store that will trigger the promise.
  */
-export function effect<Store extends object>(store: StoreApi<Store>, fn: () => Promise<void>, deps: Dependencies<Store>): Effect<Store>;
-/**
- * Hook up an asynchronous effect to Zustand. An effect may be a POST http requests that updates your database or a
- * simple promise. The promise will be executed when a dependency changes or is manually triggered.
- * @param store - Store that the query will be hooked up to.
- * @param key - Key of the store object that this query will be hooked up to.
- * @param fn - Function that executes the promise. The function name must match the key of the object tied to the store.
- * @param deps - Dependencies in the store that will trigger the promise.
- */
-export function effect<Store extends object>(store: StoreApi<Store>, key: keyof Store, fn: () => Promise<void>, deps: Dependencies<Store>): Effect<Store>;
-export function effect<Store extends object>(): Effect<Store> {
-  const p = typeof arguments[1] === "function" ? effectParams0<Store>(arguments) : effectParams1<Store>(arguments);
-  return {
+export function effect<Store extends object, Args extends any[]>(fn: (...args: Args) => Promise<void>): Effect<Store, Args>;
+export function effect<Store extends object, Args extends any[]>(): Effect<Store, Args> {
+  const p = effectParams0<Args>(arguments);
+  const getStore: () => StoreApi<Store> = () => { throw new Error("Store not set yet"); };
+  const e = {
     __id: crypto.randomUUID(),
     __type: "Effect" as "Effect",
-    __deps: p.deps,
-    __key: p.key,
+    __key: "NOT_SET_YET" as keyof Store,
     __valueCounter: 0,
     __triggers: [],
+    __store: getStore,
     isLoading: false,
-    trigger: async () => {
-      const current = p.store.getState()[p.key] as Effect<Store>;
-      const promise = p.fn();
-      p.store.setState({
-        [p.key]: {
+    trigger: async (...args: Args) => {
+      const current = e.__store().getState()[e.__key] as Effect<Store, Args>;
+      const promise = p.fn(...args);
+      e.__store().setState({
+        [e.__key]: {
           ...current,
           __triggers: [...current.__triggers, promise],
           isLoading: true
@@ -118,10 +94,10 @@ export function effect<Store extends object>(): Effect<Store> {
       } as Partial<Store>);
       setTimeout(async () => {
         await promise;
-        const current = p.store.getState()[p.key] as Effect<Store>;
+        const current = e.__store().getState()[e.__key] as Effect<Store, Args>;
         const fetches = current.__triggers.filter(f => f !== promise);
-        p.store.setState({
-          [p.key]: {
+        e.__store().setState({
+          [e.__key]: {
             ...current,
             __valueCounter: current.__valueCounter + 1,
             __triggers: fetches,
@@ -132,36 +108,20 @@ export function effect<Store extends object>(): Effect<Store> {
       return promise;
     }
   };
+  return e;
 }
 
 interface QueryParams<State, R> {
-  store: StoreApi<State>;
-  key: keyof State
   fn: () => Promise<R>;
   deps: Dependencies<State>;
 }
 
 const queryParams0 = <State, R>(args: any): QueryParams<State, R> => {
   const p = {
-    store: args[0] as StoreApi<State>,
-    key: args[1].name as keyof State,
-    fn: args[1] as () => Promise<R>,
-    deps: args[2] as Dependencies<State>
+    fn: args[0] as () => Promise<R>,
+    deps: args[1] as Dependencies<State>
   };
-  if (!p.key || !p.fn || !p.deps) {
-    throw new Error("Invalid arguments");
-  }
-  return p;
-};
-
-const queryParams1 = <State, R>(args: any): QueryParams<State, R> => {
-  const p = {
-    store: args[0] as StoreApi<State>,
-    key: args[1] as keyof State,
-    fn: args[2] as () => Promise<R>,
-    deps: args[3] as Dependencies<State>
-  };
-  if (!p.key || !p.fn || !p.deps) {
+  if (!p.fn || !p.deps) {
     throw new Error("Invalid arguments");
   }
   return p;
@@ -171,46 +131,36 @@ const queryParams1 = <State, R>(args: any): QueryParams<State, R> => {
  * Hook up an asynchronous query to Zustand. A query can be an HTTP request or simple promise. The promise will be
  * executed when a dependency changes or is manually triggered.
  *
- * @param store - Store that the query will be hooked up to.
  * @param fn - Function that executes the promise. The function name must match the key of the object tied to the store.
  * @param deps - Dependencies in the store that will trigger the promise.
  */
-export function query<Store extends object, R>(store: StoreApi<Store>, fn: () => Promise<R>, deps: Dependencies<Store>): Query<Store, R>;
-/**
- * Hook up an asynchronous query to Zustand. A query can be an HTTP request or simple promise. The promise will be
- * executed when a dependency changes or is manually triggered.
- *
- * @param store - Store that the query will be hooked up to.
- * @param key - Key of the store object that this query will be hooked up to.
- * @param fn - Function that executes the promise.
- * @param deps - Dependencies in the store that will trigger the promise.
- */
-export function query<Store extends object, R>(store: StoreApi<Store>, key: keyof Store, fn: () => Promise<R>, deps: Dependencies<Store>): Query<Store, R>;
+export function query<Store extends object, R>(fn: () => Promise<R>, deps: Dependencies<Store>): Query<Store, R>;
 export function query<Store extends object, R>(): Query<Store, R> {
-  const p = typeof arguments[1] === "function" ? queryParams0<Store, R>(arguments) : queryParams1<Store, R>(arguments);
-  return {
+  const p = queryParams0<Store, R>(arguments);
+  const getStore: () => StoreApi<Store> = () => { throw new Error("Store not set yet"); };
+  const q = {
     __id: crypto.randomUUID(),
     __type: "Query" as "Query",
     __deps: p.deps,
-    __key: p.key,
+    __key: "NOT_YET_SET" as keyof Store,
     __trigger: undefined as undefined | Promise<R>,
     __triggerStart: 0,
     __debounce: 300,
+    __store: getStore,
     isLoading: false,
     trigger: async (): Promise<R> => {
-      const state = p.store.getState();
-      const current = state[p.key] as Query<Store, R>;
+      const state = q.__store().getState();
+      const current = state[q.__key] as Query<Store, R>;
       const now = Date.now();
       if (current.__trigger && current.__triggerStart > now - current.__debounce) {
         return current.__trigger;
       }
-      const queryDependencies = current.__deps.flatMap(k => {
-        const v = state[k];
+      const queryDependencies = current.__deps(state).flatMap(v => {
         return isQuery(v) && v.value === undefined ? [v.__trigger || v.trigger()] : [];
       });
       const promise = Promise.all(queryDependencies).then(p.fn);
-      p.store.setState({
-        [p.key]: {
+      q.__store().setState({
+        [q.__key]: {
           ...current,
           __trigger: promise,
           __triggerStart: now,
@@ -219,12 +169,12 @@ export function query<Store extends object, R>(): Query<Store, R> {
       } as Partial<Store>);
       setTimeout(async () => {
         const result = await promise;
-        const current = p.store.getState()[p.key] as Query<Store, R>;
+        const current = q.__store().getState()[q.__key] as Query<Store, R>;
         if (current.__trigger !== promise) {
           return;
         }
-        p.store.setState({
-          [p.key]: {
+        q.__store().setState({
+          [q.__key]: {
             ...current,
             __trigger: undefined,
             __triggerStart: 0,
@@ -237,6 +187,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
     },
     value: undefined as unknown as R
   };
+  return q;
 }
 
 export interface UseBoundAsyncStoreOptions {
@@ -247,7 +198,7 @@ export interface UseBoundAsyncStoreOptions {
 
 }
 
-type QueryOrEffect<T> = Query<T, any> | Effect<T>
+type QueryOrEffect<T> = Query<T, any> | Effect<T, any>
 export type UseBoundAsyncStore<T> = {
   /**
    * Select a query from the store. Handle async data concerns:
@@ -267,7 +218,7 @@ export type UseBoundAsyncStore<T> = {
    * @param selector Select the effect from the store.
    * @param opts Options
    */
-  (selector: (state: T) => Effect<T>, opts?: UseBoundAsyncStoreOptions): () => Promise<void>
+  <Args extends any[]>(selector: (state: T) => Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): () => Promise<void>
 };
 
 /**
@@ -275,7 +226,7 @@ export type UseBoundAsyncStore<T> = {
  * @param store
  */
 export const subscribe = <T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStore<T> => {
-  validate(store);
+  bind(store);
   store.subscribe((state, prevState) => {
     Object
       .keys(state)
@@ -283,13 +234,10 @@ export const subscribe = <T extends object>(store: UseBoundStore<StoreApi<T>>): 
         const key = k as keyof T
         if (isQuery(state[key])) {
           const current = state[key] as Query<T, any>;
-          const dependencyChange = current.__deps.find(kk => !equals(state[kk], prevState[kk]));
-          if (dependencyChange) {
-            current.trigger();
-          }
-        } else if (isEffect(state[key])) {
-          const current = state[key] as Effect<T>;
-          const dependencyChange = current.__deps.find(kk => !equals(state[kk], prevState[kk]));
+          const prev = prevState[key] as Query<T, any>;
+          const currDeps = current.__deps(state);
+          const prevDeps = prev.__deps(prevState);
+          const dependencyChange = !equals(currDeps, prevDeps);
           if (dependencyChange) {
             current.trigger();
           }
@@ -298,32 +246,23 @@ export const subscribe = <T extends object>(store: UseBoundStore<StoreApi<T>>): 
   });
 
   function extractState<R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions): R;
-  function extractState(selector: (state: T) => Effect<T>, opts?: UseBoundAsyncStoreOptions): (() => Promise<void>);
-  function extractState<R>(selector: (state: T) => Query<T, R> | Effect<T>, opts?: UseBoundAsyncStoreOptions): R | (() => Promise<void>) {
-    const theSelector = (state: T): [Query<T, R>, ...QueryOrEffect<T>[]] | [Effect<T>, ...QueryOrEffect<T>[]] => {
+  function extractState<Args extends any[]>(selector: (state: T) => Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): (() => Promise<void>);
+  function extractState<R, Args extends any[]>(selector: (state: T) => Query<T, R> | Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): R | (() => Promise<void>) {
+    const theSelector = (state: T): [Query<T, R>, ...QueryOrEffect<T>[]] | [Effect<T, Args>, ...QueryOrEffect<T>[]] => {
       const value = selector(state);
       const _opts = opts || {};
       if (isQuery(value)) {
         const query = value as unknown as Query<T, R>;
         let deps = [] as QueryOrEffect<T>[];
         if (_opts.followDeps || _opts.followDeps === undefined) {
-          deps = query.__deps.flatMap(k => {
-            const key = k as keyof T;
-            return isQuery(state[key]) || isEffect(state[key]) ? [state[key]] : [];
-          }) as (Query<T, any> | Effect<T>)[];
+          deps = query.__deps(state).flatMap(v => {
+            return isQuery(v) || isEffect(v) ? [v] : [];
+          }) as (Query<T, any> | Effect<T, any>)[];
         }
         return [query, ...deps];
       } else if (isEffect(value)) {
-        const effect = value as unknown as Effect<T>;
-        console.log(effect);
-        let deps = [] as QueryOrEffect<T>[];
-        if (_opts.followDeps || _opts.followDeps === undefined) {
-          deps = effect.__deps.flatMap(k => {
-            const key = k as keyof T;
-            return isQuery(state[key]) || isEffect(state[key]) ? [state[key]] : [];
-          }) as (Query<T, any> | Effect<T>)[];
-        }
-        return [effect, ...deps];
+        const effect = value as unknown as Effect<T, any>;
+        return [effect];
       } else {
         throw new Error("Must return Query or Effect");
       }
@@ -332,7 +271,7 @@ export const subscribe = <T extends object>(store: UseBoundStore<StoreApi<T>>): 
     if (isQuery(value[0])) {
       return withSuspense(value as [Query<T, R>, ...QueryOrEffect<T>[]]);
     } else if (isEffect(value[0])) {
-      return withSuspense(value as [Effect<T>, ...QueryOrEffect<T>[]]);
+      return withSuspense(value as [Effect<T, Args>, ...QueryOrEffect<T>[]]);
     } else {
       throw new Error("Value must be Query or Effect");
     }
@@ -351,8 +290,8 @@ function withSuspense<T>(query: [Query<any, T>, ...QueryOrEffect<any>[]]): T;
  * Hook up your effect(s) so it will trigger <Suspense> when the effect is loading.
  * @param effect
  */
-function withSuspense(effect: [Effect<any>, ...QueryOrEffect<any>[]]): (() => Promise<void>);
-function withSuspense<T>(values: [Query<any, T>, ...QueryOrEffect<any>[]] | [Effect<any>, ...QueryOrEffect<any>[]]): T | (() => Promise<void>) {
+function withSuspense<Args extends any[]>(effect: [Effect<any, Args>, ...QueryOrEffect<any>[]]): (() => Promise<void>);
+function withSuspense<T, Args extends any[]>(values: [Query<any, T>, ...QueryOrEffect<any>[]] | [Effect<any, Args>, ...QueryOrEffect<any>[]]): T | ((...args: Args) => Promise<void>) {
   if (isQuery(values[0])) {
     const v = values[0];
     const needsTrigger = v.value === undefined || v.isLoading;
