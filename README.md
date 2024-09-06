@@ -48,9 +48,9 @@ export const removeAllBears = () => {
 ## Create a store
 ```javascript jsx
 const useBearStore = create((set, get, store) => ({
-  increasePopulation: effect(store, increasePopulation, []),
-  removeAllBears: effect(store, removeAllBears, []),
-  bears: query(store, bears, ["increasePopulation", "removeAllBears"])
+  increasePopulation: effect(increasePopulation),
+  removeAllBears: effect(removeAllBears),
+  bears: query(bears, s => [s.increasePopulation, s.removeAllBears])
 }));
 ```
 
@@ -63,11 +63,11 @@ const useBearStoreAsync = subscribe(useBearStore);
 ```javascript jsx
 function BearCounter() {
   const bears = useBearStoreAsync(state => state.bears);
-  return <h1>{bears} around here ...</h1>
+  return <h1>{bears} around here ...</h1>;
 }
 
 function Controls() {
-  const increasePopulation = useBearStore(state => state.increasePopulation.trigger)
+  const increasePopulation = useBearStore(state => state.increasePopulation.trigger);
   return <button onClick={increasePopulation}>one up</button>;
 }
 ```
@@ -94,16 +94,16 @@ Leo is the simplest and safest way to connect async queries to Zustand stores.
 
 - Integrates directly into your store
 - No need to write async queries in your components
-- No need to update the store in useEffects
 
 ### Why Leo over vanilla fetch?
 
 - Automatically caches queries
 - Automatically handles dependencies
+- No need to update the store in useEffects
 
 ## Getting Started TypeScript
 
-Typescript requires that you use `create<State>`, `query<State, return-type>`, and `effect<State>` instead of `create(...)`, `query(...)`, and `effect(...)`.
+Write the same functions, just with types!
 
 ## Write your async functions
 ```typescript
@@ -141,14 +141,14 @@ export const removeAllBears = (): Promise<void> => {
 ```typescript jsx
 interface BearsState {
   bears: Query<BearsState, number>;
-  increasePopulation: Effect<BearsState>;
-  removeAllBears: Effect<BearsState>;
+  increasePopulation: Effect<BearsState, []>;
+  removeAllBears: Effect<BearsState, []>;
 }
 
-const useBearStore = create<BearsState>((set, get, store) => ({
-  increasePopulation: effect<BearsState>(store, increasePopulation, []),
-  removeAllBears: effect<BearsState>(store, removeAllBears, []),
-  bears: query<BearsState, number>(store, bears, ["increasePopulation", "removeAllBears"])
+const useBearStore = create((set, get, store) => ({
+  increasePopulation: effect(increasePopulation),
+  removeAllBears: effect(removeAllBears),
+  bears: query(bears, s => [s.increasePopulation, s.removeAllBears])
 }));
 ```
 
@@ -161,12 +161,12 @@ const useBearStoreAsync = subscribe(useBearStore);
 ```typescript jsx
 function BearCounter() {
   const bears = useBearStoreAsync(state => state.bears);
-  return <h1>{bears} around here ...</h1>
+  return <h1>{bears} around here ...</h1>;
 }
 
 function Controls() {
-  const increasePopulation = useBearStore(state => state.increasePopulation.trigger)
-  return <button onClick={increasePopulation}>one up</button>
+  const increasePopulation = useBearStore(state => state.increasePopulation.trigger);
+  return <button onClick={increasePopulation}>one up</button>;
 }
 ```
 

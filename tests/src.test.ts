@@ -1,5 +1,6 @@
 import {equals} from "../src";
 import {Effect} from "../src/types";
+import {StoreApi} from "zustand";
 
 test("1 equals 1", () => {
   expect(equals(1, 1)).toBe(true);
@@ -18,8 +19,9 @@ test("equal effects", () => {
     __valueCounter: 0,
     __triggers: [],
     isLoading: false,
-    trigger: () => Promise.resolve()
-  } as Effect<any>;
+    trigger: () => Promise.resolve(),
+    __store: () => { return null as unknown as StoreApi<any>; }
+  } as Effect<any, any>;
   const effect2 = {
     __id: "2",
     __type: "Effect",
@@ -28,7 +30,8 @@ test("equal effects", () => {
     __valueCounter: 0,
     __triggers: [],
     isLoading: false,
-    trigger: () => Promise.resolve()
+    trigger: () => Promise.resolve(),
+    __store: () => { return null as unknown as StoreApi<any>; }
   } as Effect<any>
   expect(equals(effect1, effect2)).toBe(true);
 });
@@ -42,8 +45,9 @@ test("not equal effects", () => {
     __valueCounter: 0,
     __triggers: [],
     isLoading: false,
-    trigger: () => Promise.resolve()
-  } as Effect<any>;
+    trigger: () => Promise.resolve(),
+    __store: () => { return null as unknown as StoreApi<any>; }
+  } as Effect<any, any>;
   const effect2 = {
     __id: "2",
     __type: "Effect",
@@ -52,7 +56,8 @@ test("not equal effects", () => {
     __valueCounter: 1,
     __triggers: [],
     isLoading: false,
-    trigger: () => Promise.resolve()
-  } as Effect<any>
+    trigger: () => Promise.resolve(),
+    __store: () => { return null as unknown as StoreApi<any>; }
+  } as Effect<any, any>
   expect(equals(effect1, effect2)).toBe(false);
 });
