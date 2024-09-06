@@ -19,15 +19,6 @@ export const increasePopulation = (): Promise<void> => {
   });
 };
 
-export const increaseMultiplePopulation = (value: number): Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      db.bears = db.bears + value;
-      resolve();
-    }, 500);
-  });
-};
-
 export const removeAllBears = (): Promise<void> => {
   return new Promise((resolve) => {
     setTimeout(() => {

@@ -1,13 +1,13 @@
 import React, {Suspense} from 'react';
 import {create} from "zustand";
 import {subscribe, effect, query} from "leo-query";
-import {bears, increasePopulation, removeAllBears} from "./db";
+import {fetchBears, increasePopulation, removeAllBears} from "./db";
 
 
 const useBearStore = create(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllBears: effect(removeAllBears),
-  bears: query(bears, s => [s.increasePopulation, s.removeAllBears])
+  bears: query(fetchBears, s => [s.increasePopulation, s.removeAllBears])
 }));
 
 const useBearStoreAsync = subscribe(useBearStore);

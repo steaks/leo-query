@@ -2,7 +2,7 @@ const db = {bears: 0};
 
 // Simulated async functions
 
-export const bears = () => {
+export const fetchBears = () => {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(db.bears);
