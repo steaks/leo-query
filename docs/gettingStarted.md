@@ -45,7 +45,7 @@ export const removeAllBears = () => {
 
 ## Create a store
 ```javascript jsx
-const useBearStore = create((set, get, store) => ({
+const useBearStore = create(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllBears: effect(removeAllBears),
   bears: query(bears, s => [s.increasePopulation, s.removeAllBears])
@@ -143,7 +143,7 @@ interface BearsState {
   removeAllBears: Effect<BearsState, []>;
 }
 
-const useBearStore = create((set, get, store) => ({
+const useBearStore = create(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllBears: effect(removeAllBears),
   bears: query(bears, s => [s.increasePopulation, s.removeAllBears])
