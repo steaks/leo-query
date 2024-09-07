@@ -4,9 +4,10 @@ Welcome to the **Leo Query** documentation! This guide will help you understand 
 
 ## Table of Contents
 
-1. [Installation & Getting Started](../README.md)
+1. [Getting Started](./gettingStarted.md)
 2. [Query Usage](./query.md)
 3. [Effect Usage](./effect.md)
+4. [Examples](./examples.md)
 
 ---
 
