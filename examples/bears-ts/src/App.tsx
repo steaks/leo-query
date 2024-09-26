@@ -1,7 +1,7 @@
 import React, {Suspense} from 'react';
 import {create} from "zustand";
 import {Query, Effect} from "leo-query/types";
-import {subscribe, effect, query} from "leo-query";
+import {hook, effect, query} from "leo-query";
 import {fetchBears, increasePopulation, removeAllBears} from "./db";
 
 interface BearsState {
@@ -17,7 +17,7 @@ const useBearStore = create<BearsState>(() => ({
   })
 );
 
-const useBearStoreAsync = subscribe(useBearStore);
+const useBearStoreAsync = hook(useBearStore);
 
 function BearCounter() {
   const bears = useBearStoreAsync(state => state.bears);

@@ -29,7 +29,7 @@ import {
   updateUser,
   users
 } from "./db";
-import {effect, query, subscribe} from "leo-query";
+import {effect, query, hook} from "leo-query";
 
 export interface TasksState {
   newUser: UserInfo | null;
@@ -109,7 +109,7 @@ const useTasksStore = create<TasksState>((set, get) => {
   });
 });
 
-const useTasksStoreAsync = subscribe(useTasksStore);
+const useTasksStoreAsync = hook(useTasksStore);
 
 const modalStyle = {
   position: 'absolute' as 'absolute',
