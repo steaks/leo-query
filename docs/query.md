@@ -85,6 +85,24 @@ const Controls = () => {
 In this example:
 - The bears query depends on increaseBearCount. When increaseBearCount is triggered, the bears query will automatically re-fetch.
 
+### Example with Query Parameters
+
+```
+const fetchBears = (get) => async () => {
+  const location = get().location;
+  const res = await fetch(`/api/bears?location=${location}`);
+  return await res.json();
+};
+
+const useBearStore = create((set, get) => ({
+  bears: query(fetchBears(get), s => [s.location]),
+  location: "Colorado"
+}));
+```
+
+In this example:
+  - The bears query is location specific. It uses Zustand getStore function to access location from the store to query bears for a specific location.
+
 ### Key Features
 - Automatic re-fetching: Queries automatically re-fetch when dependencies change.
 - Caching: Queries cache results, reducing redundant requests.
