@@ -139,6 +139,7 @@ const queryParams = <State, R>(args: any): QueryParams<State, R> => {
 };
 
 interface QueryOptions {
+  /* If set to `true`, the query will fetch data as needed. Default is `true`. */
   readonly lazy?: boolean;
   readonly debounce?: number;
 }
@@ -285,6 +286,10 @@ export type UseBoundAsyncStoreWithoutSuspense<T> = {
     <Args extends any[] = []>(selector: (state: T) => Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): () => Promise<void>
 };
 
+/**
+ * React hook to retrieve queries or effects from your store. This hook will automatically trigger Suspense when a query is loading.
+ * @param store - Your Zustand store
+ */
 export const hook = <T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStore<T> => {
   subscribe(store);
   function useBoundAsyncStore<R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions): R;
@@ -321,6 +326,11 @@ export const hook = <T extends object>(store: UseBoundStore<StoreApi<T>>): UseBo
   return useBoundAsyncStore;
 };
 
+/**
+ * React hook to retrieve queries or effects from your store. This hook will return information about the
+ * state of the query (e.g. isLoading).
+ * @param store - Your Zustand store
+ */
 export const withoutSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStoreWithoutSuspense<T> => {
   subscribe(store);
   function useBoundAsyncStoreWithoutSuspense<R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions): QueryValue<R>;

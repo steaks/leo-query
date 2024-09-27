@@ -8,6 +8,8 @@ Welcome to the **Leo Query** documentation! This guide will help you understand 
 2. [Query Usage](./query.md)
 3. [Effect Usage](./effect.md)
 4. [Examples](./examples.md)
+5. [Hook](./hook.md)
+6. [Usage Without Suspense](./withoutSuspense.md)
 
 ---
 

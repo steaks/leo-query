@@ -16,6 +16,16 @@ The async function that fetches the data, such as an HTTP request.
 - **deps?: Dependencies<Store>**  
 *Optional.* Specifies store dependencies that trigger re-fetching when changed.
 
+- **options?: QueryOptions**  
+*Optional.* An object containing additional configuration options for the query.
+
+#### QueryOptions
+
+- **lazy?: boolean**  
+*Optional.* If set to `true`, the query will fetch data as needed. Default is `true`.
+- **debounce?: number**  
+  *Optional.* Debounce time in milliseconds before next fetch. Default is 300 ms.
+
 ### Returns
 
 **Query<Store, R>**  
@@ -41,8 +51,10 @@ const useBearStore = create(() => ({
   bears: query(fetchBears)
 }));
 
+const useBearStoreAsync = hook(useBearStore);
+
 const BearCounter = () => {
-  const bears = useBearStore(state => state.bears);
+  const bears = useBearStoreAsync(state => state.bears);
   return <h1>{bears} bears around here...</h1>;
 };
 ```
@@ -57,8 +69,10 @@ const useBearStore = create(() => ({
   increaseBearCount: effect(increaseBearCount)
 }));
 
+const useBearStoreAsync = hook(useBearStore);
+
 const BearCounter = () => {
-  const bears = useBearStore(state => state.bears);
+  const bears = useBearStoreAsync(state => state.bears);
   return <h1>{bears} bears around here...</h1>;
 };
 
