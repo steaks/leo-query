@@ -7,8 +7,9 @@ Welcome to the **Leo Query** documentation! This guide will help you understand 
 1. [Getting Started](./gettingStarted.md)
 2. [Query Usage](./query.md)
 3. [Effect Usage](./effect.md)
-4. [Subscribe](./subscribe.md)
-5. [Examples](./examples.md)
+4. [Examples](./examples.md)
+5. [Hook](./hook.md)
+6. [Usage Without Suspense](./withoutSuspense.md)
 
 ---
 

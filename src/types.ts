@@ -36,6 +36,16 @@ export interface Query<State, T> {
     readonly __deps: Dependencies<State>;
     /**  A delay (in ms) between query triggers. */
     readonly __debounce: number;
+    /**
+     * True if the query has not yet loaded data or the data is stale.
+     * Not true if the data is fresh or a load is in progress.
+     */
+    readonly __needsLoad: boolean;
+    /**
+     * True if the query should wait until it's needed to load.
+     * Otherwise the query will load eagerly when dependencies change.
+     */
+    readonly __lazy: boolean;
     /** The current promise representing the ongoing query, if any. */
     __trigger: Promise<T> | undefined;
     /** Timestamp of when the query was triggered. */
@@ -46,11 +56,22 @@ export interface Query<State, T> {
     value: T | undefined;
     /** Indicates if the query is currently fetching data. */
     isLoading: boolean;
+    /** Error caught in the promise. */
+    error: any | undefined;
     /** Manually triggers the query. */
     trigger: () => Promise<T>;
+    /** Mark the data as stale (i.e. needs a load). */
+    markStale: () => void;
 }
 
 type Primitive = string | number | boolean | null | undefined | bigint | symbol;
+
+export interface QueryValue<T> {
+    /** The current value returned by the query. */
+    value: T | undefined;
+    /** Indicates if the query is currently fetching data. */
+    isLoading: boolean;
+}
 
 
 /**
