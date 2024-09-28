@@ -316,7 +316,12 @@ export const hook = <T extends object>(store: UseBoundStore<StoreApi<T>>): UseBo
     };
     const value = store(theSelector);
     if (isQuery(value[0])) {
-      return withSuspense(value as [Query<T, R>, ...QueryOrEffect<T>[]]);
+      const v = withSuspense(value as [Query<T, R>, ...QueryOrEffect<T>[]]);
+      if (v.error) {
+        throw v.error;
+      } else {
+        return v.value!;
+      }
     } else if (isEffect(value[0])) {
       return withSuspense(value as [Effect<T, Args>, ...QueryOrEffect<T>[]]);
     } else {
@@ -362,12 +367,14 @@ export const withoutSuspenseHook = <T extends object>(store: UseBoundStore<Store
         withSuspense(value as [Query<T, R>, ...QueryOrEffect<T>[]]);
         return {
           value: v.value,
-          isLoading: v.isLoading
+          isLoading: v.isLoading,
+          error: v.error
         }
       } catch (e) {
         return {
           value: v.value,
-          isLoading: true
+          isLoading: true,
+          error: v.error
         }
       }
     } else if (isEffect(value[0])) {
@@ -422,13 +429,13 @@ const subscribe = <T extends object>(store: UseBoundStore<StoreApi<T>>) => {
  * query is loading.
  * @param query
  */
-function withSuspense<T>(query: [Query<any, T>, ...QueryOrEffect<any>[]]): T;
+function withSuspense<T>(query: [Query<any, T>, ...QueryOrEffect<any>[]]): QueryValue<T>;
 /**
  * Hook up your effect(s) so it will trigger <Suspense> when the effect is loading.
  * @param effect
  */
 function withSuspense<Args extends any[] = []>(effect: [Effect<any, Args>, ...QueryOrEffect<any>[]]): (() => Promise<void>);
-function withSuspense<T, Args extends any[] = []>(values: [Query<any, T>, ...QueryOrEffect<any>[]] | [Effect<any, Args>, ...QueryOrEffect<any>[]]): T | ((...args: Args) => Promise<void>) {
+function withSuspense<T, Args extends any[] = []>(values: [Query<any, T>, ...QueryOrEffect<any>[]] | [Effect<any, Args>, ...QueryOrEffect<any>[]]): QueryValue<T> | ((...args: Args) => Promise<void>) {
   if (isQuery(values[0])) {
     const v = values[0];
     const needsTrigger = v.__needsLoad || v.isLoading;
@@ -450,7 +457,7 @@ function withSuspense<T, Args extends any[] = []>(values: [Query<any, T>, ...Que
     });
     const allTriggers = [...queryTrigger, ...depTriggers];
     if (allTriggers.length === 0) {
-      return v.value!;
+      return {value: v.value, error: v.error, isLoading: false};
     } else {
       throw Promise.all(allTriggers);
     }

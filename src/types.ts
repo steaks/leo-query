@@ -71,6 +71,8 @@ export interface QueryValue<T> {
     value: T | undefined;
     /** Indicates if the query is currently fetching data. */
     isLoading: boolean;
+    /** Error caught in the promise. */
+    error: any | undefined;
 }
 
 
