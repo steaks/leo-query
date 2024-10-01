@@ -93,7 +93,6 @@ export function effect<Store extends object, Args extends any[] = []>(): Effect<
     trigger: async (...args: Args) => {
       const current = e.__store().getState()[e.__key] as Effect<Store, Args>;
       const promise = p.fn(...args);
-      console.log("mark effect loading");
       e.__store().setState({
         [e.__key]: {
           ...current,
@@ -181,7 +180,6 @@ export function query<Store extends object, R>(): Query<Store, R> {
         return isQuery(v) && v.__needsLoad ? [v.__trigger || v.trigger()] : [];
       });
       const promise = Promise.all(queryDependencies).then(p.fn);
-      console.log("mark loading");
       q.__store().setState({
         [q.__key]: {
           ...current,
@@ -203,7 +201,6 @@ export function query<Store extends object, R>(): Query<Store, R> {
         if (next.__trigger !== promise) {
           return;
         }
-        console.log("mark loaded");
         q.__store().setState({
           [q.__key]: {
             ...next,
@@ -219,7 +216,6 @@ export function query<Store extends object, R>(): Query<Store, R> {
       return promise;
     },
     markStale: () => {
-      console.log("mark stale");
       const state = q.__store().getState();
       const current = state[q.__key] as Query<Store, R>;
       q.__store().setState({
@@ -414,7 +410,6 @@ const subscribe = <T extends object>(store: UseBoundStore<StoreApi<T>>) => {
           const prevDeps = prev.__deps(prevState);
           const dependencyChange = !equals(currDeps, prevDeps);
           if (dependencyChange && current.__lazy) {
-            console.log("will mark stale");
             return current.markStale();
           } else if (dependencyChange && !current.__lazy) {
             return current.trigger();
