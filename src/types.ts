@@ -46,6 +46,8 @@ export interface Query<State, T> {
      * Otherwise the query will load eagerly when dependencies change.
      */
     readonly __lazy: boolean;
+    /** The number of retries. Zero if you don't want any retries. */
+    readonly __retries: number;
     /** The current promise representing the ongoing query, if any. */
     __trigger: Promise<T> | undefined;
     /** Timestamp of when the query was triggered. */
