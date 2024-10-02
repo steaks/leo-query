@@ -22,7 +22,7 @@ async function retry<R>(fn: () => Promise<R>, delay: number, maxRetries: number,
     if (attempt >= maxRetries) {
       throw error;
     }
-    const backoffDelay = attempt === 0 ? 0 : Math.min((2 ** attempt - 1) * 1000, 30 * 1000);
+    const backoffDelay = attempt === 0 ? 0 : Math.min((2 ** (attempt - 1)) * 1000, 30 * 1000);
     await wait(backoffDelay);
     return retry(fn, maxRetries, delay, attempt + 1);
   }
