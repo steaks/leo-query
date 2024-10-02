@@ -16,6 +16,32 @@ const wait = (timeout?: number) => {
 };
 
 /**
+ * Calculate the backoff delay for retrying a promise.
+ * @param attempt Attempt number
+ */
+export const calculateBackoffDelay = (attempt: number) =>
+  attempt === 0 ? 0 : Math.min((2 ** (attempt - 1)) * 1000, 30 * 1000);
+
+/**
+ * Retry a promise with exponential backoff.
+ * @param fn Function that returns a promise
+ * @param maxRetries Max number of retries
+ * @param attempt Attempt number
+ */
+export const retry = async <R>(fn: () => Promise<R>, maxRetries: number, attempt: number = 0): Promise<R> => {
+  try {
+    return await fn();
+  } catch (error) {
+    if (attempt >= maxRetries) {
+      throw error;
+    }
+    const backoffDelay = calculateBackoffDelay(attempt);
+    await wait(backoffDelay);
+    return retry(fn, maxRetries, attempt + 1);
+  }
+};
+
+/**
  * Bind queries and effects to the store so they can be triggered when dependencies change.
  * @param store
  */
@@ -138,9 +164,12 @@ const queryParams = <State, R>(args: any): QueryParams<State, R> => {
 };
 
 interface QueryOptions {
-  /* If set to `true`, the query will fetch data as needed. Default is `true`. */
+  /** If set to `true`, the query will fetch data as needed. Default is `true`. */
   readonly lazy?: boolean;
+  /** The delay (in ms) between query triggers. Default is 300ms. */
   readonly debounce?: number;
+  /** The number of retries. Default is 5. */
+  readonly retries?: number;
 }
 
 /**
@@ -164,6 +193,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
     __triggerStart: 0,
     __debounce: p.options.debounce !== undefined ? p.options.debounce : 300,
     __lazy: p.options.lazy !== undefined ? p.options.lazy : true,
+    __retries: p.options.retries !== undefined ? p.options.retries : 5,
     __needsLoad: true,
     __store: getStore,
     isLoading: false,
@@ -179,7 +209,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
       const queryDependencies = current.__deps(state).flatMap(v => {
         return isQuery(v) && v.__needsLoad ? [v.__trigger || v.trigger()] : [];
       });
-      const promise = Promise.all(queryDependencies).then(p.fn);
+      const promise = Promise.all(queryDependencies).then(() => retry(p.fn, q.__retries));
       q.__store().setState({
         [q.__key]: {
           ...current,
