@@ -15,18 +15,31 @@ const wait = (timeout?: number) => {
   });
 };
 
-async function retry<R>(fn: () => Promise<R>, delay: number, maxRetries: number, attempt: number = 0): Promise<R> {
+/**
+ * Calculate the backoff delay for retrying a promise.
+ * @param attempt Attempt number
+ */
+export const calculateBackoffDelay = (attempt: number) =>
+  attempt === 0 ? 0 : Math.min((2 ** (attempt - 1)) * 1000, 30 * 1000);
+
+/**
+ * Retry a promise with exponential backoff.
+ * @param fn Function that returns a promise
+ * @param maxRetries Max number of retries
+ * @param attempt Attempt number
+ */
+export const retry = async <R>(fn: () => Promise<R>, maxRetries: number, attempt: number = 0): Promise<R> => {
   try {
     return await fn();
   } catch (error) {
     if (attempt >= maxRetries) {
       throw error;
     }
-    const backoffDelay = attempt === 0 ? 0 : Math.min((2 ** (attempt - 1)) * 1000, 30 * 1000);
+    const backoffDelay = calculateBackoffDelay(attempt);
     await wait(backoffDelay);
-    return retry(fn, maxRetries, delay, attempt + 1);
+    return retry(fn, maxRetries, attempt + 1);
   }
-}
+};
 
 /**
  * Bind queries and effects to the store so they can be triggered when dependencies change.
@@ -196,7 +209,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
       const queryDependencies = current.__deps(state).flatMap(v => {
         return isQuery(v) && v.__needsLoad ? [v.__trigger || v.trigger()] : [];
       });
-      const promise = Promise.all(queryDependencies).then(() => retry(p.fn, 1000, q.__retries));
+      const promise = Promise.all(queryDependencies).then(() => retry(p.fn, q.__retries));
       q.__store().setState({
         [q.__key]: {
           ...current,
