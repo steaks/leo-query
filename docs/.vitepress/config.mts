@@ -4,6 +4,7 @@ import { defineConfig } from "vitepress"
 export default defineConfig({
   title: "Leo Query",
   description: "A simple library to connect async queries to Zustand stores.",
+  base: "/leo-query/",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     head: [["link", { rel: "icon", href: "/favicon.ico" }]],
