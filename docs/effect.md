@@ -4,7 +4,7 @@ The `effect` function allows you to integrate asynchronous effects (e.g., HTTP r
 
 ## Syntax
 
-```
+```typescript
 effect<Store extends object, Args extends any[] = []>(fn: (...args: Args) => Promise<void>): Effect<Store, Args>;
 ```
 
@@ -29,7 +29,7 @@ effect<Store extends object, Args extends any[] = []>(fn: (...args: Args) => Pro
 ## Example Usage
 ### Basic Example
 
-```
+```typescript
 const increaseBearCount = () => fetch('/api/increase', { method: 'POST' });
 
 const useBearStore = create(() => ({
@@ -47,7 +47,7 @@ In this example:
 
 ### Example with Arguments
 
-```
+```typescript
 const increaseBearCount = (amount: number) => fetch('/api/increase', { method: 'POST', body: JSON.stringify({amount}) });
 
 const useBearStore = create(() => ({

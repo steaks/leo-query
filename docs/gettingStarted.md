@@ -4,7 +4,7 @@ Welcome to the **Leo Query** documentation! This guide will help you understand 
 
 ## Installation
 
-```
+```bash
 npm i leo-query
 ```
 
