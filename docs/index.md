@@ -1,16 +1,26 @@
-# Leo Query Documentation
+---
+# https://vitepress.dev/reference/default-theme-home-page
+layout: home
 
-Welcome to the **Leo Query** documentation! This guide will help you understand the core functionalities of integrating asynchronous queries and effects with Zustand stores.
+hero:
+  name: "Leo Query"
+  text: "A simple library to connect async queries to Zustand stores."
+  tagline: Async Queries for Zustand
+  actions:
+    - theme: brand
+      text: Get Started
+      link: /gettingStarted
+    - theme: alt
+      text: Examples
+      link: /examples
+  image: /leo-without-background.png
 
-## Table of Contents
-
-1. [Getting Started](./gettingStarted.md)
-2. [Query Usage](./query.md)
-3. [Effect Usage](./effect.md)
-4. [Hook Usage](./hook.md)
-5. [Without Suspense Usage](./withoutSuspense.md)
-6. [Examples](./examples.md)
-
+features:
+  - title: Simple
+    details: Easy to use and integrate with Zustand stores.
+  - title: Robust
+    details: Supports caching, debouncing, retries, and more.
+  - title: Tested
+    details: Tested for performance and reliability.
 ---
 
-Refer to the above sections for detailed explanations on how to use **Leo Query** in your projects.

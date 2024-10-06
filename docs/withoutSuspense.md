@@ -6,7 +6,7 @@ You can use the async queries and effects provided by the library without relyin
 
 Define the async functions you want to use in your store.
 
-```
+```typescript
 const db = { bears: 0 };
 // Simulate an async query to fetch bears count
 export const bears = (): Promise<number> => {
@@ -30,7 +30,7 @@ export const increasePopulation = (): Promise<void> => {
 
 Create a Zustand store that ties your async functions to queries and effects.
 
-```
+```typescript
 interface BearsState {
   bears: Query<BearsState, number>;
   increasePopulation: Effect<BearsState, []>;
@@ -54,7 +54,7 @@ const useBearStoreAsync = withoutSuspenseHook(useBearStore);
 
 Now you can bind the queries and effects to your components without Suspense.
 
-```
+```typescript
 function BearCounter() {
   const { value: bears, isLoading } = useBearStoreAsync((state) => state.bears);
 
@@ -75,7 +75,7 @@ function Controls() {
 
 You can now use the components without the need for Suspense, as the loading state is handled manually within the component.
 
-```
+```typescript
 function App() {
   return (
     <>

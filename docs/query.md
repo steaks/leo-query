@@ -4,47 +4,47 @@ The `query` function allows you to integrate asynchronous queries with Zustand s
 
 ## Syntax
 
-```
+```typescript
 query<Store extends object, R>(fn: () => Promise<R>, deps?: Dependencies<Store>): Query<Store, R>;
 ```
 
 ### Parameters
 
-- **fn: () => Promise<R>**  
+- **`fn: () => Promise<R>`**  
 The async function that fetches the data, such as an HTTP request.
 
-- **deps?: Dependencies<Store>**  
+- **`deps?: Dependencies<Store>`**  
 *Optional.* Specifies store dependencies that trigger re-fetching when changed.
 
-- **options?: QueryOptions**  
+- **`options?: QueryOptions`**  
 *Optional.* An object containing additional configuration options for the query.
 
 #### QueryOptions
 
-- **lazy?: boolean**  
+- **`lazy?: boolean`**  
 *Optional.* If set to `true`, the query will fetch data as needed. Default is `true`.
-- **debounce?: number**  
+- **`debounce?: number`**  
   *Optional.* Debounce time in milliseconds before next fetch. Default is 300 ms.
 
 ### Returns
 
-**Query<Store, R>**  
+**`Query<Store, R>`**  
 An object representing the query, including methods and state information.
 
 ### Query Object Properties
 
-- **trigger(): Promise<R>**  
+- **`trigger(): Promise<R>`**  
   Manually triggers the query, executing the function `fn`.
 
-- **isLoading: boolean**  
+- **`isLoading: boolean`**  
   Indicates if the query is currently fetching data.
 
-- **value: R**  
+- **`value: R`**  
   Holds the result of the query once it resolves.
 
 ## Example Usage
 ### Basic Example
-```
+```typescript
 const fetchBears = () => fetch('/api/bears').then(res => res.json());
 
 const useBearStore = create(() => ({
@@ -60,7 +60,7 @@ const BearCounter = () => {
 ```
 
 ### Example with Dependencies
-```
+```typescript
 const fetchBears = () => fetch('/api/bears').then(res => res.json());
 const increaseBearCount = () => fetch('/api/increase', { method: 'POST' });
 
@@ -87,7 +87,7 @@ In this example:
 
 ### Example with Query Parameters
 
-```
+```typescript
 const fetchBears = (get) => async () => {
   const location = get().location;
   const res = await fetch(`/api/bears?location=${location}`);

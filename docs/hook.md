@@ -4,7 +4,7 @@ The `hook` function connects asynchronous **queries** and **effects** to a Zusta
 
 ## Syntax
 
-```
+```typescript
 hook<T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStore<T>
 ```
 
@@ -19,12 +19,8 @@ hook<T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStore<T>
   Function to hook into the store, managing asynchronous queries and effects. 
 
 ## Example Usage
-
 ### Basic Example
-
-## Example Usage
-### Basic Example
-```
+```typescript
 const fetchBears = () => fetch('/api/bears').then(res => res.json());
 
 const useBearStore = create(() => ({
@@ -40,7 +36,7 @@ const BearCounter = () => {
 ```
 
 ### Example with Dependencies
-```
+```typescript
 const fetchBears = () => fetch('/api/bears').then(res => res.json());
 const increaseBearCount = () => fetch('/api/increase', { method: 'POST' });
 
