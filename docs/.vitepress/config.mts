@@ -6,7 +6,21 @@ export default defineConfig({
   description: "A simple library to connect async queries to Zustand stores.",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
-    head: [["link", { rel: "icon", href: "/favicon.ico" }]],
+    head: [
+      [
+        'script',
+        { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-7MTJ6KE6QJ' }
+      ],
+      [
+        'script',
+        {},
+        `window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'TAG_ID');`
+      ],
+      ["link", { rel: "icon", href: "/favicon.ico" }]
+    ],
     nav: [
       { text: "Home", link: "/" },
       { text: "Getting Started", link: "/gettingStarted" },
