@@ -3,14 +3,14 @@ import {
   toValue,
   tryOnScopeDispose,
   unrefElement
-} from "./chunk-F4LKH65O.js";
+} from "./chunk-FH2QKAGN.js";
 import {
   computed,
   ref,
   watch
-} from "./chunk-CVQRJUPE.js";
+} from "./chunk-QPQFSO6H.js";
 
-// ../node_modules/tabbable/dist/index.esm.js
+// node_modules/tabbable/dist/index.esm.js
 var candidateSelectors = ["input:not([inert])", "select:not([inert])", "textarea:not([inert])", "a[href]:not([inert])", "button:not([inert])", "[tabindex]:not(slot):not([inert])", "audio[controls]:not([inert])", "video[controls]:not([inert])", '[contenteditable]:not([contenteditable="false"]):not([inert])', "details>summary:first-of-type:not([inert])", "details:not([inert])"];
 var candidateSelector = candidateSelectors.join(",");
 var NoElement = typeof Element === "undefined";
@@ -341,7 +341,7 @@ var isFocusable = function isFocusable2(node, options) {
   return isNodeMatchingSelectorFocusable(options, node);
 };
 
-// ../node_modules/focus-trap/dist/focus-trap.esm.js
+// node_modules/focus-trap/dist/focus-trap.esm.js
 function _defineProperty(e, r, t) {
   return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
     value: t,
@@ -1018,7 +1018,7 @@ var createFocusTrap = function createFocusTrap2(elements, userOptions) {
   return trap;
 };
 
-// ../node_modules/@vueuse/integrations/useFocusTrap.mjs
+// node_modules/@vueuse/integrations/useFocusTrap.mjs
 function useFocusTrap(target, options = {}) {
   let trap;
   const { immediate, ...focusTrapOptions } = options;

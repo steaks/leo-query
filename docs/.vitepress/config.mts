@@ -8,16 +8,16 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     head: [
       [
-        'script',
-        { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-7MTJ6KE6QJ' }
+        "script",
+        { async: "", src: "https://www.googletagmanager.com/gtag/js?id=G-7MTJ6KE6QJ" }
       ],
       [
-        'script',
+        "script",
         {},
         `window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'TAG_ID');`
+        gtag("js", new Date());
+        gtag("config", "G-7MTJ6KE6QJ");`
       ],
       ["link", { rel: "icon", href: "/favicon.ico" }]
     ],
