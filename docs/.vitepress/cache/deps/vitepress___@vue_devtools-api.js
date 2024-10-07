@@ -1,4 +1,4 @@
-// ../node_modules/@vue/devtools-shared/dist/index.js
+// node_modules/@vue/devtools-shared/dist/index.js
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -254,7 +254,7 @@ function isUrlString(str) {
 }
 var deepClone = (0, import_rfdc.default)({ circles: true });
 
-// ../node_modules/perfect-debounce/dist/index.mjs
+// node_modules/perfect-debounce/dist/index.mjs
 var DEBOUNCE_DEFAULTS = {
   trailing: true
 };
@@ -311,7 +311,7 @@ async function _applyPromised(fn, _this, args) {
   return await fn.apply(_this, args);
 }
 
-// ../node_modules/hookable/dist/index.mjs
+// node_modules/hookable/dist/index.mjs
 function flatHooks(configHooks, hooks2 = {}, parentName) {
   for (const key in configHooks) {
     const subHook = configHooks[key];
@@ -516,11 +516,11 @@ function createHooks() {
   return new Hookable();
 }
 
-// ../node_modules/birpc/dist/index.mjs
+// node_modules/birpc/dist/index.mjs
 var { clearTimeout: clearTimeout2, setTimeout: setTimeout2 } = globalThis;
 var random = Math.random.bind(Math);
 
-// ../node_modules/@vue/devtools-kit/dist/index.js
+// node_modules/@vue/devtools-kit/dist/index.js
 var __create2 = Object.create;
 var __defProp2 = Object.defineProperty;
 var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
