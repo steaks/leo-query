@@ -4,23 +4,23 @@ import { defineConfig } from "vitepress"
 export default defineConfig({
   title: "Leo Query",
   description: "A simple library to connect async queries to Zustand stores.",
-  themeConfig: {
-    // https://vitepress.dev/reference/default-theme-config
-    head: [
-      [
-        "script",
-        { async: "", src: "https://www.googletagmanager.com/gtag/js?id=G-7MTJ6KE6QJ" }
-      ],
-      [
-        "script",
-        {},
-        `window.dataLayer = window.dataLayer || [];
+  head: [
+    [
+      "script",
+      { async: "", src: "https://www.googletagmanager.com/gtag/js?id=G-7MTJ6KE6QJ" }
+    ],
+    [
+      "script",
+      {},
+      `window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag("js", new Date());
         gtag("config", "G-7MTJ6KE6QJ");`
-      ],
-      ["link", { rel: "icon", href: "/favicon.ico" }]
     ],
+    ["link", { rel: "icon", href: "/favicon.ico" }]
+  ],
+  themeConfig: {
+    // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: "Home", link: "/" },
       { text: "Getting Started", link: "/gettingStarted" },
