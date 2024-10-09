@@ -51,7 +51,8 @@ export default defineConfig({
       }
     ],
     socialLinks: [
-      { icon: "github", link: "https://github.com/steaks/leo-query" }
+      { icon: "github", link: "https://github.com/steaks/leo-query" },
+      { icon: "discord", link: "https://discord.gg/aucYm6hMsJ" }
     ],
     search: {
       provider: "local"
