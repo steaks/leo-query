@@ -1,45 +1,13 @@
 import {StoreApi, UseBoundStore} from "zustand";
-import {Dependencies, Effect, Query, QueryValue} from "./types";
+import {Dependencies, Effect, Query, QueryOptions, QueryValue} from "./types";
+import {wait} from "./util";
+import {setupRetries} from "./retry";
 
 const isEffect = (v: any): v is Effect<any, any> =>
   v && (v as Effect<any, any>).__type === "Effect";
 
 const isQuery = (v: any): v is Query<any, any> =>
   v && (v as Query<any, any>).__type === "Query"
-
-const wait = (timeout?: number) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(null);
-    }, timeout);
-  });
-};
-
-/**
- * Calculate the backoff delay for retrying a promise.
- * @param attempt Attempt number
- */
-export const calculateBackoffDelay = (attempt: number) =>
-  attempt === 0 ? 0 : Math.min((2 ** (attempt - 1)) * 1000, 30 * 1000);
-
-/**
- * Retry a promise with exponential backoff.
- * @param fn Function that returns a promise
- * @param maxRetries Max number of retries
- * @param attempt Attempt number
- */
-export const retry = async <R>(fn: () => Promise<R>, maxRetries: number, attempt: number = 0): Promise<R> => {
-  try {
-    return await fn();
-  } catch (error) {
-    if (attempt >= maxRetries) {
-      throw error;
-    }
-    const backoffDelay = calculateBackoffDelay(attempt);
-    await wait(backoffDelay);
-    return retry(fn, maxRetries, attempt + 1);
-  }
-};
 
 /**
  * Bind queries and effects to the store so they can be triggered when dependencies change.
@@ -163,15 +131,6 @@ const queryParams = <State, R>(args: any): QueryParams<State, R> => {
   return p;
 };
 
-interface QueryOptions {
-  /** If set to `true`, the query will fetch data as needed. Default is `true`. */
-  readonly lazy?: boolean;
-  /** The delay (in ms) between query triggers. Default is 300ms. */
-  readonly debounce?: number;
-  /** The number of retries. Default is 5. */
-  readonly retries?: number;
-}
-
 /**
  * Hook up an asynchronous query to Zustand. A query can be an HTTP request or simple promise. The promise will be
  * executed when a dependency changes or is manually triggered.
@@ -193,7 +152,8 @@ export function query<Store extends object, R>(): Query<Store, R> {
     __triggerStart: 0,
     __debounce: p.options.debounce !== undefined ? p.options.debounce : 300,
     __lazy: p.options.lazy !== undefined ? p.options.lazy : true,
-    __retries: p.options.retries !== undefined ? p.options.retries : 5,
+    __retry: p.options.retry,
+    __retryDelay: p.options.retryDelay,
     __needsLoad: true,
     __store: getStore,
     isLoading: false,
@@ -209,7 +169,8 @@ export function query<Store extends object, R>(): Query<Store, R> {
       const queryDependencies = current.__deps(state).flatMap(v => {
         return isQuery(v) && v.__needsLoad ? [v.__trigger || v.trigger()] : [];
       });
-      const promise = Promise.all(queryDependencies).then(() => retry(p.fn, q.__retries));
+      const promise = Promise.all(queryDependencies).then(p.fn);
+      setupRetries(p.fn, promise, q);
       q.__store().setState({
         [q.__key]: {
           ...current,
