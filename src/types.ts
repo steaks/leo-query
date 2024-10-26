@@ -46,8 +46,10 @@ export interface Query<State, T> {
      * Otherwise the query will load eagerly when dependencies change.
      */
     readonly __lazy: boolean;
-    /** The number of retries. Zero if you don't want any retries. */
-    readonly __retries: number;
+    /** Max number of retries or a function that overrides the default retry behavior. */
+    readonly __retry?: number | ((attempt: number, error: any) => boolean);
+    /** A function that overrides the default retry delay behavior. */
+    readonly __retryDelay?: (attempt: number) => number;
     /** The current promise representing the ongoing query, if any. */
     __trigger: Promise<T> | undefined;
     /** Timestamp of when the query was triggered. */
@@ -85,3 +87,14 @@ export interface QueryValue<T> {
  * @returns An array of `Query<Store, any> | Effect<Store, any> | Primitive`.
  */
 export type Dependencies<Store> = (s: Store) => (Query<Store, any> | Effect<Store, any> | Primitive)[];
+
+export interface QueryOptions {
+    /** If set to `true`, the query will fetch data as needed. Default is `true`. */
+    readonly lazy?: boolean;
+    /** The delay (in ms) between query triggers. Default is 300ms. */
+    readonly debounce?: number;
+    /** Max number of retries or a function that overrides the default retry behavior. */
+    readonly retry?: number | ((attempt: number, error: any) => boolean);
+    /** A function that overrides the default retry delay behavior. */
+    readonly retryDelay?: (attempt: number) => number;
+}

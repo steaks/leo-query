@@ -1,6 +1,7 @@
-import {calculateBackoffDelay, equals} from "../src";
+import {equals} from "../src";
 import {Effect} from "../src/types";
 import {StoreApi} from "zustand";
+import {defaultRetryDelay} from "../src/retry";
 
 test("1 equals 1", () => {
   expect(equals(1, 1)).toBe(true);
@@ -74,5 +75,5 @@ test.each([
   { attempt: 5, expected: 16000 },
   { attempt: 10, expected: 30000 },
 ])('returns $expected ms for attempt $attempt', ({ attempt, expected }) => {
-  expect(calculateBackoffDelay(attempt)).toBe(expected);
+  expect(defaultRetryDelay(attempt)).toBe(expected);
 });
