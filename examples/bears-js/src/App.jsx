@@ -1,35 +1,52 @@
-import React, {Suspense} from 'react';
-import {create} from "zustand";
-import {hook, effect, query} from "leo-query";
-import {fetchBears, increasePopulation, removeAllBears} from "./db";
-
+import React, { Suspense } from "react";
+import { create } from "zustand";
+import { hook, effect, query } from "leo-query";
+import { fetchBears, increasePopulation, removeAllBears } from "./db";
+import "./App.css";
 
 const useBearStore = create(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllBears: effect(removeAllBears),
-  bears: query(fetchBears, s => [s.increasePopulation, s.removeAllBears])
+  bears: query(fetchBears, (s) => [s.increasePopulation, s.removeAllBears]),
 }));
 
 const useBearStoreAsync = hook(useBearStore);
 
 function BearCounter() {
-  const bears = useBearStoreAsync(state => state.bears);
-  return <h1>{bears} around here ...</h1>;
+  const bears = useBearStoreAsync((state) => state.bears);
+  return <h1 className="bear-counter">{bears} around here ...</h1>;
+}
+
+function Loading() {
+  return <h1 className="bear-counter">Loading...</h1>;
 }
 
 function Controls() {
-  const increasePopulation = useBearStore(state => state.increasePopulation.trigger)
-  return <button onClick={increasePopulation}>one up</button>;
+  const increasePopulation = useBearStore(
+    (state) => state.increasePopulation.trigger
+  );
+  return (
+    <button className="cool-button" onClick={increasePopulation}>
+      one up
+    </button>
+  );
 }
 
 function App() {
   return (
-    <>
-      <Suspense fallback={<h1>Loading...</h1>}>
-        <BearCounter/>
-      </Suspense>
-      <Controls/>
-    </>
+    <div className="app-container">
+      <img
+        className="leo-logo"
+        src="https://leoquery.com/leo-without-background.png"
+        alt="Leo Logo"
+      />
+      <div className="bear-counter-container">
+        <Suspense fallback={<Loading />}>
+          <BearCounter />
+        </Suspense>
+      </div>
+      <Controls />
+    </div>
   );
 }
 

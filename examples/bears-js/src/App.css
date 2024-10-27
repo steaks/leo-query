@@ -1,0 +1,57 @@
+.app-container {
+    text-align: center;
+    margin-top: 50px;
+    font-family: "Arial", sans-serif;
+}
+
+.bear-counter-container {
+    height: 80px;
+}
+
+.bear-counter {
+    font-size: 36px;
+    color: #264653;
+    animation: pop 0.3s ease-in-out;
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.cool-button {
+    background-color: #2596be;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 28px;
+    font-size: 18px;
+    color: #fff;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.cool-button:hover {
+    background-color: #1e7ca2;
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.cool-button:active {
+    transform: scale(0.95);
+    background-color: #176586;
+}
+
+.leo-logo {
+    width: 150px;
+    margin-bottom: 20px;
+    animation: float 3s ease-in-out infinite;
+}
