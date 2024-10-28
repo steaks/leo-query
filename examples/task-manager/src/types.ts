@@ -30,4 +30,5 @@ export interface TaskInfo {
   ownerId?: string;
   ownerName?: string;
   teamName?: string
+  teamId?: string;
 }

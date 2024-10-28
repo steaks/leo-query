@@ -1,0 +1,47 @@
+.app {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(135deg, #f0f2f5, #e8ebee);
+}
+.board {
+    display: flex;
+    gap: 16px; /* Adjust spacing between columns */
+    padding: 16px;
+}
+
+.board-column {
+    flex: 1;
+    min-width: 275px;
+    border: 1px solid #d1d5db;
+    padding: 16px;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.board-column span {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: block;
+    color: #4a5568;
+}
+
+.task {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.task:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
