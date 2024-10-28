@@ -19,17 +19,22 @@ import {create} from "zustand";
 import {
   addTask,
   addTeam,
-  addUser,
+  addUser, moveTask,
   removeTask,
   removeTeam,
   removeUser,
   tasks,
-  teams, updateTask,
+  taskStatuses,
+  teams,
+  updateTask,
   updateTeam,
   updateUser,
   users
 } from "./db";
-import {effect, query, hook} from "leo-query";
+import {effect, query, hook, withoutSuspenseHook} from "leo-query";
+import {DndProvider, useDrag, useDrop} from 'react-dnd'
+import {HTML5Backend} from 'react-dnd-html5-backend'
+import "./App.css";
 
 export interface TasksState {
   newUser: UserInfo | null;
@@ -58,9 +63,13 @@ export interface TasksState {
   setNewTask: (t: TaskInfo | null) => void;
   setUpdatedTask: (t: TaskInfo | null) => void;
   tasks: Query<TasksState, TaskInfo[]>;
+  taskStatuses: Query<TasksState, string[]>;
   addTask: Effect<TasksState>;
   updateTask: Effect<TasksState>;
-  removeTask: Effect<TasksState>;
+  removeTask: Effect<TasksState, [TaskInfo]>;
+  moveTask: Effect<TasksState, [TaskInfo, string]>;
+  taskFilters: {userId: string | null, teamId: string | null};
+  setTaskFilters: (taskFilters: {userId: string | null, teamId: string | null}) => void;
 
   tab: "users" | "teams",
   setTab: (t: "users" | "teams") => void;
@@ -70,7 +79,7 @@ const userChanges = (s: TasksState) => [s.addUser, s.updateUser, s.removeUser];
 const existingUserChanges = (s: TasksState) => [s.updateUser, s.removeUser];
 const teamChanges = (s: TasksState) => [s.addTeam, s.updateTeam, s.removeTeam];
 const existingTeamChanges = (s: TasksState) => [s.updateTeam, s.removeTeam];
-const taskChanges = (s: TasksState) => [s.addTask, s.updateTask, s.removeTask];
+const taskChanges = (s: TasksState) => [s.addTask, s.updateTask, s.removeTask, s.moveTask];
 
 const useTasksStore = create<TasksState>((set, get) => {
   return ({
@@ -103,6 +112,17 @@ const useTasksStore = create<TasksState>((set, get) => {
     addTask: effect(addTask(get, set)),
     updateTask: effect(updateTask(get, set)),
     removeTask: effect(removeTask),
+    taskStatuses: query(taskStatuses),
+    moveTask: effect((task: TaskInfo, status: string) => {
+      const tasks = get().tasks;
+      const newValue = get().tasks.value?.map(t => t.id === task.id ? {...t, status} : t);
+      const newTasks = {...tasks, value: newValue};
+      set({tasks: newTasks});
+      return moveTask(task, status);
+    }),
+    taskFilters: {userId: null, teamId: null},
+    setTaskFilters: (taskFilters: {userId: string | null, teamId: string | null}) => set({taskFilters}),
+
 
     tab: "users",
     setTab: tab => set({tab}),
@@ -110,6 +130,7 @@ const useTasksStore = create<TasksState>((set, get) => {
 });
 
 const useTasksStoreAsync = hook(useTasksStore);
+const useTasksStoreWithoutSuspense = withoutSuspenseHook(useTasksStore);
 
 const modalStyle = {
   position: 'absolute' as 'absolute',
@@ -138,7 +159,7 @@ const NewUserButton = () => {
 
 
 const BrowseUsers = () => {
-  const users = useTasksStoreAsync(s => s.users);
+  const users = useTasksStoreWithoutSuspense(s => s.users);
   const [setUpdatedUser, removeUser] = useTasksStore(s => [
     s.setUpdatedUser,
     s.removeUser.trigger
@@ -148,7 +169,7 @@ const BrowseUsers = () => {
     removeUser(user);
   };
 
-  const rows = (users || []).map(u => ({...u, edit: u, remove: u}));
+  const rows = (users.value || []).map(u => ({...u, edit: u, remove: u}));
   const columns: GridColDef[] = [
     {field: "id", headerName: "ID"},
     {field: "name", headerName: "Name"},
@@ -156,6 +177,10 @@ const BrowseUsers = () => {
     {field: "edit", headerName: "Edit", renderCell: (p) => <Button variant="contained" onClick={() => setUpdatedUser(p.value)}>Edit</Button>},
     {field: "remove", headerName: "Remove", renderCell: (p) => <Button variant="contained" onClick={() => onRemove(p.value)}>Remove</Button>},
   ];
+
+  if (users.isLoading && !users.value) {
+    return <></>;
+  }
 
   return (
     <DataGrid rows={rows} columns={columns}/>
@@ -316,14 +341,14 @@ const NewTeamButton = () => {
 };
 
 const BrowseTeams = () => {
-  const teams = useTasksStoreAsync(s => s.teams);
+  const teams = useTasksStoreWithoutSuspense(s => s.teams);
   const [setUpdatedTeam, remove] = useTasksStore(s => [s.setUpdatedTeam, s.removeTeam.trigger]);
 
   const onRemove = (team: Team) => {
     remove(team);
   };
 
-  const rows = (teams || []).map(t => ({...t, edit: t, remove: t}));
+  const rows = (teams.value || []).map(t => ({...t, edit: t, remove: t}));
 
   const columns: GridColDef[] = [
     {field: "id", headerName: "ID"},
@@ -342,9 +367,7 @@ const Teams = () => {
     <>
       <Box mt={2} typography="h2">Teams&nbsp;<Link variant="caption" sx={switchButtonStyle} onClick={() => setTab("users")}>VIEW USERS</Link></Box>
       <NewTeamButton/>
-      <Suspense fallback={<div>Loading...</div>}>
-        <BrowseTeams/>
-      </Suspense>
+      <BrowseTeams/>
       <AddTeam/>
       <EditTeam/>
     </>
@@ -361,9 +384,7 @@ const Users = () => {
       <Box mt={2} typography="h2">Users&nbsp;<Link variant="caption" sx={switchButtonStyle} onClick={() => setTab("teams")}>VIEW TEAMS</Link></Box>
       <Suspense><NewUserButton/></Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
-        <BrowseUsers/>
-      </Suspense>
+      <BrowseUsers/>
       <AddUser/>
       <EditUser/>
     </>
@@ -472,31 +493,124 @@ const EditTask = () => {
   );
 };
 
-const BrowseTasks = () => {
-  const tasks = useTasksStoreAsync(s => s.tasks);
-  const [setUpdatedTask, remove] = useTasksStore(s => [s.setUpdatedTask, s.removeTask.trigger]);
+const TaskFilters = () => {
+  const [taskFilters, setTaskFilters] = useTasksStore((s) => [s.taskFilters, s.setTaskFilters]);
+  const users = useTasksStoreWithoutSuspense((s) => s.users); // Fetch users from Zustand store
+  const teams = useTasksStoreWithoutSuspense((s) => s.teams); // Fetch teams from Zustand store
 
-  const onRemove = (task: TaskInfo) => {
-    remove(task);
+  const handleUserChange = (event: SelectChangeEvent) => {
+    setTaskFilters({ ...taskFilters, userId: event.target.value === '' ? null : event.target.value });
   };
 
-  const rows = (tasks || []).map(t => ({...t, edit: t, remove: t}));
-  const columns: GridColDef[] = [
-    {field: "id", headerName: "ID"},
-    {field: "name", headerName: "Name", width: 200},
-    {field: "ownerName", headerName: "Owner"},
-    {field: "teamName", headerName: "Team"},
-    {field: "status", headerName: "Status"},
-    {field: "edit", headerName: "Edit", renderCell: (p) => <Button variant="contained" onClick={() => setUpdatedTask(p.value)}>Edit</Button>},
-    {field: "remove", headerName: "Remove", renderCell: (p) => <Button variant="contained" onClick={() => onRemove(p.value)}>Remove</Button>},
-  ];
+  const handleTeamChange = (event: SelectChangeEvent) => {
+    setTaskFilters({ ...taskFilters, teamId: event.target.value === '' ? null : event.target.value });
+  };
 
   return (
-    <Box height={800}>
-      <DataGrid rows={rows} columns={columns} />
+    <Box display="flex" gap={2} mb={2}>
+      {/* User Filter */}
+      <Box width={200}>
+        <InputLabel>User</InputLabel>
+        <Select
+          value={taskFilters.userId || ''}
+          onChange={handleUserChange}
+          displayEmpty
+          fullWidth
+        >
+          <MenuItem value="">
+            <em>All Users</em>
+          </MenuItem>
+          {(users.value || []).map(user => (
+            <MenuItem key={user.id} value={user.id}>
+              {user.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </Box>
+
+      {/* Team Filter */}
+      <Box width={200}>
+        <InputLabel>Team</InputLabel>
+        <Select
+          value={taskFilters.teamId || ''}
+          onChange={handleTeamChange}
+          displayEmpty
+          fullWidth
+        >
+          <MenuItem value="">
+            <em>All Teams</em>
+          </MenuItem>
+          {(teams.value || []).map(team => (
+            <MenuItem key={team.id} value={team.id}>
+              {team.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </Box>
     </Box>
   );
 };
+
+const TaskBoard = () => {
+  const statuses = useTasksStoreWithoutSuspense(s => s.taskStatuses);
+  const tasks = useTasksStoreWithoutSuspense(s => s.tasks);
+  const taskFilters = useTasksStore(s => s.taskFilters);
+  if (statuses.isLoading) {
+    return <></>;
+  }
+  const t = (tasks.value || []).filter(t => {
+    if (taskFilters.userId && t.ownerId !== taskFilters.userId) {
+      return false;
+    }
+    if (taskFilters.teamId && t.teamId !== taskFilters.teamId) {
+      return false;
+    }
+    return true
+
+  });
+  //todo: filter tasks using the filters
+  return (
+    <>
+      <NewTaskButton/>
+      <TaskFilters />
+      <div className="board">{statuses.value.map(s => <BoardColumn key={s} status={s} tasks={t.filter(t => t.status === s)}/>)}</div>
+    </>
+  )
+
+};
+const BoardColumn = (p: { status: string, tasks: TaskInfo[]; }) => {
+  const [moveTask] = useTasksStore(s => [s.moveTask.trigger]);
+  const [,  ref] = useDrop(() => {
+    return {
+      accept: "TASK",
+      drop: (task: TaskInfo) => {
+        console.log("HERE");
+        moveTask(task, p.status);
+      }
+    };
+  });
+  return (
+    <div className="board-column" ref={ref} key={p.status}>
+      <span>{p.status}</span>
+      {p.tasks.map(t => <Task key={t.id} task={t} />)}
+    </div>
+  );
+};
+
+const Task = (p: {task: TaskInfo}) => {
+  const setUpdatedTask = useTasksStore(s => s.setUpdatedTask);
+  const [, ref] = useDrag(() => {
+    return {
+      type: "TASK",
+      item: p.task
+    };
+  });
+  return (
+    <div className="task" ref={ref} key={p.task.id} onClick={() => setUpdatedTask(p.task)}>
+      {p.task.name}
+    </div>
+  );
+}
 
 const NewTaskButton = () => {
   const setNewTask = useTasksStore(s => s.setNewTask);
@@ -511,10 +625,7 @@ const Tasks = () => {
   return (
     <>
       <Box mt={2} typography="h2">Tasks</Box>
-      <NewTaskButton/>
-      <Suspense fallback={<div>Loading...</div>}>
-        <BrowseTasks/>
-      </Suspense>
+      <TaskBoard/>
       <AddTask/>
       <EditTask/>
     </>
@@ -524,15 +635,16 @@ const Tasks = () => {
 const App = () => {
   const tab = useTasksStore(s => s.tab)
   return (
-    <>
+    <DndProvider backend={HTML5Backend}>
       <AppBar>
         <Toolbar>
+          <img src="https://leoquery.com/leo-without-background.png" alt="Logo" style={{height: 40, marginRight: 16}}/>
           <Typography variant="h6" component="div">
             TASKS APPLICATION
           </Typography>
         </Toolbar>
       </AppBar>
-      <Box mt={8}>
+      <Box className="app" mt={8}>
         <Box display="flex" justifyContent="space-evenly">
           <Box width={850}>
             <Tasks/>
@@ -543,7 +655,7 @@ const App = () => {
           </Box>
         </Box>
       </Box>
-    </>
+    </DndProvider>
   );
 };
 

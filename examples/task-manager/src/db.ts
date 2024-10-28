@@ -18,8 +18,73 @@ const db = {
   tasks: [
     { id: 'aa526ecf-69d5-4144-9e83-a75e232803d4', name: 'Build Histogram', ownerId: '11526ecf-69d5-4144-9e83-a75e232803d4', status: 'To Do' },
     { id: 'aa3ef09d-7853-4664-8b17-f648373964a5', name: 'Style Header', ownerId: '11526ecf-69d5-4144-9e83-a75e232803d4', status: 'To Do' },
-    { id: 'aa0c8997-f0bb-45b4-be88-db7e62201f24', name: 'Build Calculations', ownerId: '973ef09d-7853-4664-8b17-f648373964a5', status: 'In Progress' }
-  ] as Task[]
+    { id: 'aa0c8997-f0bb-45b4-be88-db7e62201f24', name: 'Build Calculations', ownerId: '973ef09d-7853-4664-8b17-f648373964a5', status: 'In Progress' },
+    {
+      id: 'bb126ecf-79d5-4244-9e83-a75e232803d5',
+      name: 'Implement User Authentication',
+      ownerId: '11526ecf-69d5-4144-9e83-a75e232803d4', // Bert
+      status: 'To Do'
+    },
+    {
+      id: 'bb3ef09d-7953-4664-8b17-f648373964b6',
+      name: 'Setup Database Schema',
+      ownerId: '973ef09d-7853-4664-8b17-f648373964a5', // Ernie
+      status: 'In Progress'
+    },
+    {
+      id: 'bb0c8997-f0cc-45b4-be88-db7e62201f35',
+      name: 'Create CI/CD Pipeline',
+      ownerId: '770c8997-f0bb-45b4-be88-db7e62201f24', // Andrea
+      status: 'To Do'
+    },
+    {
+      id: 'bb426ecf-89d5-4144-9e83-a75e232803d6',
+      name: 'Optimize API Performance',
+      ownerId: 'c8c93655-2dcc-417d-bb49-01218db58894', // Sarah
+      status: 'In Progress'
+    },
+    {
+      id: 'bb5ef09d-8953-4664-8b17-f648373964b7',
+      name: 'Design New Landing Page',
+      ownerId: '11526ecf-69d5-4144-9e83-a75e232803d4', // Bert
+      status: 'To Do'
+    },
+    {
+      id: 'bb6c8997-f0cc-45b4-be88-db7e62201f36',
+      name: 'Integrate Payment Gateway',
+      ownerId: '2264b5aa-836b-4ba4-84c4-0816572b52a1', // Courtney
+      status: 'To Do'
+    },
+    {
+      id: 'bb726ecf-99d5-4144-9e83-a75e232803d7',
+      name: 'Configure Load Balancer',
+      ownerId: '770c8997-f0bb-45b4-be88-db7e62201f24', // Andrea
+      status: 'In Progress'
+    },
+    {
+      id: 'bb8ef09d-9953-4664-8b17-f648373964b8',
+      name: 'Setup Logging and Monitoring',
+      ownerId: '42e769f0-7d4d-472b-b1fa-05ecf6a8ac02', // Doug
+      status: 'To Do'
+    },
+    {
+      id: 'bb9c8997-f0cc-45b4-be88-db7e62201f37',
+      name: 'Migrate to New Cloud Provider',
+      ownerId: 'c8c93655-2dcc-417d-bb49-01218db58894', // Sarah
+      status: 'Done'
+    },
+    {
+      id: 'bba126ecf-19d5-4144-9e83-a75e232803d8',
+      name: 'Refactor Legacy Codebase',
+      ownerId: '2264b5aa-836b-4ba4-84c4-0816572b52a1', // Courtney
+      status: 'In Progress'
+    }
+  ] as Task[],
+  statuses: [
+    "To Do",
+    "In Progress",
+    "Done"
+  ] as string[]
 }
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -108,9 +173,14 @@ export const tasks = async (): Promise<TaskInfo[]> => {
   const tasksInfo = db.tasks.map(t => {
     const user = db.users.find(u => t.ownerId === u.id);
     const team = db.teams.find(tt => user?.teamId === tt.id);
-    return {...t, ownerName: user?.name, teamName: team?.name};
+    return {...t, ownerName: user?.name, teamId: team?.id, teamName: team?.name};
   });
   return Promise.resolve(tasksInfo);
+};
+
+export const taskStatuses = async (): Promise<string[]> => {
+  await delay(500);
+  return Promise.resolve(db.statuses)
 };
 
 export const addTask = (get: () => TasksState, set: (s: Partial<TasksState>) =>  void) => async (): Promise<void> => {
@@ -145,4 +215,12 @@ export const removeTask = async (task: Task): Promise<void> => {
     db.tasks = db.tasks.filter(tt => task.id !== tt.id);
   }
   return Promise.resolve();
+};
+
+export const moveTask = async(task: Task, status: string): Promise<void> => {
+  await delay(500);
+  const t = db.tasks.find(t => t.id === task.id);
+  if (t) {
+    t.status = status;
+  }
 };
