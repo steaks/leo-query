@@ -104,13 +104,6 @@
     /* Skip type checking all .d.ts files. */
     "jsx": "react-jsx"
   },
-  "exclude": [
-    "./assets",
-    "./dist",
-    "./examples",
-    "./node_modules",
-    "./tests"
-  ],
   "include": [
     "src"
   ]
