@@ -56,6 +56,10 @@ export interface Query<State, T> {
     __triggerStart: number;
     /** The initial try to fetch the data. */
     __initialPromise: Promise<T> | undefined;
+    /** Time in ms before data is considered stale. */
+    __staleTime: number | undefined;
+    /** Timeout for stale data. */
+    __staleTimeout: number | undefined;
     /** Function to access the Zustand store. */
     __store: () => StoreApi<State>;
     /** The current value returned by the query. */
@@ -99,4 +103,6 @@ export interface QueryOptions {
     readonly retry?: number | ((attempt: number, error: any) => boolean);
     /** A function that overrides the default retry delay behavior. */
     readonly retryDelay?: (attempt: number) => number;
+    /** Time in ms before data is considered stale. */
+    readonly staleTime?: number;
 }
