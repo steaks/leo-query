@@ -2,12 +2,22 @@
   "name": "leo-query",
   "version": "0.1.0",
   "description": "A simple library to connect async queries to Zustand stores.",
-  "main": "./index.js",
-  "types": "./types",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
-    "build": "npx tsc --project tsconfig.json",
+    "build": "npx tsc && vite build",
     "test": "jest",
-    "prepack": "cp -r dist/* ."
+    "clean": "shx rm -rf dist",
+    "prebuild": "npm run clean"
   },
   "peerDependencies": {
     "@types/react": ">=16.8",
@@ -22,6 +32,7 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.2",
     "@types/jest": "^28.1.4",
+    "@types/node": "^22.9.0",
     "@types/react": "^18.0.12",
     "@types/react-dom": "^18.0.5",
     "jest": "^28.1.2",
@@ -30,20 +41,15 @@
     "rollup": "^3.28.0",
     "shx": "^0.3.4",
     "ts-jest": "^28.0.5",
-    "tslib": "^2.6.1"
+    "tslib": "^2.6.1",
+    "vite": "^5.4.10",
+    "vite-plugin-dts": "^4.3.0"
   },
   "author": "Steven Wexler",
   "license": "MIT",
   "files": [
+    "dist",
     "README.md",
-    "LICENSE",
-    "index.js",
-    "index.js.map",
-    "src.js",
-    "src.js.map",
-    "types.js",
-    "types.js.map",
-    "types",
-    "src"
+    "LICENSE"
   ]
 }
