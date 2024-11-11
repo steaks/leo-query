@@ -53,7 +53,7 @@ npm run dev
 7. Make your changes in `/src`
     - Run `npm run build` to see the changes in the test app
 8. Write tests for your changes in `/test`
-    - Run `npm test` to run the tests
+    - Run `npm run test` to run the tests
 9. Submit a Pull Request with:
    - A clear description of the changes
    - A reference to any related issues
