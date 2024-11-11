@@ -131,6 +131,18 @@ const queryParams = <State, R>(args: any): QueryParams<State, R> => {
   return p;
 };
 
+const setupStaleTimeout = <Store extends object, R>(query: Query<Store, R>): number | undefined => {
+  clearTimeout(query.__staleTimeout);
+  
+  if (query.__staleTime !== undefined) {
+    return setTimeout(() => {
+      query.markStale();
+    }, query.__staleTime) as unknown as number;
+  }
+
+  return undefined;
+};
+
 /**
  * Hook up an asynchronous query to Zustand. A query can be an HTTP request or simple promise. The promise will be
  * executed when a dependency changes or is manually triggered.
@@ -157,6 +169,8 @@ export function query<Store extends object, R>(): Query<Store, R> {
     __retryDelay: p.options.retryDelay,
     __needsLoad: true,
     __store: getStore,
+    __staleTime: p.options.staleTime,
+    __staleTimeout: undefined as number | undefined,
     isLoading: false,
     value: undefined as unknown as R,
     error: undefined,
@@ -194,6 +208,9 @@ export function query<Store extends object, R>(): Query<Store, R> {
         if (next.__trigger !== promise) {
           return;
         }
+
+        const staleTimeout = setupStaleTimeout(next);
+
         q.__store().setState({
           [q.__key]: {
             ...next,
@@ -201,6 +218,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
             __triggerStart: 0,
             __initialPromise: undefined,
             __needsLoad: false,
+            __staleTimeout: staleTimeout,
             isLoading: false,
             value,
             error
@@ -212,10 +230,13 @@ export function query<Store extends object, R>(): Query<Store, R> {
     markStale: () => {
       const state = q.__store().getState();
       const current = state[q.__key] as Query<Store, R>;
+      const staleTimeout = clearTimeout(current.__staleTimeout);
+
       q.__store().setState({
         [q.__key]: {
           ...current,
           __needsLoad: true,
+          __staleTimeout: staleTimeout,
         }
       } as Partial<Store>);
     },
