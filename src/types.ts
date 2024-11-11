@@ -54,6 +54,8 @@ export interface Query<State, T> {
     __trigger: Promise<T> | undefined;
     /** Timestamp of when the query was triggered. */
     __triggerStart: number;
+    /** The initial try to fetch the data. */
+    __initialPromise: Promise<T> | undefined;
     /** Function to access the Zustand store. */
     __store: () => StoreApi<State>;
     /** The current value returned by the query. */
