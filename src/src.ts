@@ -1,5 +1,5 @@
 import {StoreApi, UseBoundStore} from "zustand";
-import {Dependencies, Effect, Query, QueryOptions, QueryValue} from "./types";
+import {Dependencies, Effect, Query, QueryOptions, QueryValue, GlobalOptions} from "./types";
 import {wait} from "./util";
 import {setupRetries} from "./retry";
 
@@ -8,6 +8,12 @@ const isEffect = (v: any): v is Effect<any, any> =>
 
 const isQuery = (v: any): v is Query<any, any> =>
   v && (v as Query<any, any>).__type === "Query"
+
+let globalOptions: GlobalOptions = {};
+
+export const configure = (options: GlobalOptions) => {
+  globalOptions = options;
+};
 
 /**
  * Bind queries and effects to the store so they can be triggered when dependencies change.
@@ -123,7 +129,7 @@ const queryParams = <State, R>(args: any): QueryParams<State, R> => {
   const p = {
     fn: args[0] as () => Promise<R>,
     deps: args[1] || (() => []) as Dependencies<State>,
-    options: args[2] || {} as QueryOptions
+    options: {...globalOptions.query, ...args[2]} as QueryOptions
   };
   if (!p.fn || !p.deps) {
     throw new Error("Invalid arguments");
