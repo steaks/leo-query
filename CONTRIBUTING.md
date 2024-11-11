@@ -29,10 +29,9 @@ npm run docs:dev
 ```
 5. Open your browser to `http://localhost:5173` to preview changes
 6. Update the documentation as needed in `docs/`
-7. Submit a Pull Request:
-   - Describe what documentation was added/changed
-   - Include screenshots of visual changes if applicable 
-   - Reference any related issues
+7. Submit a Pull Request with:
+   - A clear description of the changes
+   - A reference to any related issues
 
 ### Contributing Code
 
@@ -45,7 +44,7 @@ npm install
 npm run build
 ```
 5. Run the test app locally
-```
+```bash
 cd test-apps/bears-ts
 npm install
 npm run dev
@@ -55,12 +54,11 @@ npm run dev
     - Run `npm run build` to see the changes in the test app
 8. Write tests for your changes in `/test`
     - Run `npm test` to run the tests
-7. Submit a Pull Request with:
+9. Submit a Pull Request with:
    - A clear description of the changes
-   - Any related issue numbers
-   - Screenshots if applicable
+   - A reference to any related issues
 
 ### Community & Support
 
-- Join our [Discord](https://discord.gg/aucYm6hMsJ)
+- Join our [discord](https://discord.gg/aucYm6hMsJ)
 - Email me at [steven.m.wexler@gmail.com](mailto:steven.m.wexler@gmail.com)
