@@ -106,3 +106,7 @@ export interface QueryOptions {
     /** Time in ms before data is considered stale. */
     readonly staleTime?: number;
 }
+
+export interface GlobalOptions {
+    query?: QueryOptions;
+}
