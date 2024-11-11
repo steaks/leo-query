@@ -150,6 +150,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
     __key: "NOT_YET_SET" as keyof Store,
     __trigger: undefined as undefined | Promise<R>,
     __triggerStart: 0,
+    __initialPromise: undefined as undefined | Promise<R>,
     __debounce: p.options.debounce !== undefined ? p.options.debounce : 300,
     __lazy: p.options.lazy !== undefined ? p.options.lazy : true,
     __retry: p.options.retry,
@@ -169,14 +170,15 @@ export function query<Store extends object, R>(): Query<Store, R> {
       const queryDependencies = current.__deps(state).flatMap(v => {
         return isQuery(v) && v.__needsLoad ? [v.__trigger || v.trigger()] : [];
       });
-      const promise = Promise.all(queryDependencies).then(p.fn);
-      setupRetries(p.fn, promise, q);
+      const initialPromise = Promise.all(queryDependencies).then(p.fn);
+      const promise = setupRetries(p.fn, initialPromise, q);
       q.__store().setState({
         [q.__key]: {
           ...current,
           __trigger: promise,
           __triggerStart: now,
           __needsLoad: false,
+          __initialPromise: initialPromise,
           isLoading: true
         }
       } as Partial<Store>);
@@ -197,6 +199,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
             ...next,
             __trigger: undefined,
             __triggerStart: 0,
+            __initialPromise: undefined,
             __needsLoad: false,
             isLoading: false,
             value,

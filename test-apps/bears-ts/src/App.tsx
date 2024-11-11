@@ -1,7 +1,6 @@
 import React, {Suspense} from 'react';
 import {create} from "zustand";
-import {hook, effect, query} from "leo-query";
-import {Query, Effect} from "leo-query/types";
+import {hook, effect, query, Query, Effect} from "leo-query";
 import {fetchBears, increasePopulation, removeAllBears} from "./db";
 import "./App.css";
 

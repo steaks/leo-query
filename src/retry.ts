@@ -2,10 +2,10 @@ import {Query} from "./types";
 import {wait} from "./util";
 
 
-const isOutOfDate = <State, R>(originalPromise: Promise<R>, query: Query<State, R>) => {
+const isOutOfDate = <State, R>(nitialPromise: Promise<R>, query: Query<State, R>) => {
   const state = query.__store().getState();
   const current = state[query.__key] as Query<State, R>;
-  return current.__trigger !== originalPromise;
+  return current.__initialPromise !== nitialPromise;
 };
 
 export const defaultRetry = (attempt: number, error: any): boolean =>
@@ -15,8 +15,12 @@ export const defaultRetry = (attempt: number, error: any): boolean =>
  * Default retry delay function. Defaults to exponential backoff.
  * @param attempt
  */
-export const defaultRetryDelay = (attempt: number): number =>
-  attempt === 0 ? 0 : Math.min((2 ** (attempt - 1)) * 1000, 30 * 1000)
+export const defaultRetryDelay = (attempt: number): number => {
+  console.log(`Attempt ${attempt}`);
+  const delay = attempt === 0 ? 0 : Math.min((2 ** (attempt - 1)) * 1000, 30 * 1000);
+  console.log(`Delaying for ${delay}ms`);
+  return delay;
+}
 
 export const retryDelay = <State, R>(attempt: number, query: Query<State, R>): number =>
   query.__retryDelay ? query.__retryDelay(attempt) : defaultRetryDelay(attempt);
@@ -50,7 +54,7 @@ export const retry = async <State, R>(fn: () => Promise<R>, originalPromise: Pro
   }
 };
 
-export const setupRetries = <State, R>(fn: () => Promise<R>, initialTry: Promise<R>, query: Query<State, R>) => {
+export const setupRetries = <State, R>(fn: () => Promise<R>, initialTry: Promise<R>, query: Query<State, R>): Promise<R> =>
   initialTry.catch(async error => {
     if (isOutOfDate(initialTry, query)) {
       throw error;
@@ -60,6 +64,5 @@ export const setupRetries = <State, R>(fn: () => Promise<R>, initialTry: Promise
     }
     const delay = retryDelay(0, query);
     await wait(delay);
-    return retry(fn, initialTry, error, query, 0);
+    return retry(fn, initialTry, error, query, 1);
   });
-};
