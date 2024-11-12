@@ -40,10 +40,10 @@ export const equals = (a: any, b: any): boolean => {
   let aValue;
   let bValue;
   if (Array.isArray(a) && Array.isArray(b)) {
-    return a.every((v, i) => equals(v, b[i]));
+    return a.length === b.length && a.every((v, i) => equals(v, b[i]));
   }
   if (isQuery(a)) {
-    aValue = a.value
+    aValue = a.value;
   } else if (isEffect(a)) {
     aValue = a.__valueCounter;
   } else {
@@ -51,7 +51,7 @@ export const equals = (a: any, b: any): boolean => {
   }
   if (isQuery(b)) {
     bValue = b.value
-  } else if (isEffect(a)) {
+  } else if (isEffect(b)) {
     bValue = b.__valueCounter;
   } else {
     bValue = b;
