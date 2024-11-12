@@ -1,5 +1,5 @@
 import {equals} from "../src";
-import {Effect} from "../src/types";
+import {Effect, Query} from "../src/types";
 import {StoreApi} from "zustand";
 import {defaultRetryDelay} from "../src/retry";
 
@@ -66,6 +66,57 @@ test("not equal effects", () => {
 
   expect(equals(effect1, effect2)).toBe(false);
 });
+
+test("effect compared with non-effect", () => {
+  const effect1 = {
+    __id: "1",
+    __type: "Effect",
+    __deps: [],
+    __key: "key1",
+    __valueCounter: 0,
+    __triggers: [],
+    isLoading: false,
+    trigger: () => Promise.resolve(),
+    __store: () => { return null as unknown as StoreApi<any>; }
+  } as Effect<any, any>;
+
+  const nonEffect = {
+    __valueCounter: 0
+  };
+
+  expect(equals(effect1, nonEffect)).toBe(false);
+});
+
+test("arrays of different lengths", () => {
+  expect(equals([1, 2, 3], [1, 2])).toBe(false);
+  expect(equals([1, 2], [1, 2, 3])).toBe(false);
+});
+
+test("nested arrays", () => {
+  expect(equals([1, [2, 3]], [1, [2, 3]])).toBe(true);
+  expect(equals([1, [2, 3]], [1, [2, 4]])).toBe(false);
+});
+
+test("equal queries", () => {
+  const query1 = {
+    __type: "Query",
+    __deps: [],
+    __key: "key1",
+    value: 42,
+    isLoading: false,
+  } as unknown as Query<any, number>;
+
+  const query2 = {
+    __type: "Query",
+    __deps: [],
+    __key: "key2",
+    value: 42,
+    isLoading: false,
+  } as unknown as Query<any, number>;
+
+  expect(equals(query1, query2)).toBe(true);
+});
+
 
 test.each([
   { attempt: 0, expected: 0 },
