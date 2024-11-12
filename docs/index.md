@@ -8,7 +8,10 @@ hero:
   tagline: Async Queries for Zustand
   actions:
     - theme: brand
-      text: Get Started
+      text: Why Leo Query?
+      link: /why
+    - theme: alt
+      text: Getting Started
       link: /gettingStarted
     - theme: alt
       text: Examples
@@ -19,7 +22,7 @@ features:
   - title: Simple
     details: Easy to use and integrate with Zustand stores.
   - title: Robust
-    details: Supports caching, debouncing, retries, and more.
+    details: Supports caching, debouncing, dependencies, retries, and more.
   - title: Tested
     details: Tested for performance and reliability.
 ---
