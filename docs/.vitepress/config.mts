@@ -29,8 +29,9 @@ export default defineConfig({
     ],
     sidebar: [
       {
-        text: "Getting Started",
+        text: "Introduction",
         items: [
+          { text: "Why Leo Query?", link: "/why" },
           { text: "Getting Started", link: "/gettingStarted" },
         ]
       },
