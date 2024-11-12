@@ -47,9 +47,16 @@ Here is a comparison of how you may build a TODOs app with Tanstack Query vs. Le
 ```typescript
 // Store frontend state in Zustand
 const useStore = create<FilterStore>((set) => ({
-  filter: 'all',
+  filter: "all", // all | active | completed
   setFilter: (filter) => set({ filter }),
 }));
+
+const filterTodos = (todos: Todo[], filter: string) => {
+  if (filter === "all") return todos;
+  if (filter === "active") return todos.filter(todo => !todo.completed);
+  if (filter === "completed") return todos.filter(todo => todo.completed);
+  throw new Error(`Invalid filter: ${filter}`);
+};
 
 function TodoItems() {
   const filter = useStore(state => state.filter);
@@ -97,11 +104,18 @@ const useStore = create<TodoStore>((set) => ({
   todos: query(fetchTodos, s => [s.createTodo]),
   createTodo: effect(createTodo),
   // Frontend state
-  filter: 'all',
+  filter: "all", // all | active | completed
   setFilter: (filter) => set({ filter }),
 }));
 
 const useStoreAsync = hook(useStore); //Hook into async state
+
+const filterTodos = (todos: Todo[], filter: string) => {
+  if (filter === "all") return todos;
+  if (filter === "active") return todos.filter(todo => !todo.completed);
+  if (filter === "completed") return todos.filter(todo => todo.completed);
+  throw new Error(`Invalid filter: ${filter}`);
+};
 
 function TodoItems() {
   const todos = useStoreAsync(state => state.todos);
