@@ -67,6 +67,27 @@ test("not equal effects", () => {
   expect(equals(effect1, effect2)).toBe(false);
 });
 
+test("effect compared with non-effect", () => {
+  const effect1 = {
+    __id: "1",
+    __type: "Effect",
+    __deps: [],
+    __key: "key1",
+    __valueCounter: 0,
+    __triggers: [],
+    isLoading: false,
+    trigger: () => Promise.resolve(),
+    __store: () => { return null as unknown as StoreApi<any>; }
+  } as Effect<any, any>;
+
+  const nonEffect = {
+    __valueCounter: 0
+  };
+
+  expect(equals(effect1, nonEffect)).toBe(false);
+});
+
+
 test.each([
   { attempt: 0, expected: 0 },
   { attempt: 1, expected: 1000 },
