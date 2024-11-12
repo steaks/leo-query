@@ -40,7 +40,7 @@ export const equals = (a: any, b: any): boolean => {
   let aValue;
   let bValue;
   if (Array.isArray(a) && Array.isArray(b)) {
-    return a.every((v, i) => equals(v, b[i]));
+    return a.length === b.length && a.every((v, i) => equals(v, b[i]));
   }
   if (isQuery(a)) {
     aValue = a.value;
