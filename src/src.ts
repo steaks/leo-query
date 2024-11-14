@@ -259,7 +259,7 @@ export interface UseBoundAsyncStoreOptions {
 }
 
 type QueryOrEffect<T> = Query<T, any> | Effect<T, any>
-export type UseBoundAsyncStore<T> = {
+export type UseBoundAsyncStoreWithSuspense<T> = {
   /**
    * Select a query from the store. Handle async data concerns:
    *   - Fetch data for the query as needed
@@ -307,7 +307,7 @@ export type UseBoundAsyncStoreWithoutSuspense<T> = {
  * React hook to retrieve queries or effects from your store. This hook will automatically trigger Suspense when a query is loading.
  * @param store - Your Zustand store
  */
-export const hook = <T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStore<T> => {
+const withSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStoreWithSuspense<T> => {
   subscribe(store);
   function useBoundAsyncStore<R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions): R;
   function useBoundAsyncStore<Args extends any[] = []>(selector: (state: T) => Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): (() => Promise<void>);
@@ -353,7 +353,7 @@ export const hook = <T extends object>(store: UseBoundStore<StoreApi<T>>): UseBo
  * state of the query (e.g. isLoading).
  * @param store - Your Zustand store
  */
-export const withoutSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStoreWithoutSuspense<T> => {
+const withoutSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStoreWithoutSuspense<T> => {
   subscribe(store);
   function useBoundAsyncStoreWithoutSuspense<R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions): QueryValue<R>;
   function useBoundAsyncStoreWithoutSuspense<Args extends any[] = []>(selector: (state: T) => Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): (() => Promise<void>);
@@ -407,6 +407,13 @@ export const withoutSuspenseHook = <T extends object>(store: UseBoundStore<Store
   }
   return useBoundAsyncStoreWithoutSuspense;
 };
+
+export function hook<T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStoreWithoutSuspense<T>;
+export function hook<T extends object>(store: UseBoundStore<StoreApi<T>>, suspense: false): UseBoundAsyncStoreWithoutSuspense<T>;
+export function hook<T extends object>(store: UseBoundStore<StoreApi<T>>, suspense: true): UseBoundAsyncStoreWithSuspense<T>;
+export function hook<T extends object>(store: UseBoundStore<StoreApi<T>>, suspense?: boolean) {
+  return suspense ? withSuspenseHook(store) : withoutSuspenseHook(store);
+}
 
 const subscriptions = new Set<UseBoundStore<StoreApi<any>>>();
 /**

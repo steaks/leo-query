@@ -44,10 +44,10 @@ const useBearStore = create<BearsState>(() => ({
 
 ### 3. Create Your Hook Without Suspense
 
-Use the `withoutSuspenseHook` to create a hook that doesn’t rely on React Suspense for managing loading states.
+Use the `suspense` flag to create a hook that doesn’t rely on React Suspense for managing loading states.
 
 ```
-const useBearStoreAsync = withoutSuspenseHook(useBearStore);
+const useBearStoreAsync = hook(useBearStore, /*suspense*/ false);
 ```
 
 ### 4. Bind Your Components

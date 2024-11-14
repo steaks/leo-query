@@ -108,7 +108,7 @@ const useStore = create<TodoStore>((set) => ({
   setFilter: (filter) => set({ filter }),
 }));
 
-const useStoreAsync = hook(useStore); //Hook into async state
+const useStoreAsync = hook(useStore, /*suspense*/ true); //Hook into async state
 
 const filterTodos = (todos: Todo[], filter: string) => {
   if (filter === "all") return todos;
