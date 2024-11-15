@@ -14,7 +14,6 @@ import {
   Typography,
 } from "@mui/material";
 import {DataGrid, GridColDef} from "@mui/x-data-grid";
-import {Effect, Query} from "leo-query/types";
 import {create} from "zustand";
 import {
   addTask,
@@ -31,7 +30,7 @@ import {
   updateUser,
   users
 } from "./db";
-import {effect, query, hook, withoutSuspenseHook} from "leo-query";
+import {effect, query, hook, Query, Effect} from "leo-query";
 import {DndProvider, useDrag, useDrop} from 'react-dnd'
 import {HTML5Backend} from 'react-dnd-html5-backend'
 import "./App.css";
@@ -129,8 +128,8 @@ const useTasksStore = create<TasksState>((set, get) => {
   });
 });
 
-const useTasksStoreAsync = hook(useTasksStore);
-const useTasksStoreWithoutSuspense = withoutSuspenseHook(useTasksStore);
+const useTasksStoreSuspense = hook(useTasksStore, /*suspense*/true);
+const useTasksStoreAsync = hook(useTasksStore, /*suspense*/false);
 
 const modalStyle = {
   position: 'absolute' as 'absolute',
@@ -145,7 +144,7 @@ const modalStyle = {
 };
 
 const NewUserButton = () => {
-  const teams = useTasksStoreAsync(s => s.teams);
+  const teams = useTasksStoreSuspense(s => s.teams);
   const defaultTeamId = teams[0].id;
   const [setNewUser] = useTasksStore(s => [s.setNewUser]);
   return (
@@ -159,7 +158,7 @@ const NewUserButton = () => {
 
 
 const BrowseUsers = () => {
-  const users = useTasksStoreWithoutSuspense(s => s.users);
+  const users = useTasksStoreAsync(s => s.users);
   const [setUpdatedUser, removeUser] = useTasksStore(s => [
     s.setUpdatedUser,
     s.removeUser.trigger
@@ -188,7 +187,7 @@ const BrowseUsers = () => {
 };
 
 const AddUserForm = () => {
-  const teams = useTasksStoreAsync(s => s.teams);
+  const teams = useTasksStoreSuspense(s => s.teams);
   const [newUser, setNewUser, add] = useTasksStore(s => [s.newUser, s.setNewUser, s.addUser.trigger]);
 
   const onTeamSelect = (e: SelectChangeEvent) => {
@@ -234,7 +233,7 @@ const AddUser = () => {
 };
 
 const EditUserForm = () => {
-  const teams = useTasksStoreAsync(s => s.teams);
+  const teams = useTasksStoreSuspense(s => s.teams);
   const [updatedUser, setUpdatedUser, update] = useTasksStore(s => [s.updatedUser, s.setUpdatedUser, s.updateUser.trigger]);
 
   if (!updatedUser) {
@@ -341,7 +340,7 @@ const NewTeamButton = () => {
 };
 
 const BrowseTeams = () => {
-  const teams = useTasksStoreWithoutSuspense(s => s.teams);
+  const teams = useTasksStoreAsync(s => s.teams);
   const [setUpdatedTeam, remove] = useTasksStore(s => [s.setUpdatedTeam, s.removeTeam.trigger]);
 
   const onRemove = (team: Team) => {
@@ -392,7 +391,7 @@ const Users = () => {
 };
 
 const AddTaskForm = () => {
-  const users = useTasksStoreAsync(s => s.users);
+  const users = useTasksStoreSuspense(s => s.users);
   const [newTask, setNewTask, addTask] = useTasksStore(s => [s.newTask, s.setNewTask, s.addTask.trigger]);
 
   if (!newTask) {
@@ -442,7 +441,7 @@ const AddTask = () => {
 };
 
 const EditTaskForm = () => {
-  const users = useTasksStoreAsync(s => s.users);
+  const users = useTasksStoreSuspense(s => s.users);
   const [updatedTask, setUpdatedTask, update] = useTasksStore(s => [s.updatedTask, s.setUpdatedTask, s.updateTask.trigger]);
 
   if (!updatedTask) {
@@ -495,8 +494,8 @@ const EditTask = () => {
 
 const TaskFilters = () => {
   const [taskFilters, setTaskFilters] = useTasksStore((s) => [s.taskFilters, s.setTaskFilters]);
-  const users = useTasksStoreWithoutSuspense((s) => s.users); // Fetch users from Zustand store
-  const teams = useTasksStoreWithoutSuspense((s) => s.teams); // Fetch teams from Zustand store
+  const users = useTasksStoreAsync((s) => s.users); // Fetch users from Zustand store
+  const teams = useTasksStoreAsync((s) => s.teams); // Fetch teams from Zustand store
 
   const handleUserChange = (event: SelectChangeEvent) => {
     setTaskFilters({ ...taskFilters, userId: event.target.value === '' ? null : event.target.value });
@@ -552,8 +551,8 @@ const TaskFilters = () => {
 };
 
 const TaskBoard = () => {
-  const statuses = useTasksStoreWithoutSuspense(s => s.taskStatuses);
-  const tasks = useTasksStoreWithoutSuspense(s => s.tasks);
+  const statuses = useTasksStoreAsync(s => s.taskStatuses);
+  const tasks = useTasksStoreAsync(s => s.tasks);
   const taskFilters = useTasksStore(s => s.taskFilters);
   if (statuses.isLoading) {
     return <></>;
