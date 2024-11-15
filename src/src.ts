@@ -408,11 +408,11 @@ const withoutSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>
   return useBoundAsyncStoreWithoutSuspense;
 };
 
-export function hook<T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStoreWithoutSuspense<T>;
+export function hook<T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStoreWithSuspense<T>;
 export function hook<T extends object>(store: UseBoundStore<StoreApi<T>>, suspense: false): UseBoundAsyncStoreWithoutSuspense<T>;
 export function hook<T extends object>(store: UseBoundStore<StoreApi<T>>, suspense: true): UseBoundAsyncStoreWithSuspense<T>;
 export function hook<T extends object>(store: UseBoundStore<StoreApi<T>>, suspense?: boolean) {
-  return suspense ? withSuspenseHook(store) : withoutSuspenseHook(store);
+  return suspense === undefined || suspense ? withSuspenseHook(store) : withoutSuspenseHook(store);
 }
 
 const subscriptions = new Set<UseBoundStore<StoreApi<any>>>();

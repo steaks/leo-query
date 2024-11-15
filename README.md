@@ -56,7 +56,7 @@ const useBearStore = create(() => ({
 
 ## Create your hook
 ```javascript jsx
-const useBearStoreAsync = hook(useBearStore, /*suspense*/ true);
+const useBearStoreAsync = hook(useBearStore);
 ```
 
 ## Bind your components
@@ -154,7 +154,7 @@ const useBearStore = create(() => ({
 
 ## Create your hook
 ```typescript jsx
-const useBearStoreAsync = hook(useBearStore, /*suspense*/ true);
+const useBearStoreAsync = hook(useBearStore);
 ```
 
 ## Bind your components
