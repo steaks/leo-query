@@ -27,7 +27,7 @@ const useBearStore = create(() => ({
   bears: query(fetchBears)
 }));
 
-const useBearStoreAsync = hook(useBearStore, /*suspense*/ true);
+const useBearStoreAsync = hook(useBearStore);
 
 const BearCounter = () => {
   const bears = useBearStoreAsync(state => state.bears);
@@ -45,7 +45,7 @@ const useBearStore = create(() => ({
   increaseBearCount: effect(increaseBearCount)
 }));
 
-const useBearStoreAsync = hook(useBearStore, /*suspense*/ true);
+const useBearStoreAsync = hook(useBearStore);
 
 const BearCounter = () => {
   const bears = useBearStoreAsync(state => state.bears);
