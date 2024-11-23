@@ -1,54 +1,17 @@
 # Query
 
-The `query` function allows you to integrate asynchronous queries with Zustand stores, handling data fetching, dependencies, and state management.
+The `query` function allows you to integrate asynchronous queries with Zustand stores, handling data fetching, caching, dependencies, debouncing, retrying, and state management.
 
-## Syntax
-
-```typescript
-query<Store extends object, R>(fn: () => Promise<R>, deps?: Dependencies<Store>): Query<Store, R>;
-```
-
-### Parameters
-
-- **`fn: () => Promise<R>`**  
-The async function that fetches the data, such as an HTTP request.
-
-- **`deps?: Dependencies<Store>`**  
-*Optional.* Specifies store dependencies that trigger re-fetching when changed.
-
-- **`options?: QueryOptions`**  
-*Optional.* An object containing additional configuration options for the query.
-
-#### QueryOptions
-
-- **`lazy?: boolean`**  
-*Optional.* If set to `true`, the query will fetch data as needed. Default is `true`.
-- **`debounce?: number`**  
-  *Optional.* Debounce time in milliseconds before next fetch. Default is 300 ms.
-
-### Returns
-
-**`Query<Store, R>`**  
-An object representing the query, including methods and state information.
-
-### Query Object Properties
-
-- **`trigger(): Promise<R>`**  
-  Manually triggers the query, executing the function `fn`.
-
-- **`isLoading: boolean`**  
-  Indicates if the query is currently fetching data.
-
-- **`value: R`**  
-  Holds the result of the query once it resolves.
-
-## Example Usage
+## Usage
 ### Basic Example
+
+Fetch data from an API and store it in Zustand.
+
 ```typescript
 const fetchBears = () => fetch('/api/bears').then(res => res.json());
 
 const useBearStore = create(() => ({
-  bears: query(fetchBears)
+  bears: query(fetchBears) // Fetch bears when the BearCounter component is mounted
 }));
 
 const useBearStoreAsync = hook(useBearStore);
@@ -60,12 +23,15 @@ const BearCounter = () => {
 ```
 
 ### Example with Dependencies
+
+Fetch data from an API and store it in Zustand. Then re-fetch when the `increaseBearCount` effect successfully completes.
+
 ```typescript
 const fetchBears = () => fetch('/api/bears').then(res => res.json());
 const increaseBearCount = () => fetch('/api/increase', { method: 'POST' });
 
 const useBearStore = create(() => ({
-  bears: query(fetchBears, s => [s.increaseBearCount]),
+  bears: query(fetchBears, s => [s.increaseBearCount]), // Fetch bears when increaseBearCount effect completes
   increaseBearCount: effect(increaseBearCount)
 }));
 
@@ -82,28 +48,92 @@ const Controls = () => {
 };
 ```
 
-In this example:
-- The bears query depends on increaseBearCount. When increaseBearCount is triggered, the bears query will automatically re-fetch.
-
 ### Example with Query Parameters
+
+Fetch data from an API and store it in Zustand. Then re-fetch when the `location` changes. And pass location as a parameter to the HTTP request.
 
 ```typescript
 const fetchBears = (get) => async () => {
-  const location = get().location;
+  const location = get().location; // Get location from Zustand
   const res = await fetch(`/api/bears?location=${location}`);
   return await res.json();
 };
 
 const useBearStore = create((set, get) => ({
-  bears: query(fetchBears(get), s => [s.location]),
+  bears: query(fetchBears(get), s => [s.location]), // Fetch bears when location changes
   location: "Colorado"
 }));
 ```
 
-In this example:
-  - The bears query is location specific. It uses Zustand getStore function to access location from the store to query bears for a specific location.
+## API Reference
 
-### Key Features
-- Automatic re-fetching: Queries automatically re-fetch when dependencies change.
-- Caching: Queries cache results, reducing redundant requests.
-- Integrated with Zustand: No need for extra hooks like useEffect to handle async logic inside components.
+```typescript
+query<Store extends object, R>(fn: () => Promise<R>, deps?: Dependencies<Store>): Query<Store, R>;
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `fn` | `() => Promise<R>` | The async function that fetches the data, such as an HTTP request. |
+| `deps` | `Dependencies<Store>` | *Optional.* Specifies store dependencies that trigger re-fetching when changed. |
+| `options` | `QueryOptions` | *Optional.* An object containing additional configuration options for the query. |
+
+#### QueryOptions
+The `QueryOptions` interface provides configuration options to customize query behavior:
+
+```typescript
+interface QueryOptions {
+  /** If set to true, the query will fetch data as needed. @default true */
+  lazy?: boolean;
+  /** The delay (in ms) between query triggers. @default 300ms */
+  debounce?: number;
+  /** Max number of retries or a function that overrides the default retry behavior */
+  retry?: number | ((attempt: number, error: any) => boolean);
+  /** A function that overrides the default retry delay behavior */
+  retryDelay?: (attempt: number) => number;
+  /** Time in ms before data is considered stale */
+  staleTime?: number;
+}
+```
+
+### Dependencies
+
+The `deps` parameter allows you to specify dependencies that will trigger the query to re-fetch when they change:
+
+```typescript
+/**
+ * Dependencies for triggering a query. When one of the dependencies changes the query will be triggered.
+ *
+ * @param s - The current store state.
+ * @returns An array of Query, Effect, or primitive values
+ */
+type Dependencies<Store> = (s: Store) => (Query<Store, any> | Effect<Store, any> | Primitive)[];
+```
+
+Where `Primitive` is defined as:
+```typescript
+type Primitive = string | number | boolean | null | undefined | bigint | symbol;
+```
+
+### Returns
+
+**`Query<Store, R>`**  
+An object representing the query, including methods and state information.
+
+#### Query
+
+```typescript
+export interface Query<State, T> {
+    /** The current value returned by the query. */
+    value: T | undefined;
+    /** Indicates if the query is currently fetching data. */
+    isLoading: boolean;
+    /** Error caught in the promise. */
+    error: any | undefined;
+    /** Manually triggers the query. */
+    trigger: () => Promise<T>;
+    /** Mark the data as stale (i.e. needs a load). */
+    markStale: () => void;
+}
+```

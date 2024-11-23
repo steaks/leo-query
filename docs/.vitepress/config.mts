@@ -38,10 +38,10 @@ export default defineConfig({
       {
         text: "Guide",
         items: [
-          { text: "Query Usage", link: "/query" },
-          { text: "Effect Usage", link: "/effect" },
-          { text: "Hook Usage", link: "/hook" },
-          { text: "Without Suspense Usage", link: "/withoutSuspense" },
+          { text: "Query", link: "/query" },
+          { text: "Effect", link: "/effect" },
+          { text: "Hook", link: "/hook" },
+          { text: "Global Config", link: "/globalConfig" },
         ]
       },
       {
