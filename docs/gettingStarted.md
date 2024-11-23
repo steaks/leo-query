@@ -19,13 +19,13 @@ Hook up async queries in three steps:
 /**********************************************************
  * Write async functions                                  *
  **********************************************************/
-export const bears = (): Promise<number> => 
+const fetchBears = (): Promise<number> => 
   fetch('https://good.dog.com/bears').then(r => r.json());
 
-export const increasePopulation = (): Promise<void> =>
+const increasePopulation = (): Promise<void> =>
   fetch('https://good.dog.com/increasePopulation', {method: "POST"});
 
-export const removeAllBears = (): Promise<void> =>
+const removeAllBears = (): Promise<void> =>
   fetch('https://good.dog.com/removeAllBears', {method: "POST"});
 
 /**********************************************************
@@ -41,7 +41,7 @@ interface BearsState {
 const useBearStore = create(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllBears: effect(removeAllBears),
-  bears: query(bears, s => [s.increasePopulation, s.removeAllBears]) // Re-fetch when increasePopulation or removeAllBears succeeds 
+  bears: query(fetchBears, s => [s.increasePopulation, s.removeAllBears]) // Re-fetch when increasePopulation or removeAllBears succeeds 
 }));
 
 const useBearStoreAsync = hook(useBearStore);
@@ -50,17 +50,17 @@ const useBearStoreAsync = hook(useBearStore);
  * Bind your components                                   *
  **********************************************************/
 
-function BearCounter() {
+const BearCounter = () => {
   const bears = useBearStoreAsync(s => s.bears);
   return <h1>{bears} around here ...</h1>;
 }
 
-function Controls() {
+const Controls = () => {
   const increasePopulation = useBearStore(s => s.increasePopulation.trigger);
   return <button onClick={increasePopulation}>one up</button>;
 }
 
-function App() {
+const App = () => {
   return (
     <>
       {/* Leo Query works with Suspense */}
