@@ -2,32 +2,10 @@
 
 The `effect` function allows you to integrate asynchronous effects (e.g., HTTP requests or other side effects) into Zustand stores, managing triggers and loading states.
 
-## Syntax
-
-```typescript
-effect<Store extends object, Args extends any[] = []>(fn: (...args: Args) => Promise<void>): Effect<Store, Args>;
-```
-
-## Parameters
-
-- **`fn: (...args: Args) => Promise<void>`**  
-  The asynchronous function that performs the side effect. It can be an HTTP request or any promise.
-
-## Returns
-
-- **`Effect<Store, Args>`**  
-  An object representing the effect, including methods and state information.
-
-## Effect Object Properties
-
-- **`trigger(...args: Args): Promise<void>`**  
-  Manually triggers the effect, executing the function `fn` with optional arguments.
-
-- **`isLoading: boolean`**  
-  Indicates whether the effect is currently being executed.
-
-## Example Usage
+## Usage
 ### Basic Example
+
+Trigger an effect to update the bear population when the button is clicked.
 
 ```typescript
 const increaseBearCount = () => fetch('/api/increase', { method: 'POST' });
@@ -42,10 +20,9 @@ const Controls = () => {
 };
 ```
 
-In this example:
-- The increaseBearCount effect can be triggered via the trigger function, and the bears query will automatically update if the effect is triggered.
-
 ### Example with Arguments
+
+Trigger an effect to update the bear population with an amount in the HTTP request body when the button is clicked.
 
 ```typescript
 const increaseBearCount = (amount: number) => fetch('/api/increase', { method: 'POST', body: JSON.stringify({amount}) });
@@ -65,11 +42,29 @@ const Controls = () => {
 };
 ```
 
-In this example:
-- The updateBearPopulation effect takes an argument (amount) to update the bear population by a specific value.
-- In the component, the trigger method is called with the argument amount, allowing dynamic updates.
+## API Reference
 
-## Key Features
-- Manual triggering: Effects are manually triggered but can interact with other store properties.
-- Handles async operations: Automatically manages loading state and concurrent executions.
-- Integrated with Zustand: Simple integration with Zustand, no need for complex useEffect hooks inside components.
+```typescript
+function effect<Store extends object, Args extends any[] = []>(fn: (...args: Args) => Promise<void>): Effect<Store, Args>;
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `fn` | `(...args: Args) => Promise<void>` | The asynchronous function that performs the side effect. It can be an HTTP request or any promise. |
+
+
+### Returns
+
+**`Effect<Store, Args>`**  
+An object representing the effect, including methods and state information.
+
+```typescript
+export interface Effect<State, Args extends any[] = []> {
+    /** Indicates if the effect is currently executing. */
+    isLoading: boolean;
+    /** Triggers the effect manually. */
+    trigger: (...args: Args) => Promise<void>;
+}
+```
