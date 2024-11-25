@@ -99,7 +99,7 @@ interface QueryOptions {
 
 ### Dependencies
 
-The `deps` parameter allows you to specify dependencies that will trigger the query to re-fetch when they change:
+The `deps` parameter allows you to specify dependencies of the query. When a dependency changes the query will be marked as stale. If the query is configured to be lazy it will re-fetch when the data is next accessed. If the query is not configured to be lazy it will re-fetch immediately.
 
 ```typescript
 /**
@@ -112,6 +112,7 @@ type Dependencies<Store> = (s: Store) => (Query<Store, any> | Effect<Store, any>
 ```
 
 Where `Primitive` is defined as:
+
 ```typescript
 type Primitive = string | number | boolean | null | undefined | bigint | symbol;
 ```

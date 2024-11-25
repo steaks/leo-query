@@ -45,6 +45,14 @@ export default defineConfig({
         ]
       },
       {
+        text: "Advanced Concepts",
+        items: [
+          { text: "Caching", link: "/caching" },
+          { text: "Optimistic Updates", link: "/optimisticUpdates" },
+          { text: "Retries", link: "/retries" }
+        ]
+      },
+      {
         text: "Examples",
         items: [
           { text: "Examples", link: "/examples" },

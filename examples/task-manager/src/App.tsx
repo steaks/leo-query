@@ -572,7 +572,7 @@ const TaskBoard = () => {
     <>
       <NewTaskButton/>
       <TaskFilters />
-      <div className="board">{statuses.value.map(s => <BoardColumn key={s} status={s} tasks={t.filter(t => t.status === s)}/>)}</div>
+      <div className="board">{statuses.value!.map(s => <BoardColumn key={s} status={s} tasks={t.filter(t => t.status === s)}/>)}</div>
     </>
   )
 

@@ -99,7 +99,7 @@ export interface QueryOptions {
     readonly lazy?: boolean;
     /** The delay (in ms) between query triggers. Default is 300ms. */
     readonly debounce?: number;
-    /** Max number of retries or a function that overrides the default retry behavior. */
+    /** Max number of retries or a function that overrides the default retry behavior. Default is 5. */
     readonly retry?: number | ((attempt: number, error: any) => boolean);
     /** A function that overrides the default retry delay behavior. */
     readonly retryDelay?: (attempt: number) => number;
