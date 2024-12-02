@@ -1,6 +1,6 @@
 # Examples
 
-Here are some live examples to see leo-query.
+Here are live examples to see Leo Query in action.
 
 | Example                                                                                           | Description                        |
 |---------------------------------------------------------------------------------------------------|------------------------------------|
