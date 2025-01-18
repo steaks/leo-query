@@ -11,7 +11,7 @@ The default stale time is infinite - data never becomes stale. You can set the d
 config({staleTime: 60000}); // 1 minute
 
 // Query-specific stale time (overrides global stale time)
-query(fetchBears, s => [], {staleTime: 60000}); // 1 minute
+query(fetchDogs, s => [], {staleTime: 60000}); // 1 minute
 ```
 
 ## Mark Stale Manually
@@ -19,16 +19,16 @@ query(fetchBears, s => [], {staleTime: 60000}); // 1 minute
 You can manually mark a query stale by calling `markStale()`.
 
 ```typescript
-const useBearsStoreAsync = hook(useBearStore, /*suspense*/ false);
+const useDogsStoreAsync = hook(useDogStore, /*suspense*/ false);
 
 const MyComponent = () => {
-  const bears = useBearsStoreAsync(fetchBears, s => []);
+  const dogs = useDogsStoreAsync(fetchDogs, s => []);
 
-  const markBearsStale = () => {
-    bears.markStale();
+  const markDogsStale = () => {
+    dogs.markStale();
   };
 
-  return <button onClick={markBearsStale}>Mark Bears Stale</button>
+  return <button onClick={markDogsStale}>Mark Dogs Stale</button>
 };
 ```
 

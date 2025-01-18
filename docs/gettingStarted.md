@@ -19,44 +19,44 @@ Hook up async queries in three steps:
 /**********************************************************
  * Write async functions                                  *
  **********************************************************/
-const fetchBears = (): Promise<number> => 
-  fetch('https://good.dog.com/bears').then(r => r.json());
+const fetchDogs = (): Promise<number> => 
+  fetch('https://good.dog.com/dogs').then(r => r.json());
 
 const increasePopulation = (): Promise<void> =>
   fetch('https://good.dog.com/increasePopulation', {method: "POST"});
 
-const removeAllBears = (): Promise<void> =>
-  fetch('https://good.dog.com/removeAllBears', {method: "POST"});
+const removeAllDogs = (): Promise<void> =>
+  fetch('https://good.dog.com/removeAllDogs', {method: "POST"});
 
 /**********************************************************
  * Connect your store                                     *
  **********************************************************/
 
-interface BearsState {
-  bears: Query<BearsState, number>;
-  increasePopulation: Effect<BearsState, []>;
-  removeAllBears: Effect<BearsState, []>;
+interface DogsState {
+  dogs: Query<DogsState, number>;
+  increasePopulation: Effect<DogsState, []>;
+  removeAllDogs: Effect<DogsState, []>;
 }
 
-const useBearStore = create(() => ({
+const useDogStore = create(() => ({
   increasePopulation: effect(increasePopulation),
-  removeAllBears: effect(removeAllBears),
-  bears: query(fetchBears, s => [s.increasePopulation, s.removeAllBears]) // Re-fetch when increasePopulation or removeAllBears succeeds 
+  removeAllDogs: effect(removeAllDogs),
+  dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]) // Re-fetch when increasePopulation or removeAllDogs succeeds 
 }));
 
-const useBearStoreAsync = hook(useBearStore);
+const useDogStoreAsync = hook(useDogStore);
 
 /**********************************************************
  * Bind your components                                   *
  **********************************************************/
 
-const BearCounter = () => {
-  const bears = useBearStoreAsync(s => s.bears);
-  return <h1>{bears} around here ...</h1>;
+const DogCounter = () => {
+  const dogs = useDogStoreAsync(s => s.dogs);
+  return <h1>{dogs} around here ...</h1>;
 }
 
 const Controls = () => {
-  const increasePopulation = useBearStore(s => s.increasePopulation.trigger);
+  const increasePopulation = useDogStore(s => s.increasePopulation.trigger);
   return <button onClick={increasePopulation}>one up</button>;
 }
 
@@ -65,7 +65,7 @@ const App = () => {
     <>
       {/* Leo Query works with Suspense */}
       <Suspense fallback={<h1>Loading...</h1>}>
-        <BearCounter />
+        <DogCounter />
       </Suspense>
       <Controls />
     </>

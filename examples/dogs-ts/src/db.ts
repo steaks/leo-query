@@ -1,11 +1,11 @@
-const db = {bears: 0};
+const db = {dogs: 0};
 
 // Simulated async functions
 
-export const fetchBears = (): Promise<number> => {
+export const fetchDogs = (): Promise<number> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(db.bears);
+      resolve(db.dogs);
     }, 500);
   });
 };
@@ -13,16 +13,16 @@ export const fetchBears = (): Promise<number> => {
 export const increasePopulation = (): Promise<void> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      db.bears = db.bears + 1;
+      db.dogs = db.dogs + 1;
       resolve();
     }, 500);
   });
 };
 
-export const removeAllBears = (): Promise<void> => {
+export const removeAllDogs = (): Promise<void> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      db.bears = db.bears = 0;
+      db.dogs = db.dogs = 0;
       resolve();
     }, 500);
   });

@@ -5,38 +5,38 @@ The `effect` function allows you to integrate asynchronous effects (e.g., HTTP r
 ## Usage
 ### Basic Example
 
-Trigger an effect to update the bear population when the button is clicked.
+Trigger an effect to update the dog population when the button is clicked.
 
 ```typescript
-const increaseBearCount = () => fetch('/api/increase', { method: 'POST' });
+const increaseDogCount = () => fetch('/api/increase', { method: 'POST' });
 
-const useBearStore = create(() => ({
-  increaseBearCount: effect(increaseBearCount)
+const useDogStore = create(() => ({
+  increaseDogCount: effect(increaseDogCount)
 }));
 
 const Controls = () => {
-  const increase = useBearStore(state => state.increaseBearCount.trigger);
-  return <button onClick={increase}>Increase bear count</button>;
+  const increase = useDogStore(state => state.increaseDogCount.trigger);
+  return <button onClick={increase}>Increase dog count</button>;
 };
 ```
 
 ### Example with Arguments
 
-Trigger an effect to update the bear population with an amount in the HTTP request body when the button is clicked.
+Trigger an effect to update the dog population with an amount in the HTTP request body when the button is clicked.
 
 ```typescript
-const increaseBearCount = (amount: number) => fetch('/api/increase', { method: 'POST', body: JSON.stringify({amount}) });
+const increaseDogCount = (amount: number) => fetch('/api/increase', { method: 'POST', body: JSON.stringify({amount}) });
 
-const useBearStore = create(() => ({
-  increaseBearCount: effect(increaseBearCount)
+const useDogStore = create(() => ({
+  increaseDogCount: effect(increaseDogCount)
 }));
 
 const Controls = () => {
-  const increaseBearCount = useBearStore(state => state.increaseBearCount.trigger);
+  const increaseDogCount = useDogStore(state => state.increaseDogCount.trigger);
   return (
     <>
-      <button onClick={() => increaseBearCount(1)}>Increase by 1</button>
-      <button onClick={() => increaseBearCount(5)}>Increase by 5</button>
+      <button onClick={() => increaseDogCount(1)}>Increase by 1</button>
+      <button onClick={() => increaseDogCount(5)}>Increase by 5</button>
     </> 
   );
 };

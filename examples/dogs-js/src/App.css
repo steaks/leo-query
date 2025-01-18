@@ -1,14 +1,14 @@
 .app-container {
     text-align: center;
     margin-top: 50px;
-    font-family: 'Arial', sans-serif;
+    font-family: "Arial", sans-serif;
 }
 
-.bear-counter-container {
+.dog-counter-container {
     height: 80px;
 }
 
-.bear-counter {
+.dog-counter {
     font-size: 36px;
     color: #264653;
     animation: pop 0.3s ease-in-out;

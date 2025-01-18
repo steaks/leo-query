@@ -10,49 +10,49 @@ Optimistically updating the UI without waiting for the server can create a more 
 
 ### Basic Example
 
-This is an example of an optimistic update with bears.
+This is an example of an optimistic update with dogs.
 
 ```typescript
-interface BearsState {
-  bears: Query<BearsState, number>;
-  increaseBears: Effect<BearsState, []>;
+interface DogsState {
+  dogs: Query<DogsState, number>;
+  increaseDogs: Effect<DogsState, []>;
 }
 
 const api = {
-  fetchBears: async () => fetch("/api/bears"),
-  increaseBears: async () => fetch("/api/bears/increase", {method: "POST"}),
+  fetchDogs: async () => fetch("/api/dogs"),
+  increaseDogs: async () => fetch("/api/dogs/increase", {method: "POST"}),
 };
 
-const increaseBears = (set: (s: Partial<BearsState> => void), get: () => BearsState) => async () => {
-  const bears = get().bears;
-  set({bears: {...bears, value: bears.value + 1}});
+const increaseDogs = (set: (s: Partial<DogsState> => void), get: () => DogsState) => async () => {
+  const dogs = get().dogs;
+  set({dogs: {...dogs, value: dogs.value + 1}});
   try {
-    await api.increaseBears();
+    await api.increaseDogs();
   } catch (error) {
-    set({bears: {...bears, value: bears.value - 1}});
+    set({dogs: {...dogs, value: dogs.value - 1}});
   }
 };
 
-const useBearStore = create((set, get) => ({
-  bears: query(api.fetchBears, s => [s.increaseBears]),
-  increaseBears: effect(increaseBears(set, set))
+const useDogStore = create((set, get) => ({
+  dogs: query(api.fetchDogs, s => [s.increaseDogs]),
+  increaseDogs: effect(increaseDogs(set, set))
 }));
 
-const useBearStoreAsync = hook(useBearStore, /*suspense*/ false);
+const useDogStoreAsync = hook(useDogStore, /*suspense*/ false);
 
 const MyComponent = () => {
-  const bears = useBearStoreAsync(s => s.bears);
-  const increaseBears = useBearStoreAsync(s => s.increaseBears);
+  const dogs = useDogStoreAsync(s => s.dogs);
+  const increaseDogs = useDogStoreAsync(s => s.increaseDogs);
 
   //First load, show loading indicator
-  if (bears.value === undefined) {
+  if (dogs.value === undefined) {
     return <div>Loading...</div>;
   }
 
   return (
     <>
       {/* Subsequent loads, ignore isLoading because we optimistically updated the value. */}
-      <button onClick={increaseBears.value}>Increase Bears</button>
+      <button onClick={increaseDogs.value}>Increase Dogs</button>
     </>
   );
 };

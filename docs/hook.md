@@ -5,26 +5,26 @@ The `hook` function connects asynchronous **queries** and **effects** to a Zusta
 ## Usage
 ### Basic Example
 
-Hook into a store to access bears. Render a loading message using React's Suspense when the bears are loading.
+Hook into a store to access dogs. Render a loading message using React's Suspense when the dogs are loading.
 
 ```typescript
-const fetchBears = () => fetch('/api/bears').then(res => res.json());
+const fetchDogs = () => fetch('/api/dogs').then(res => res.json());
 
-const useBearStore = create(() => ({
-  bears: query(fetchBears)
+const useDogStore = create(() => ({
+  dogs: query(fetchDogs)
 }));
 
-const useBearStoreAsync = hook(useBearStore);
+const useDogStoreAsync = hook(useDogStore);
 
-const BearCounter = () => {
-  const bears = useBearStoreAsync(state => state.bears);
-  return <h1>{bears} bears around here...</h1>
+const DogCounter = () => {
+  const dogs = useDogStoreAsync(state => state.dogs);
+  return <h1>{dogs} dogs around here...</h1>
 };
 
 const App = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <BearCounter />
+      <DogCounter />
     </Suspense>
   );
 };
@@ -32,34 +32,34 @@ const App = () => {
 
 ### Example with Dependencies
 
-Hook into bears. Use Suspense to render a loading message when the bears are loading. Make a POST request to increase the bear count when the button is clicked.
+Hook into dogs. Use Suspense to render a loading message when the dogs are loading. Make a POST request to increase the dog count when the button is clicked.
 
 ```typescript
-const fetchBears = () => fetch('/api/bears').then(res => res.json());
-const increaseBearCount = () => fetch('/api/increase', { method: 'POST' });
+const fetchDogs = () => fetch('/api/dogs').then(res => res.json());
+const increaseDogCount = () => fetch('/api/increase', { method: 'POST' });
 
-const useBearStore = create(() => ({
-  bears: query(fetchBears, s => [s.increaseBearCount]),
-  increaseBearCount: effect(increaseBearCount)
+const useDogStore = create(() => ({
+  dogs: query(fetchDogs, s => [s.increaseDogCount]),
+  increaseDogCount: effect(increaseDogCount)
 }));
 
-const useBearStoreAsync = hook(useBearStore);
+const useDogStoreAsync = hook(useDogStore);
 
-const BearCounter = () => {
-  const bears = useBearStoreAsync(state => state.bears);
-  return <h1>{bears} bears around here...</h1>;
+const DogCounter = () => {
+  const dogs = useDogStoreAsync(state => state.dogs);
+  return <h1>{dogs} dogs around here...</h1>;
 };
 
 const Controls = () => {
-  const increase = useBearStore(state => state.increaseBearCount.trigger);
-  return <button onClick={increase}>Increase bear count</button>;
+  const increase = useDogStore(state => state.increaseDogCount.trigger);
+  return <button onClick={increase}>Increase dog count</button>;
 };
 
 const App = () => {
   return (
     <>
       <Suspense fallback={<div>Loading...</div>}>
-        <BearCounter />
+        <DogCounter />
       </Suspense>
       <Controls />
     </>
@@ -69,22 +69,22 @@ const App = () => {
 
 ### Example without Suspense
 
-Hook into bears. Render a loading message when the bears are loading. Render an error message if the bears fail to load.
+Hook into dogs. Render a loading message when the dogs are loading. Render an error message if the dogs fail to load.
 
 ```typescript
-const fetchBears = () => fetch('/api/bears').then(res => res.json());
+const fetchDogs = () => fetch('/api/dogs').then(res => res.json());
 
-const useBearStore = create(() => ({
-  bears: query(fetchBears)
+const useDogStore = create(() => ({
+  dogs: query(fetchDogs)
 }));
 
-const useBearStoreAsync = hook(useBearStore, /*suspense*/ false);
+const useDogStoreAsync = hook(useDogStore, /*suspense*/ false);
 
-const BearCounter = () => {
-  const bears = useBearStoreAsync(state => state.bears);
-  if (bears.isLoading) return <div>Loading...</div>;
-  if (bears.error) return <div>Error: {bears.error.message}</div>;
-  return <h1>{bears.value} bears around here...</h1>;
+const DogCounter = () => {
+  const dogs = useDogStoreAsync(state => state.dogs);
+  if (dogs.isLoading) return <div>Loading...</div>;
+  if (dogs.error) return <div>Error: {dogs.error.message}</div>;
+  return <h1>{dogs.value} dogs around here...</h1>;
 };
 ```
 

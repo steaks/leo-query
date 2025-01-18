@@ -8,43 +8,43 @@ The `query` function allows you to integrate asynchronous queries with Zustand s
 Fetch data from an API and store it in Zustand.
 
 ```typescript
-const fetchBears = () => fetch('/api/bears').then(res => res.json());
+const fetchDogs = () => fetch('/api/dogs').then(res => res.json());
 
-const useBearStore = create(() => ({
-  bears: query(fetchBears) // Fetch bears when the BearCounter component is mounted
+const useDogStore = create(() => ({
+  dogs: query(fetchDogs) // Fetch dogs when the DogCounter component is mounted
 }));
 
-const useBearStoreAsync = hook(useBearStore);
+const useDogStoreAsync = hook(useDogStore);
 
-const BearCounter = () => {
-  const bears = useBearStoreAsync(state => state.bears);
-  return <h1>{bears} bears around here...</h1>;
+const DogCounter = () => {
+  const dogs = useDogStoreAsync(state => state.dogs);
+  return <h1>{dogs} dogs around here...</h1>;
 };
 ```
 
 ### Example with Dependencies
 
-Fetch data from an API and store it in Zustand. Then re-fetch when the `increaseBearCount` effect successfully completes.
+Fetch data from an API and store it in Zustand. Then re-fetch when the `increaseDogCount` effect successfully completes.
 
 ```typescript
-const fetchBears = () => fetch('/api/bears').then(res => res.json());
-const increaseBearCount = () => fetch('/api/increase', { method: 'POST' });
+const fetchDogs = () => fetch('/api/dogs').then(res => res.json());
+const increaseDogCount = () => fetch('/api/increase', { method: 'POST' });
 
-const useBearStore = create(() => ({
-  bears: query(fetchBears, s => [s.increaseBearCount]), // Fetch bears when increaseBearCount effect completes
-  increaseBearCount: effect(increaseBearCount)
+const useDogStore = create(() => ({
+  dogs: query(fetchDogs, s => [s.increaseDogCount]), // Fetch dogs when increaseDogCount effect completes
+  increaseDogCount: effect(increaseDogCount)
 }));
 
-const useBearStoreAsync = hook(useBearStore);
+const useDogStoreAsync = hook(useDogStore);
 
-const BearCounter = () => {
-  const bears = useBearStoreAsync(state => state.bears);
-  return <h1>{bears} bears around here...</h1>;
+const DogCounter = () => {
+  const dogs = useDogStoreAsync(state => state.dogs);
+  return <h1>{dogs} dogs around here...</h1>;
 };
 
 const Controls = () => {
-  const increase = useBearStore(state => state.increaseBearCount.trigger);
-  return <button onClick={increase}>Increase bear count</button>;
+  const increase = useDogStore(state => state.increaseDogCount.trigger);
+  return <button onClick={increase}>Increase dog count</button>;
 };
 ```
 
@@ -53,14 +53,14 @@ const Controls = () => {
 Fetch data from an API and store it in Zustand. Then re-fetch when the `location` changes. And pass location as a parameter to the HTTP request.
 
 ```typescript
-const fetchBears = (get) => async () => {
+const fetchDogs = (get) => async () => {
   const location = get().location; // Get location from Zustand
-  const res = await fetch(`/api/bears?location=${location}`);
+  const res = await fetch(`/api/dogs?location=${location}`);
   return await res.json();
 };
 
-const useBearStore = create((set, get) => ({
-  bears: query(fetchBears(get), s => [s.location]), // Fetch bears when location changes
+const useDogStore = create((set, get) => ({
+  dogs: query(fetchDogs(get), s => [s.location]), // Fetch dogs when location changes
   location: "Colorado"
 }));
 ```
