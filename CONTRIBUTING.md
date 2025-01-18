@@ -45,7 +45,7 @@ npm run build
 ```
 5. Run the test app locally
 ```bash
-cd test-apps/bears-ts
+cd test-apps/dogs-ts
 npm install
 npm run dev
 ```

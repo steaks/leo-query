@@ -1,20 +1,20 @@
 import React, { Suspense } from "react";
 import { create } from "zustand";
 import { hook, effect, query } from "leo-query";
-import { fetchBears, increasePopulation, removeAllBears } from "./db";
+import { fetchDogs, increasePopulation, removeAllDogs } from "./db";
 import "./App.css";
 
 const useBearStore = create(() => ({
   increasePopulation: effect(increasePopulation),
-  removeAllBears: effect(removeAllBears),
-  bears: query(fetchBears, (s) => [s.increasePopulation, s.removeAllBears]),
+  removeAllDogs: effect(removeAllDogs),
+  dogs: query(fetchDogs, (s) => [s.increasePopulation, s.removeAllDogs]),
 }));
 
 const useBearStoreAsync = hook(useBearStore);
 
 function BearCounter() {
-  const bears = useBearStoreAsync((state) => state.bears);
-  return <h1 className="bear-counter">{bears} around here ...</h1>;
+  const dogs = useBearStoreAsync((state) => state.dogs);
+  return <h1 className="bear-counter">{dogs} around here ...</h1>;
 }
 
 function Loading() {

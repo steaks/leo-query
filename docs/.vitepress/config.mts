@@ -56,8 +56,8 @@ export default defineConfig({
         text: "Examples",
         items: [
           { text: "All Examples", link: "/examples" },
-          { text: "Bears JS", link: "https://codesandbox.io/p/sandbox/leo-query-bears-demo-js-wmwlgt?file=%2Fsrc%2FApp.jsx" },
-          { text: "Bears TS", link: "https://codesandbox.io/p/sandbox/leo-query-bears-demo-ts-7f2c34?file=%2Fsrc%2FApp.tsx" },
+          { text: "Dogs JS", link: "https://codesandbox.io/p/sandbox/leo-query-dogs-demo-js-wmwlgt?file=%2Fsrc%2FApp.jsx" },
+          { text: "Dogs TS", link: "https://codesandbox.io/p/sandbox/leo-query-dogs-demo-ts-7f2c34?file=%2Fsrc%2FApp.tsx" },
           { text: "Task Manager", link: "https://xsh8c4.csb.app/" },
         ]
       },

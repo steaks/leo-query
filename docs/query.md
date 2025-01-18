@@ -8,17 +8,17 @@ The `query` function allows you to integrate asynchronous queries with Zustand s
 Fetch data from an API and store it in Zustand.
 
 ```typescript
-const fetchBears = () => fetch('/api/bears').then(res => res.json());
+const fetchDogs = () => fetch('/api/dogs').then(res => res.json());
 
 const useBearStore = create(() => ({
-  bears: query(fetchBears) // Fetch bears when the BearCounter component is mounted
+  dogs: query(fetchDogs) // Fetch dogs when the BearCounter component is mounted
 }));
 
 const useBearStoreAsync = hook(useBearStore);
 
 const BearCounter = () => {
-  const bears = useBearStoreAsync(state => state.bears);
-  return <h1>{bears} bears around here...</h1>;
+  const dogs = useBearStoreAsync(state => state.dogs);
+  return <h1>{dogs} dogs around here...</h1>;
 };
 ```
 
@@ -27,19 +27,19 @@ const BearCounter = () => {
 Fetch data from an API and store it in Zustand. Then re-fetch when the `increaseBearCount` effect successfully completes.
 
 ```typescript
-const fetchBears = () => fetch('/api/bears').then(res => res.json());
+const fetchDogs = () => fetch('/api/dogs').then(res => res.json());
 const increaseBearCount = () => fetch('/api/increase', { method: 'POST' });
 
 const useBearStore = create(() => ({
-  bears: query(fetchBears, s => [s.increaseBearCount]), // Fetch bears when increaseBearCount effect completes
+  dogs: query(fetchDogs, s => [s.increaseBearCount]), // Fetch dogs when increaseBearCount effect completes
   increaseBearCount: effect(increaseBearCount)
 }));
 
 const useBearStoreAsync = hook(useBearStore);
 
 const BearCounter = () => {
-  const bears = useBearStoreAsync(state => state.bears);
-  return <h1>{bears} bears around here...</h1>;
+  const dogs = useBearStoreAsync(state => state.dogs);
+  return <h1>{dogs} dogs around here...</h1>;
 };
 
 const Controls = () => {
@@ -53,14 +53,14 @@ const Controls = () => {
 Fetch data from an API and store it in Zustand. Then re-fetch when the `location` changes. And pass location as a parameter to the HTTP request.
 
 ```typescript
-const fetchBears = (get) => async () => {
+const fetchDogs = (get) => async () => {
   const location = get().location; // Get location from Zustand
-  const res = await fetch(`/api/bears?location=${location}`);
+  const res = await fetch(`/api/dogs?location=${location}`);
   return await res.json();
 };
 
 const useBearStore = create((set, get) => ({
-  bears: query(fetchBears(get), s => [s.location]), // Fetch bears when location changes
+  dogs: query(fetchDogs(get), s => [s.location]), // Fetch dogs when location changes
   location: "Colorado"
 }));
 ```

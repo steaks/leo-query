@@ -19,29 +19,29 @@ Hook up async queries in three steps:
 /**********************************************************
  * Write async functions                                  *
  **********************************************************/
-const fetchBears = (): Promise<number> => 
-  fetch('https://good.dog.com/bears').then(r => r.json());
+const fetchDogs = (): Promise<number> => 
+  fetch('https://good.dog.com/dogs').then(r => r.json());
 
 const increasePopulation = (): Promise<void> =>
   fetch('https://good.dog.com/increasePopulation', {method: "POST"});
 
-const removeAllBears = (): Promise<void> =>
-  fetch('https://good.dog.com/removeAllBears', {method: "POST"});
+const removeAllDogs = (): Promise<void> =>
+  fetch('https://good.dog.com/removeAllDogs', {method: "POST"});
 
 /**********************************************************
  * Connect your store                                     *
  **********************************************************/
 
-interface BearsState {
-  bears: Query<BearsState, number>;
-  increasePopulation: Effect<BearsState, []>;
-  removeAllBears: Effect<BearsState, []>;
+interface DogsState {
+  dogs: Query<DogsState, number>;
+  increasePopulation: Effect<DogsState, []>;
+  removeAllDogs: Effect<DogsState, []>;
 }
 
 const useBearStore = create(() => ({
   increasePopulation: effect(increasePopulation),
-  removeAllBears: effect(removeAllBears),
-  bears: query(fetchBears, s => [s.increasePopulation, s.removeAllBears]) // Re-fetch when increasePopulation or removeAllBears succeeds 
+  removeAllDogs: effect(removeAllDogs),
+  dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]) // Re-fetch when increasePopulation or removeAllDogs succeeds 
 }));
 
 const useBearStoreAsync = hook(useBearStore);
@@ -51,8 +51,8 @@ const useBearStoreAsync = hook(useBearStore);
  **********************************************************/
 
 const BearCounter = () => {
-  const bears = useBearStoreAsync(s => s.bears);
-  return <h1>{bears} around here ...</h1>;
+  const dogs = useBearStoreAsync(s => s.dogs);
+  return <h1>{dogs} around here ...</h1>;
 }
 
 const Controls = () => {
