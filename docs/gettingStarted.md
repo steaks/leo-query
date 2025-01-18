@@ -38,25 +38,25 @@ interface DogsState {
   removeAllDogs: Effect<DogsState, []>;
 }
 
-const useBearStore = create(() => ({
+const useDogStore = create(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllDogs: effect(removeAllDogs),
   dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]) // Re-fetch when increasePopulation or removeAllDogs succeeds 
 }));
 
-const useBearStoreAsync = hook(useBearStore);
+const useDogStoreAsync = hook(useDogStore);
 
 /**********************************************************
  * Bind your components                                   *
  **********************************************************/
 
-const BearCounter = () => {
-  const dogs = useBearStoreAsync(s => s.dogs);
+const DogCounter = () => {
+  const dogs = useDogStoreAsync(s => s.dogs);
   return <h1>{dogs} around here ...</h1>;
 }
 
 const Controls = () => {
-  const increasePopulation = useBearStore(s => s.increasePopulation.trigger);
+  const increasePopulation = useDogStore(s => s.increasePopulation.trigger);
   return <button onClick={increasePopulation}>one up</button>;
 }
 
@@ -65,7 +65,7 @@ const App = () => {
     <>
       {/* Leo Query works with Suspense */}
       <Suspense fallback={<h1>Loading...</h1>}>
-        <BearCounter />
+        <DogCounter />
       </Suspense>
       <Controls />
     </>

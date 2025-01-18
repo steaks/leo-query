@@ -49,19 +49,19 @@ const useDogsStore = create(() => ({
   dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]) // Re-fetch when increasePopulation or removeAllDogs succeeds 
 }));
 
-const useBearStoreAsync = hook(useBearStore);
+const useDogStoreAsync = hook(useDogStore);
 
 /**********************************************************
  * Bind your components                                   *
  **********************************************************/
 
-const BearCounter = () => {
-  const dogs = useBearStoreAsync(s => s.dogs);
+const DogCounter = () => {
+  const dogs = useDogStoreAsync(s => s.dogs);
   return <h1>{dogs} around here ...</h1>;
 }
 
 const Controls = () => {
-  const increasePopulation = useBearStore(s => s.increasePopulation.trigger);
+  const increasePopulation = useDogStore(s => s.increasePopulation.trigger);
   return <button onClick={increasePopulation}>one up</button>;
 }
 
@@ -70,7 +70,7 @@ const App = () => {
     <>
       {/* Leo Query works with Suspense */}
       <Suspense fallback={<h1>Loading...</h1>}>
-        <BearCounter />
+        <DogCounter />
       </Suspense>
       <Controls />
     </>
@@ -87,6 +87,6 @@ Leo Query is simple, robust, and designed for Zustand. Read more about why Leo Q
 
 | Example                                                                                           | Description                        |
 |---------------------------------------------------------------------------------------------------|------------------------------------|
-| [Dogs JS](https://codesandbox.io/p/sandbox/leo-query-dogs-demo-js-wmwlgt?file=%2Fsrc%2FApp.jsx) | A simple bear counter (Javascript) |
-| [Dogs TS](https://codesandbox.io/p/sandbox/leo-query-dogs-demo-ts-7f2c34?file=%2Fsrc%2FApp.tsx) | A simple bear counter (Typescript) |
+| [Dogs JS](https://codesandbox.io/p/sandbox/leo-query-dogs-demo-js-wmwlgt?file=%2Fsrc%2FApp.jsx) | A simple dog counter (Javascript) |
+| [Dogs TS](https://codesandbox.io/p/sandbox/leo-query-dogs-demo-ts-7f2c34?file=%2Fsrc%2FApp.tsx) | A simple dog counter (Typescript) |
 | [Task Manager](https://xsh8c4.csb.app/)                                                           | A more complex task manager app.   |

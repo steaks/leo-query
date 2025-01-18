@@ -10,41 +10,41 @@ Fetch data from an API and store it in Zustand.
 ```typescript
 const fetchDogs = () => fetch('/api/dogs').then(res => res.json());
 
-const useBearStore = create(() => ({
-  dogs: query(fetchDogs) // Fetch dogs when the BearCounter component is mounted
+const useDogStore = create(() => ({
+  dogs: query(fetchDogs) // Fetch dogs when the DogCounter component is mounted
 }));
 
-const useBearStoreAsync = hook(useBearStore);
+const useDogStoreAsync = hook(useDogStore);
 
-const BearCounter = () => {
-  const dogs = useBearStoreAsync(state => state.dogs);
+const DogCounter = () => {
+  const dogs = useDogStoreAsync(state => state.dogs);
   return <h1>{dogs} dogs around here...</h1>;
 };
 ```
 
 ### Example with Dependencies
 
-Fetch data from an API and store it in Zustand. Then re-fetch when the `increaseBearCount` effect successfully completes.
+Fetch data from an API and store it in Zustand. Then re-fetch when the `increaseDogCount` effect successfully completes.
 
 ```typescript
 const fetchDogs = () => fetch('/api/dogs').then(res => res.json());
-const increaseBearCount = () => fetch('/api/increase', { method: 'POST' });
+const increaseDogCount = () => fetch('/api/increase', { method: 'POST' });
 
-const useBearStore = create(() => ({
-  dogs: query(fetchDogs, s => [s.increaseBearCount]), // Fetch dogs when increaseBearCount effect completes
-  increaseBearCount: effect(increaseBearCount)
+const useDogStore = create(() => ({
+  dogs: query(fetchDogs, s => [s.increaseDogCount]), // Fetch dogs when increaseDogCount effect completes
+  increaseDogCount: effect(increaseDogCount)
 }));
 
-const useBearStoreAsync = hook(useBearStore);
+const useDogStoreAsync = hook(useDogStore);
 
-const BearCounter = () => {
-  const dogs = useBearStoreAsync(state => state.dogs);
+const DogCounter = () => {
+  const dogs = useDogStoreAsync(state => state.dogs);
   return <h1>{dogs} dogs around here...</h1>;
 };
 
 const Controls = () => {
-  const increase = useBearStore(state => state.increaseBearCount.trigger);
-  return <button onClick={increase}>Increase bear count</button>;
+  const increase = useDogStore(state => state.increaseDogCount.trigger);
+  return <button onClick={increase}>Increase dog count</button>;
 };
 ```
 
@@ -59,7 +59,7 @@ const fetchDogs = (get) => async () => {
   return await res.json();
 };
 
-const useBearStore = create((set, get) => ({
+const useDogStore = create((set, get) => ({
   dogs: query(fetchDogs(get), s => [s.location]), // Fetch dogs when location changes
   location: "Colorado"
 }));

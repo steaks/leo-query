@@ -33,16 +33,16 @@ const increaseDogs = (set: (s: Partial<DogsState> => void), get: () => DogsState
   }
 };
 
-const useBearStore = create((set, get) => ({
+const useDogStore = create((set, get) => ({
   dogs: query(api.fetchDogs, s => [s.increaseDogs]),
   increaseDogs: effect(increaseDogs(set, set))
 }));
 
-const useBearStoreAsync = hook(useBearStore, /*suspense*/ false);
+const useDogStoreAsync = hook(useDogStore, /*suspense*/ false);
 
 const MyComponent = () => {
-  const dogs = useBearStoreAsync(s => s.dogs);
-  const increaseDogs = useBearStoreAsync(s => s.increaseDogs);
+  const dogs = useDogStoreAsync(s => s.dogs);
+  const increaseDogs = useDogStoreAsync(s => s.increaseDogs);
 
   //First load, show loading indicator
   if (dogs.value === undefined) {
