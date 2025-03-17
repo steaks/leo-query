@@ -2,23 +2,17 @@
 
 Welcome to the **Leo Query** documentation! This guide will help you integrate async queries into your app in minutes.
 
-## Installation
+## Install 
 
 ```bash
 npm i leo-query
 ```
 
-## Getting Started
+## Write async functions
 
-Hook up async queries in three steps: 
-- Write async functions. 
-- Connect your store. 
-- Bind your components.
+Write async functions like you normally would. These can use your favorite http library (e.g. fetch, axios).
 
-```typescript
-/**********************************************************
- * Write async functions                                  *
- **********************************************************/
+```ts
 const fetchDogs = (): Promise<number> => 
   fetch('https://good.dog.com/dogs').then(r => r.json());
 
@@ -27,10 +21,15 @@ const increasePopulation = (): Promise<void> =>
 
 const removeAllDogs = (): Promise<void> =>
   fetch('https://good.dog.com/removeAllDogs', {method: "POST"});
+```
 
-/**********************************************************
- * Connect your store                                     *
- **********************************************************/
+## Connect your store
+
+Create a Zustand store. Connect your async functions with Leo Query's `query` and `effect` functions. Then create an async hook to handle loading and error states in your components.
+
+```typescript
+import {create} from "zustand";
+import {effect, query, hook, Query, Effect} from "leo-query";
 
 interface DogsState {
   dogs: Query<DogsState, number>;
@@ -38,25 +37,27 @@ interface DogsState {
   removeAllDogs: Effect<DogsState, []>;
 }
 
-const useDogStore = create(() => ({
+const useDogStore = create<DogsState>(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllDogs: effect(removeAllDogs),
   dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]) // Re-fetch when increasePopulation or removeAllDogs succeeds 
 }));
 
 const useDogStoreAsync = hook(useDogStore);
+```
 
-/**********************************************************
- * Bind your components                                   *
- **********************************************************/
+## Bind your components
 
+Use the async hook when you need to handle loading states and errors. Use the normal Zustand hook when you don't.
+
+```tsx
 const DogCounter = () => {
   const dogs = useDogStoreAsync(s => s.dogs);
   return <h1>{dogs} around here ...</h1>;
 }
 
 const Controls = () => {
-  const increasePopulation = useDogStore(s => s.increasePopulation.trigger);
+  const increasePopulation = useDogStoreAsync(s => s.increasePopulation.trigger);
   return <button onClick={increasePopulation}>one up</button>;
 }
 
@@ -70,8 +71,12 @@ const App = () => {
       <Controls />
     </>
   );
-}
+};
 ```
+## Try Leo Query
+<center>
+  <a href="https://codesandbox.io/p/sandbox/leo-query-dogs-demo-ts-7f2c34">Try it out in codesandbox.io</a>
+</center>
 
 
 ## Why Leo?
