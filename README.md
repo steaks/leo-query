@@ -61,7 +61,7 @@ const DogCounter = () => {
 }
 
 const Controls = () => {
-  const increasePopulation = useDogStoreAsync(s => s.increasePopulation.trigger);
+  const increasePopulation = useDogStore(s => s.increasePopulation.trigger);
   return <button onClick={increasePopulation}>one up</button>;
 }
 
