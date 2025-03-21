@@ -36,10 +36,20 @@ Welcome to the Leo Query blog! Here you'll find articles about state management,
 ## Latest Posts
 
 <div class="blog-post">
+    <h3><a href="/blog/dataFetchingWithZustand">Data Fetching with Zustand</a></h3>
+    <p class="post-meta">By Steven Wexler • Dec 1, 2024</p>
+    <p>
+        Managing server state alongside client state is a challenge. Zustand is a great choice for managing client state. Here are options for managing async state (aka data fetching) when you're using Zustand...
+        <a href="/blog/dataFetchingWithZustand" class="read-more">read more</a>
+    </p>
+</div>
+
+
+<div class="blog-post">
     <h3><a href="/blog/implementingRetryLogic">Implementing Retry Logic</a></h3>
     <p class="post-meta">By Steven Wexler • Dec 1, 2024</p>
     <p>
-        Lots of things can go wrong when you're making HTTP requests. Wifi can cut out. Servers can overload. Apps need to have a retry strategy for good UX. Leo Query implements a nuanced retry strategy using an exponential backoff...
+        Lots of things can go wrong when you're making HTTP requests. Wifi can cut out. Servers can overload. Apps need to have a retry strategy for good UX. Leo Query implements a nuanced retry strategy...
         <a href="/blog/implementingRetryLogic" class="read-more">read more</a>
     </p>
 </div>
