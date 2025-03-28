@@ -72,6 +72,13 @@ export interface Query<State, T> {
     trigger: () => Promise<T>;
     /** Mark the data as stale (i.e. needs a load). */
     markStale: () => void;
+    /** Manually set the value of the query synchronously. This is useful for optimistic updates, setting initial values, or setting values loaded in server components.
+     * 
+     * @param value - The value to set.
+     * @param options - Options for the update.
+     * @returns The updated query.
+     */
+    setValueSync: (value: T, options?: SetValueSyncOptions) => Query<State, T>; 
 }
 
 type Primitive = string | number | boolean | null | undefined | bigint | symbol;
@@ -94,7 +101,7 @@ export interface QueryValue<T> {
  */
 export type Dependencies<Store> = (s: Store) => (Query<Store, any> | Effect<Store, any> | Primitive)[];
 
-export interface QueryOptions {
+interface GlobalQueryOptions {
     /** If set to `true`, the query will fetch data as needed. Default is `true`. */
     readonly lazy?: boolean;
     /** The delay (in ms) between query triggers. Default is 300ms. */
@@ -107,6 +114,18 @@ export interface QueryOptions {
     readonly staleTime?: number;
 }
 
+interface IndividualQueryOptions<T> {
+    /** The initial value of the query. */
+    readonly initialValue?: T;
+}
+
+export type QueryOptions<T> = GlobalQueryOptions & IndividualQueryOptions<T>;
+
 export interface GlobalOptions {
-    query?: QueryOptions;
+    query?: GlobalQueryOptions;
+}
+
+export interface SetValueSyncOptions {
+    /** If `true`, the store will be updated with the new value. Defaults to true. */
+    readonly updateStore?: boolean;
 }

@@ -1,12 +1,12 @@
 import {StoreApi, UseBoundStore} from "zustand";
-import {Dependencies, Effect, Query, QueryOptions, QueryValue, GlobalOptions} from "./types";
+import {Dependencies, Effect, Query, QueryOptions, QueryValue, GlobalOptions, SetValueSyncOptions} from "./types";
 import {wait} from "./util";
 import {setupRetries} from "./retry";
 
-const isEffect = (v: any): v is Effect<any, any> =>
+export const isEffect = (v: any): v is Effect<any, any> =>
   v && (v as Effect<any, any>).__type === "Effect";
 
-const isQuery = (v: any): v is Query<any, any> =>
+export const isQuery = (v: any): v is Query<any, any> =>
   v && (v as Query<any, any>).__type === "Query"
 
 let globalOptions: GlobalOptions = {};
@@ -122,14 +122,14 @@ export function effect<Store extends object, Args extends any[] = []>(): Effect<
 interface QueryParams<State, R> {
   readonly fn: () => Promise<R>;
   readonly deps: Dependencies<State>;
-  readonly options: QueryOptions;
+  readonly options: QueryOptions<R>;
 }
 
 const queryParams = <State, R>(args: any): QueryParams<State, R> => {
   const p = {
     fn: args[0] as () => Promise<R>,
     deps: args[1] || (() => []) as Dependencies<State>,
-    options: {...globalOptions.query, ...args[2]} as QueryOptions
+    options: {...globalOptions.query, ...args[2]} as QueryOptions<R>
   };
   if (!p.fn || !p.deps) {
     throw new Error("Invalid arguments");
@@ -149,6 +149,31 @@ const setupStaleTimeout = <Store extends object, R>(query: Query<Store, R>): num
   return undefined;
 };
 
+const setSync = <Store extends object, R>(query: Query<Store, R>, value?: R, error?: any, options: SetValueSyncOptions = {}): Query<Store, R> => {
+  const state = query.__store().getState();
+  const current = state[query.__key] as Query<Store, R>;
+  const staleTimeout = setupStaleTimeout(current);
+  const next = {
+    ...current,
+    __trigger: undefined,
+    __triggerStart: 0,
+    __initialPromise: undefined,
+    __needsLoad: false,
+    __staleTimeout: staleTimeout,
+    isLoading: false,
+    value: error === undefined ? value : undefined,
+    error
+  };
+
+  if (options.updateStore || options.updateStore === undefined) {
+    query.__store().setState({
+      [query.__key]: next
+    } as Partial<Store>);
+  }
+
+  return next;
+};
+
 /**
  * Hook up an asynchronous query to Zustand. A query can be an HTTP request or simple promise. The promise will be
  * executed when a dependency changes or is manually triggered.
@@ -157,7 +182,7 @@ const setupStaleTimeout = <Store extends object, R>(query: Query<Store, R>): num
  * @param deps - Dependencies in the store that will trigger the promise.
  * @param options - Options for the query
  */
-export function query<Store extends object, R>(fn: () => Promise<R>, deps?: Dependencies<Store>, options?: QueryOptions): Query<Store, R>;
+export function query<Store extends object, R>(fn: () => Promise<R>, deps?: Dependencies<Store>, options?: QueryOptions<R>): Query<Store, R>;
 export function query<Store extends object, R>(): Query<Store, R> {
   const p = queryParams<Store, R>(arguments);
   const getStore: () => StoreApi<Store> = () => { throw new Error("Store not set yet"); };
@@ -173,12 +198,12 @@ export function query<Store extends object, R>(): Query<Store, R> {
     __lazy: p.options.lazy !== undefined ? p.options.lazy : true,
     __retry: p.options.retry,
     __retryDelay: p.options.retryDelay,
-    __needsLoad: true,
+    __needsLoad: p.options.initialValue === undefined,
     __store: getStore,
     __staleTime: p.options.staleTime,
     __staleTimeout: undefined as number | undefined,
     isLoading: false,
-    value: undefined as unknown as R,
+    value: p.options.initialValue as unknown as R,
     error: undefined,
     trigger: async (): Promise<R> => {
       const state = q.__store().getState();
@@ -188,7 +213,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
         return current.__trigger;
       }
       const queryDependencies = current.__deps(state).flatMap(v => {
-        return isQuery(v) && v.__needsLoad ? [v.__trigger || v.trigger()] : [];
+        return isQuery(v) && v.value === undefined ? [v.__trigger || v.trigger()] : [];
       });
       const initialPromise = Promise.all(queryDependencies).then(p.fn);
       const promise = setupRetries(p.fn, initialPromise, q);
@@ -215,21 +240,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
           return;
         }
 
-        const staleTimeout = setupStaleTimeout(next);
-
-        q.__store().setState({
-          [q.__key]: {
-            ...next,
-            __trigger: undefined,
-            __triggerStart: 0,
-            __initialPromise: undefined,
-            __needsLoad: false,
-            __staleTimeout: staleTimeout,
-            isLoading: false,
-            value,
-            error
-          }
-        } as Partial<Store>);
+        setSync(q, value, error);
       });
       return promise;
     },
@@ -246,16 +257,18 @@ export function query<Store extends object, R>(): Query<Store, R> {
         }
       } as Partial<Store>);
     },
+    setValueSync: (value: R, options: SetValueSyncOptions = {}): Query<Store, R> => 
+      setSync(q, value, /*error*/undefined, options)
   };
   return q;
 }
+
 
 export interface UseBoundAsyncStoreOptions {
   /**
    * Trigger suspense when the query's dependencies are loading.
    */
   readonly followDeps?: boolean;
-
 }
 
 type QueryOrEffect<T> = Query<T, any> | Effect<T, any>
@@ -484,7 +497,7 @@ function withSuspense<T, Args extends any[] = []>(values: [Query<any, T>, ...Que
     } else {
       throw Promise.all(allTriggers);
     }
-  } else {
+  } else if (isEffect(values[0])) {
     const v = values[0];
     const effectTriggers = v.__triggers;
     const depTriggers = values.slice(1).flatMap(vv => {
@@ -502,5 +515,7 @@ function withSuspense<T, Args extends any[] = []>(values: [Query<any, T>, ...Que
     } else {
       throw Promise.all(allTriggers);
     }
+  } else {
+    throw new Error("Value must be Query or Effect");
   }
 }

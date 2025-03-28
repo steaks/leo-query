@@ -49,7 +49,9 @@ export default defineConfig({
         items: [
           { text: "Caching", link: "/caching" },
           { text: "Optimistic Updates", link: "/optimisticUpdates" },
-          { text: "Retries", link: "/retries" }
+          { text: "Retries", link: "/retries" },
+          { text: "Persisting Data", link: "/persistingData" },
+          { text: "Initial Data", link: "/initialData" },
         ]
       },
       {
