@@ -26,6 +26,7 @@
     "zustand": ">=4.5"
   },
   "dependencies": {
+    "leo-query": "file:.yalc/leo-query",
     "typescript": "^4.7.3"
   },
   "devDependencies": {
@@ -33,11 +34,11 @@
     "@rollup/plugin-typescript": "^11.1.2",
     "@types/jest": "^28.1.4",
     "@types/node": "^22.9.0",
-    "@types/react": "^18.0.12",
-    "@types/react-dom": "^18.0.5",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "jest": "^28.1.2",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "rollup": "^3.28.0",
     "shx": "^0.3.4",
     "ts-jest": "^28.0.5",

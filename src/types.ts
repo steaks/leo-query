@@ -1,4 +1,5 @@
-import {StoreApi} from "zustand/vanilla";
+import { ReactNode } from "react";
+import {UseBoundStore, StoreApi} from "zustand";
 
 /**
  * Represents an asynchronous effect tied to a Zustand store.
@@ -62,6 +63,10 @@ export interface Query<State, T> {
     __staleTimeout: number | undefined;
     /** Function to access the Zustand store. */
     __store: () => StoreApi<State>;
+    /** Whether the query has been initialized. */
+    __isInitialized: boolean;
+    /** Timestamp of when the value was set. */
+    __valueTimestamp: number;
     /** The current value returned by the query. */
     value: T | undefined;
     /** Indicates if the query is currently fetching data. */
@@ -81,7 +86,7 @@ export interface Query<State, T> {
     setValueSync: (value: T, options?: SetValueSyncOptions) => Query<State, T>; 
 }
 
-type Primitive = string | number | boolean | null | undefined | bigint | symbol;
+export type Primitive = string | number | boolean | null | undefined | bigint | symbol;
 
 export interface QueryValue<T> {
     /** The current value returned by the query. */
@@ -101,7 +106,7 @@ export interface QueryValue<T> {
  */
 export type Dependencies<Store> = (s: Store) => (Query<Store, any> | Effect<Store, any> | Primitive)[];
 
-interface GlobalQueryOptions {
+export interface GlobalQueryOptions {
     /** If set to `true`, the query will fetch data as needed. Default is `true`. */
     readonly lazy?: boolean;
     /** The delay (in ms) between query triggers. Default is 300ms. */
@@ -126,6 +131,91 @@ export interface GlobalOptions {
 }
 
 export interface SetValueSyncOptions {
-    /** If `true`, the store will be updated with the new value. Defaults to true. */
+    /** If `true`, the store will be updated with the new value. Defaults to `true`. */
     readonly updateStore?: boolean;
+    /** If `true`, this value is the initial value for the query. */
+    readonly __isInitialValue?: boolean;
+    /** Timestamp of the server value. */
+    readonly __serverValueTimestamp?: number;
+}
+
+
+export interface UseBoundAsyncStoreOptions<T> {
+  /**
+   * Trigger suspense when the query's dependencies are loading.
+   */
+  readonly followDeps?: boolean;
+  /**
+   * Initial value for the query.
+   */
+  readonly initialValue?: T;
+  /**
+   * Server value for the query.
+   */
+  readonly serverValue?: T;
+  /**
+   * Timestamp of the server value.
+   */
+  readonly serverValueTimestamp?: number;
+}
+
+
+export type UseBoundAsyncStoreWithSuspense<T> = {
+  /**
+   * Select a query from the store. Handle async data concerns:
+   *   - Fetch data for the query as needed
+   *   - Leverage caching
+   *   - Re-render component when query value updates
+   *   - Trigger suspense when the query is loading
+   *   - Consider dependencies
+   * @param selector Select the query from the store.
+   * @param opts Options
+   */
+  <R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions<R>): R;
+  /**
+   * Select an effect from the store. Handle async data concerns:
+   *   - Trigger suspense when the effect is loading
+   *   - Consider dependencies
+   * @param selector Select the effect from the store.
+   * @param opts Options
+   */
+  <Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): () => Promise<void>
+};
+
+export type UseBoundAsyncStoreWithoutSuspense<T> = {
+  /**
+   * Select a query from the store. Handle async data concerns:
+   *   - Fetch data for the query as needed
+   *   - Leverage caching
+   *   - Re-render component when query value updates
+   *   - Trigger suspense when the query is loading
+   *   - Consider dependencies
+   * @param selector Select the query from the store.
+   */
+    <R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions<R>): QueryValue<R>;
+  /**
+   * Select an effect from the store. Handle async data concerns:
+   *   - Trigger suspense when the effect is loading
+   *   - Consider dependencies
+   * @param selector Select the effect from the store.
+   */
+    <Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): () => Promise<void>
+};
+
+interface StoreProviderProps {
+  children: ReactNode;
+}
+
+export interface StoreHooks<T> {
+  readonly hook: UseBoundStore<StoreApi<T>>;
+  readonly hookAsync: UseBoundAsyncStoreWithoutSuspense<T>;
+  readonly hookAsyncSuspense: UseBoundAsyncStoreWithSuspense<T>;
+}
+
+export interface StoreProvider<T> {
+  Provider: React.FC<StoreProviderProps>;
+  Context: React.Context<StoreHooks<T> | null>;
+  useStore: UseBoundStore<StoreApi<T>>;
+  useStoreAsync: UseBoundAsyncStoreWithoutSuspense<T>;
+  useStoreSuspense: UseBoundAsyncStoreWithSuspense<T>;
 }

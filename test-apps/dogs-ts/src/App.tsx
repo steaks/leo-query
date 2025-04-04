@@ -1,9 +1,9 @@
-import React, {Suspense} from 'react';
-import {create} from "zustand";
-import {hook, effect, query, Query, Effect} from "leo-query";
+import React, {Suspense, useEffect} from 'react';
+import {create, StoreApi, UseBoundStore} from "zustand";
+import {persist} from "zustand/middleware";
+import {hook, effect, query, partialize, merge, Query, Effect} from "leo-query";
 import {fetchDogs, increasePopulation, removeAllDogs} from "./db";
 import "./App.css";
-
 
 interface DogsState {
   dogs: Query<DogsState, number>;
@@ -11,17 +11,31 @@ interface DogsState {
   removeAllDogs: Effect<DogsState, []>;
 }
 
-const useDogStore = create<DogsState>(() => ({
+const useDogStore = create<DogsState>()(persist(() => ({
     increasePopulation: effect(increasePopulation),
     removeAllDogs: effect(removeAllDogs),
-    dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]),
+    dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs], {initialValue: "SSR"}),
+  }), {
+    name: "dogs-storage",
+    merge,
+    partialize
   })
 );
 
-const useDogStoreAsync = hook(useDogStore);
+// const foo: UseBoundStore<Write<StoreApi<DogsState>, StorePersist<DogsState, Partial<DogsState>>>> = useDogStore;
+
+const useDogStoreAsync = hook<DogsState>(useDogStore);
 
 function DogCounter() {
-  const dogs = useDogStoreAsync(state => state.dogs);
+  useEffect(() => {
+    useDogStore.setState(state => {
+      return {
+        dogs: state.dogs.setValueSync(100, {updateStore: false})
+      };
+    });
+    useDogStore.persist.rehydrate();
+  }, []);
+  const dogs = useDogStoreAsync(state => state.dogs, {initialValue: dogs});
   return <h1 className="dog-counter">{dogs} around here...</h1>;
 }
 

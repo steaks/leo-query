@@ -1,5 +1,16 @@
 import {StoreApi, UseBoundStore} from "zustand";
-import {Dependencies, Effect, Query, QueryOptions, QueryValue, GlobalOptions, SetValueSyncOptions} from "./types";
+import {
+  Dependencies, 
+  Effect, 
+  Query, 
+  QueryOptions, 
+  QueryValue, 
+  GlobalOptions, 
+  SetValueSyncOptions, 
+  UseBoundAsyncStoreWithoutSuspense,
+  UseBoundAsyncStoreWithSuspense,
+  UseBoundAsyncStoreOptions
+} from "./types";
 import {wait} from "./util";
 import {setupRetries} from "./retry";
 
@@ -56,7 +67,7 @@ export const equals = (a: any, b: any): boolean => {
   } else {
     bValue = b;
   }
-  return aValue === bValue
+  return aValue === bValue;
 };
 
 interface EffectParams<Args extends any[] = []> {
@@ -152,14 +163,25 @@ const setupStaleTimeout = <Store extends object, R>(query: Query<Store, R>): num
 const setSync = <Store extends object, R>(query: Query<Store, R>, value?: R, error?: any, options: SetValueSyncOptions = {}): Query<Store, R> => {
   const state = query.__store().getState();
   const current = state[query.__key] as Query<Store, R>;
+  if (equals(current.value, value)) {
+    return current;
+  }
+  if (options.__isInitialValue && current.__isInitialized) {
+    return current;
+  }
+  if (options.__serverValueTimestamp && options.__serverValueTimestamp < current.__valueTimestamp) {
+    return current;
+  }
   const staleTimeout = setupStaleTimeout(current);
   const next = {
     ...current,
+    __isInitialized: true,
     __trigger: undefined,
     __triggerStart: 0,
     __initialPromise: undefined,
     __needsLoad: false,
     __staleTimeout: staleTimeout,
+    __valueTimestamp: Date.now(),
     isLoading: false,
     value: error === undefined ? value : undefined,
     error
@@ -193,6 +215,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
     __key: "NOT_YET_SET" as keyof Store,
     __trigger: undefined as undefined | Promise<R>,
     __triggerStart: 0,
+    __valueTimestamp: p.options.initialValue === undefined ? 0 : Date.now(),
     __initialPromise: undefined as undefined | Promise<R>,
     __debounce: p.options.debounce !== undefined ? p.options.debounce : 300,
     __lazy: p.options.lazy !== undefined ? p.options.lazy : true,
@@ -202,6 +225,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
     __store: getStore,
     __staleTime: p.options.staleTime,
     __staleTimeout: undefined as number | undefined,
+    __isInitialized: p.options.initialValue !== undefined,
     isLoading: false,
     value: p.options.initialValue as unknown as R,
     error: undefined,
@@ -224,6 +248,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
           __triggerStart: now,
           __needsLoad: false,
           __initialPromise: initialPromise,
+          __isInitialized: true,
           isLoading: true
         }
       } as Partial<Store>);
@@ -263,58 +288,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
   return q;
 }
 
-
-export interface UseBoundAsyncStoreOptions {
-  /**
-   * Trigger suspense when the query's dependencies are loading.
-   */
-  readonly followDeps?: boolean;
-}
-
 type QueryOrEffect<T> = Query<T, any> | Effect<T, any>
-export type UseBoundAsyncStoreWithSuspense<T> = {
-  /**
-   * Select a query from the store. Handle async data concerns:
-   *   - Fetch data for the query as needed
-   *   - Leverage caching
-   *   - Re-render component when query value updates
-   *   - Trigger suspense when the query is loading
-   *   - Consider dependencies
-   * @param selector Select the query from the store.
-   * @param opts Options
-   */
-  <R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions): R;
-  /**
-   * Select an effect from the store. Handle async data concerns:
-   *   - Trigger suspense when the effect is loading
-   *   - Consider dependencies
-   * @param selector Select the effect from the store.
-   * @param opts Options
-   */
-  <Args extends any[] = []>(selector: (state: T) => Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): () => Promise<void>
-};
-
-export type UseBoundAsyncStoreWithoutSuspense<T> = {
-  /**
-   * Select a query from the store. Handle async data concerns:
-   *   - Fetch data for the query as needed
-   *   - Leverage caching
-   *   - Re-render component when query value updates
-   *   - Trigger suspense when the query is loading
-   *   - Consider dependencies
-   * @param selector Select the query from the store.
-   * @param opts Options
-   */
-    <R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions): QueryValue<R>;
-  /**
-   * Select an effect from the store. Handle async data concerns:
-   *   - Trigger suspense when the effect is loading
-   *   - Consider dependencies
-   * @param selector Select the effect from the store.
-   * @param opts Options
-   */
-    <Args extends any[] = []>(selector: (state: T) => Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): () => Promise<void>
-};
 
 /**
  * React hook to retrieve queries or effects from your store. This hook will automatically trigger Suspense when a query is loading.
@@ -322,12 +296,12 @@ export type UseBoundAsyncStoreWithoutSuspense<T> = {
  */
 const withSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStoreWithSuspense<T> => {
   subscribe(store);
-  function useBoundAsyncStore<R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions): R;
-  function useBoundAsyncStore<Args extends any[] = []>(selector: (state: T) => Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): (() => Promise<void>);
-  function useBoundAsyncStore<R, Args extends any[] = []>(selector: (state: T) => Query<T, R> | Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): R | (() => Promise<void>) {
+  function useBoundAsyncStore<R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions<R>): R;
+  function useBoundAsyncStore<Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): (() => Promise<void>);
+  function useBoundAsyncStore<R, Args extends any[] = []>(selector: (state: T) => Query<T, R> | Effect<T, Args>, opts?: UseBoundAsyncStoreOptions<R>): R | (() => Promise<void>) {
+    const _opts = opts || {};
     const theSelector = (state: T): [Query<T, R>, ...QueryOrEffect<T>[]] | [Effect<T, Args>, ...QueryOrEffect<T>[]] => {
       const value = selector(state);
-      const _opts = opts || {};
       if (isQuery(value)) {
         const query = value as unknown as Query<T, R>;
         let deps = [] as QueryOrEffect<T>[];
@@ -346,7 +320,7 @@ const withSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>): 
     };
     const value = store(theSelector);
     if (isQuery(value[0])) {
-      const v = withSuspense(value as [Query<T, R>, ...QueryOrEffect<T>[]]);
+      const v = withSuspense(value as [Query<T, R>, ...QueryOrEffect<T>[]], _opts as UseBoundAsyncStoreOptions<R>);
       if (v.error) {
         throw v.error;
       } else {
@@ -368,12 +342,12 @@ const withSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>): 
  */
 const withoutSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStoreWithoutSuspense<T> => {
   subscribe(store);
-  function useBoundAsyncStoreWithoutSuspense<R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions): QueryValue<R>;
-  function useBoundAsyncStoreWithoutSuspense<Args extends any[] = []>(selector: (state: T) => Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): (() => Promise<void>);
-  function useBoundAsyncStoreWithoutSuspense<R, Args extends any[] = []>(selector: (state: T) => Query<T, R> | Effect<T, Args>, opts?: UseBoundAsyncStoreOptions): QueryValue<R> | (() => Promise<void>) {
+  function useBoundAsyncStoreWithoutSuspense<R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions<R>): QueryValue<R>;
+  function useBoundAsyncStoreWithoutSuspense<Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): (() => Promise<void>);
+  function useBoundAsyncStoreWithoutSuspense<R, Args extends any[] = []>(selector: (state: T) => Query<T, R> | Effect<T, Args>, opts?: UseBoundAsyncStoreOptions<R>): QueryValue<R> | (() => Promise<void>) {
+    const _opts = opts || {};
     const theSelector = (state: T): [Query<T, R>, ...QueryOrEffect<T>[]] | [Effect<T, Args>, ...QueryOrEffect<T>[]] => {
       const value = selector(state);
-      const _opts = opts || {};
       if (isQuery(value)) {
         const query = value as unknown as Query<T, R>;
         let deps = [] as QueryOrEffect<T>[];
@@ -394,12 +368,7 @@ const withoutSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>
     if (isQuery(value[0])) {
       const v = value[0] as Query<T, R>;
       try {
-        withSuspense(value as [Query<T, R>, ...QueryOrEffect<T>[]]);
-        return {
-          value: v.value,
-          isLoading: v.isLoading,
-          error: v.error
-        }
+        return withSuspense(value as [Query<T, R>, ...QueryOrEffect<T>[]], _opts);
       } catch (e) {
         return {
           value: v.value,
@@ -409,8 +378,7 @@ const withoutSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>
       }
     } else if (isEffect(value[0])) {
       try {
-        withSuspense(value as [Effect<T, Args>, ...QueryOrEffect<T>[]]);
-        return value[0].trigger;
+        return withSuspense(value as [Effect<T, Args>, ...QueryOrEffect<T>[]]);
       } catch (e) {
         return value[0].trigger;
       }
@@ -460,61 +428,99 @@ const subscribe = <T extends object>(store: UseBoundStore<StoreApi<T>>) => {
   });
 };
 
+const setInitialValue = <T>(query: Query<any, T>, initialValue: T) => {
+  query.setValueSync(initialValue, {__isInitialValue: true});
+};
+
+const setServerValue = <T>(query: Query<any, T>, serverValue: T, timestamp: number) => {
+  query.setValueSync(serverValue, {__serverValueTimestamp: timestamp});
+};
+
+const assertOptions = <T>(opts: UseBoundAsyncStoreOptions<T>) => {
+  if (opts.serverValue !== undefined && opts.serverValueTimestamp === undefined) {
+    throw new Error("serverValueTimestamp is required when serverValue is provided");
+  }
+  if (opts.serverValueTimestamp !== undefined && opts.serverValue === undefined) {
+    throw new Error("serverValue is required when serverValueTimestamp is provided");
+  }
+};
+
+const withSuspenseQuery = <T>(values: [Query<any, T>, ...QueryOrEffect<any>[]], opts: UseBoundAsyncStoreOptions<T>): QueryValue<T> => {
+  assertOptions(opts);
+  const v = values[0] as Query<any, T>;
+  const needsTrigger = v.__needsLoad || v.isLoading;
+  const needsInitialValue = needsTrigger && opts.initialValue !== undefined && !v.__isInitialized;
+  const needsServerValue = opts.serverValue !== undefined && v.__valueTimestamp < opts.serverValueTimestamp!;
+  let queryTrigger = [] as Promise<T>[];
+  let depTriggers = [] as Promise<any>[];
+  if (needsInitialValue) {
+    wait().then(() => { setInitialValue(v, opts.initialValue!); });
+  } else if (needsServerValue) {
+    wait().then(() => { setServerValue(v, opts.serverValue!, opts.serverValueTimestamp!); });
+  } else if (needsTrigger) {
+    if (v.__trigger) {
+      queryTrigger = [v.__trigger];
+    } else {
+      queryTrigger = [wait().then(v.trigger)];
+    }
+    depTriggers = values.slice(1).flatMap(vv => {
+      if (isQuery(vv)) {
+        return vv.__trigger ? [vv.__trigger] : [];
+      } else if (isEffect(vv)) {
+        return vv.__triggers;
+      } else {
+        return [];
+      }
+    });
+  } 
+  const allTriggers = [...queryTrigger, ...depTriggers];
+  if (needsInitialValue) {
+    return {value: opts.initialValue, error: undefined, isLoading: false};
+  } else if (needsServerValue) {
+    return {value: opts.serverValue, error: undefined, isLoading: false};
+  } else if (allTriggers.length === 0) {
+    return {value: v.value, error: v.error, isLoading: false};
+  } else {
+    throw Promise.all(allTriggers);
+  }
+};
+
+const withSuspenseEffect = <Args extends any[]>(values: [Effect<any, Args>, ...QueryOrEffect<any>[]]): (() => Promise<void>) => {
+  const v = values[0];
+  const effectTriggers = v.__triggers;
+  const depTriggers = values.slice(1).flatMap(vv => {
+    if (isQuery(vv)) {
+      return vv.__trigger ? [vv.__trigger] : [];
+    } else if (isEffect(vv)) {
+      return vv.__triggers;
+    } else {
+      return [];
+    }
+  });
+  const allTriggers = [...effectTriggers, ...depTriggers];
+  if (allTriggers.length === 0) {
+    return v.trigger;
+  } else {
+    throw Promise.all(allTriggers);
+  }
+};
+
 /**
  * Hook up your query so it will automatically load when your component needs it. And leverage <Suspense> when the
  * query is loading.
  * @param query
  */
-function withSuspense<T>(query: [Query<any, T>, ...QueryOrEffect<any>[]]): QueryValue<T>;
+function withSuspense<T>(query: [Query<any, T>, ...QueryOrEffect<any>[]], opts: UseBoundAsyncStoreOptions<T>): QueryValue<T>;
 /**
  * Hook up your effect(s) so it will trigger <Suspense> when the effect is loading.
  * @param effect
  */
 function withSuspense<Args extends any[] = []>(effect: [Effect<any, Args>, ...QueryOrEffect<any>[]]): (() => Promise<void>);
-function withSuspense<T, Args extends any[] = []>(values: [Query<any, T>, ...QueryOrEffect<any>[]] | [Effect<any, Args>, ...QueryOrEffect<any>[]]): QueryValue<T> | ((...args: Args) => Promise<void>) {
+function withSuspense<T, Args extends any[] = []>(values: [Query<any, T>, ...QueryOrEffect<any>[]] | [Effect<any, Args>, ...QueryOrEffect<any>[]], opts?: UseBoundAsyncStoreOptions<T>): QueryValue<T> | ((...args: Args) => Promise<void>) {
   if (isQuery(values[0])) {
-    const v = values[0];
-    const needsTrigger = v.__needsLoad || v.isLoading;
-    let queryTrigger = [] as Promise<T>[];
-    if (needsTrigger && v.__trigger) {
-      queryTrigger = [v.__trigger];
-    }
-    if (needsTrigger && !v.__trigger) {
-      queryTrigger = [wait().then(v.trigger)];
-    }
-    const depTriggers = values.slice(1).flatMap(vv => {
-      if (isQuery(vv)) {
-        return vv.__trigger ? [vv.__trigger] : [];
-      } else if (isEffect(vv)) {
-        return vv.__triggers;
-      } else {
-        return [];
-      }
-    });
-    const allTriggers = [...queryTrigger, ...depTriggers];
-    if (allTriggers.length === 0) {
-      return {value: v.value, error: v.error, isLoading: false};
-    } else {
-      throw Promise.all(allTriggers);
-    }
+    return withSuspenseQuery(values as [Query<any, T>, ...QueryOrEffect<any>[]], opts!);
   } else if (isEffect(values[0])) {
-    const v = values[0];
-    const effectTriggers = v.__triggers;
-    const depTriggers = values.slice(1).flatMap(vv => {
-      if (isQuery(vv)) {
-        return vv.__trigger ? [vv.__trigger] : [];
-      } else if (isEffect(vv)) {
-        return vv.__triggers;
-      } else {
-        return [];
-      }
-    });
-    const allTriggers = [...effectTriggers, ...depTriggers];
-    if (allTriggers.length === 0) {
-      return v.trigger;
-    } else {
-      throw Promise.all(allTriggers);
-    }
+    return withSuspenseEffect(values as [Effect<any, Args>, ...QueryOrEffect<any>[]]);
   } else {
     throw new Error("Value must be Query or Effect");
   }
