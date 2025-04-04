@@ -1,7 +1,9 @@
-.idea
 /**/.idea
-
+/**/.vscode
 /**/build
 /**/types
 /**/node_modules
 /**/dist
+/**/.yalc
+/**/.vitepress/cache
+/**/.vitepress/dist
