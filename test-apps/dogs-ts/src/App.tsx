@@ -1,5 +1,5 @@
 import React, {Suspense, useEffect} from 'react';
-import {create, StoreApi, UseBoundStore} from "zustand";
+import {create} from "zustand";
 import {persist} from "zustand/middleware";
 import {hook, effect, query, partialize, merge, Query, Effect} from "leo-query";
 import {fetchDogs, increasePopulation, removeAllDogs} from "./db";
@@ -14,7 +14,7 @@ interface DogsState {
 const useDogStore = create<DogsState>()(persist(() => ({
     increasePopulation: effect(increasePopulation),
     removeAllDogs: effect(removeAllDogs),
-    dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs], {initialValue: "SSR"}),
+    dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]),
   }), {
     name: "dogs-storage",
     merge,
@@ -33,9 +33,8 @@ function DogCounter() {
         dogs: state.dogs.setValueSync(100, {updateStore: false})
       };
     });
-    useDogStore.persist.rehydrate();
   }, []);
-  const dogs = useDogStoreAsync(state => state.dogs, {initialValue: dogs});
+  const dogs = useDogStoreAsync(state => state.dogs);
   return <h1 className="dog-counter">{dogs} around here...</h1>;
 }
 

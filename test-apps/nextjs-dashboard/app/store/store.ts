@@ -21,7 +21,7 @@ export const createCounterStore = () => {
     count: 0,
     decrementCount: () => set((s) => ({ count: s.count - 1 })),
     incrementCount: () => set((s) => ({ count: s.count + 1 })),
-    dogs: query(fetchDogs, (s) => [s.incrementCount]),
+    dogs: query(fetchDogs, (s) => []),
   }));
 };
 

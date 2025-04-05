@@ -1,16 +1,12 @@
 import {createContext, ReactNode, useContext, useRef} from "react";
 import {StoreApi, useStore, UseBoundStore} from "zustand";
 import {hook} from "./src";
-import {UseBoundAsyncStoreWithSuspense, UseBoundAsyncStoreWithoutSuspense, StoreProvider, StoreHooks} from "./types";
-
-interface Props {
-  children: ReactNode;
-}
+import {UseBoundAsyncStoreWithSuspense, UseBoundAsyncStoreWithoutSuspense, StoreProvider, StoreHooks, StoreProviderProps} from "./types";
 
 export const createStoreProvider = <T extends object, >(createStore: () => StoreApi<T>): StoreProvider<T> => {
   const Context = createContext<StoreHooks<T> | null>(null);
 
-  const Provider = (p: Props) => {
+  const Provider = (p: StoreProviderProps) => {
     const storeRef = useRef<StoreHooks<T> | null>(null);
     if (storeRef.current === null) {
       const store = createStore();

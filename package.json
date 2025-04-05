@@ -26,7 +26,6 @@
     "zustand": ">=4.5"
   },
   "dependencies": {
-    "leo-query": "file:.yalc/leo-query",
     "typescript": "^4.7.3"
   },
   "devDependencies": {

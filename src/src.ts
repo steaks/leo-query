@@ -160,9 +160,14 @@ const setupStaleTimeout = <Store extends object, R>(query: Query<Store, R>): num
   return undefined;
 };
 
-const setSync = <Store extends object, R>(query: Query<Store, R>, value?: R, error?: any, options: SetValueSyncOptions = {}): Query<Store, R> => {
-  const state = query.__store().getState();
-  const current = state[query.__key] as Query<Store, R>;
+const setSync = <Store extends object, R>(query: Query<Store, R>, value?: R, error?: any, options: SetValueSyncOptions<Store, R> = {}): Query<Store, R> => {
+  let current: Query<Store, R>;
+  if (options.__query) {
+    current = options.__query;
+  } else {
+    const state = query.__store().getState();
+    current = state[query.__key] as Query<Store, R>;
+  }
   if (equals(current.value, value)) {
     return current;
   }
@@ -282,7 +287,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
         }
       } as Partial<Store>);
     },
-    setValueSync: (value: R, options: SetValueSyncOptions = {}): Query<Store, R> => 
+    setValueSync: (value: R, options: SetValueSyncOptions<Store, R> = {}): Query<Store, R> => 
       setSync(q, value, /*error*/undefined, options)
   };
   return q;

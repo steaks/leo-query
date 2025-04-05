@@ -83,7 +83,7 @@ export interface Query<State, T> {
      * @param options - Options for the update.
      * @returns The updated query.
      */
-    setValueSync: (value: T, options?: SetValueSyncOptions) => Query<State, T>; 
+    setValueSync: (value: T, options?: SetValueSyncOptions<State, T>) => Query<State, T>; 
 }
 
 export type Primitive = string | number | boolean | null | undefined | bigint | symbol;
@@ -130,13 +130,15 @@ export interface GlobalOptions {
     query?: GlobalQueryOptions;
 }
 
-export interface SetValueSyncOptions {
+export interface SetValueSyncOptions<State, T> {
     /** If `true`, the store will be updated with the new value. Defaults to `true`. */
     readonly updateStore?: boolean;
     /** If `true`, this value is the initial value for the query. */
     readonly __isInitialValue?: boolean;
     /** Timestamp of the server value. */
     readonly __serverValueTimestamp?: number;
+    /** The query to update. */
+    readonly __query?: Query<State, T>;
 }
 
 
@@ -202,7 +204,7 @@ export type UseBoundAsyncStoreWithoutSuspense<T> = {
     <Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): () => Promise<void>
 };
 
-interface StoreProviderProps {
+export interface StoreProviderProps {
   children: ReactNode;
 }
 
