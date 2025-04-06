@@ -1,13 +1,12 @@
 "use client";
 
-import { CounterStore, createCounterStore } from "./store";
+import { createDogsStore } from "./store";
 import { createStoreProvider } from "leo-query";
 
-console.log("HERE");
 export const {
-    Provider: CounterStoreProvider, 
-    Context: CounterStoreContext, 
-    useStore: useCounterStore, 
-    useStoreAsync: useCounterStoreAsync, 
-    useStoreSuspense: useCounterStoreSuspense
-} = createStoreProvider<CounterStore>(createCounterStore);
+    Provider: DogsStoreProvider, 
+    Context: DogsStoreContext, 
+    useStore: useDogsStore, 
+    useStoreAsync: useDogsStoreAsync, 
+    useStoreSuspense: useDogsStoreSuspense
+} = createStoreProvider(createDogsStore);

@@ -1,29 +1,32 @@
 # Initial Data
 
-Sometimes you may want to set initial data for your queries. You have three options to set initial data. 1) Use the `initialValue` property, 2) Set manually with `setValueSync` or 3) Pull [persisted data store](./persistingData).
+Sometimes you may want to set initial data for your queries. You can set initial data at store creation time or in your React component hook.
 
 ## Usage
 
-### InitialValue Example
+### Store creation
 Pass initialValue as an option to the query.
 
 ```typescript
 const useDogStore = create<DogsState>(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllDogs: effect(removeAllDogs),
-  dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs], {initialValue: 100}) // Re-fetch when increasePopulation or removeAllDogs succeeds 
+  dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs], {initialValue: 100}) 
 }));
 ```
 
-### SetValueSync Example
-Call setValueSync to populate a query with a value. This can be invoked inside or outside a React component.
-
-```typescript
+### Hook
+Pass initialValue in your React component
+```
 const useDogStore = create<DogsState>(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllDogs: effect(removeAllDogs),
-  dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]) // Re-fetch when increasePopulation or removeAllDogs succeeds 
+  dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs])
 }));
 
-useDogStore.getState().dogs.setValueSync({value: 100});
+const useDogStoreAsync = hook(useDogStore);
+
+const MyComponent = () => {
+  const dogs = useDogStoreAsync(s => s.dogs, {initialValue: 100});
+};
 ```

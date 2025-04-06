@@ -52,6 +52,8 @@ export default defineConfig({
           { text: "Retries", link: "/retries" },
           { text: "Persisting Data", link: "/persistingData" },
           { text: "Initial Data", link: "/initialData" },
+          { text: "Manual Updates", link: "/manualUpdates" },
+          { text: "Setup with Next", link: "/setupWithNext" },
         ]
       },
       {

@@ -1,6 +1,5 @@
 import '@/app/ui/global.css';
 import { inter } from '@/app/ui/fonts';
-import { CounterStoreProvider } from './store/provider';
 
 export default function RootLayout({
   children,
@@ -10,9 +9,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} antialiased`}>
-        <CounterStoreProvider>
-          {children}
-        </CounterStoreProvider>
+        {children}
       </body>
     </html>
   );

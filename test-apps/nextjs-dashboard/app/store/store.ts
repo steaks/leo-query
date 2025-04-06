@@ -1,28 +1,18 @@
 import {createStore} from "zustand/vanilla";
-import {Query, query} from "leo-query";
+import {query, effect, Effect, Query} from "leo-query";
+import {fetchDogs, increasePopulation, removeAllDogs } from "./data";
 
-export interface CounterStore {
-  count: number;
-  decrementCount: () => void;
-  incrementCount: () => void;
-  dogs: Query<CounterStore, number>;
+export interface DogsState {
+  dogs: Query<DogsState, number>;
+  increasePopulation: Effect<DogsState, []>;
+  removeAllDogs: Effect<DogsState, []>;
 }
 
-const fetchDogs = async (): Promise<number> => {
-  // Simulate API call
-  console.log("fetchDogs");
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return 42;
-};
-
-export const createCounterStore = () => {
-  console.log("createCounterStore");
-  return createStore<CounterStore>()((set) => ({
-    count: 0,
-    decrementCount: () => set((s) => ({ count: s.count - 1 })),
-    incrementCount: () => set((s) => ({ count: s.count + 1 })),
-    dogs: query(fetchDogs, (s) => []),
+export const createDogsStore = () => 
+  createStore<DogsState>(() => ({
+    increasePopulation: effect(increasePopulation),
+    removeAllDogs: effect(removeAllDogs),
+    dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]) // Re-fetch when increasePopulation or removeAllDogs succeeds 
   }));
-};
 
-export type CounterStoreApi = ReturnType<typeof createCounterStore>;
+export type DogsStateApi = ReturnType<typeof createDogsStore>;

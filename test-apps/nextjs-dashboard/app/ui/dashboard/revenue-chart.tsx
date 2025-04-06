@@ -4,7 +4,7 @@ import { generateYAxis } from '@/app/lib/utils';
 import { CalendarIcon } from '@heroicons/react/24/outline';
 import { lusitana } from '@/app/ui/fonts';
 import { Revenue } from '@/app/lib/definitions';
-import { useCounterStore } from '@/app/store/provider';
+import { useDogsStore, useDogsStoreAsync } from '@/app/store/provider';
 // This component is representational only.
 // For data visualization UI, check out:
 // https://www.tremor.so/
@@ -23,9 +23,9 @@ export default function RevenueChart({
   revenue: Revenue[];
 }) {
   const chartHeight = 350;
-  const count = useCounterStore(s => s.count);
-  const incrementCount = useCounterStore(s => s.incrementCount);
-  logWithEnv(`count: ${count}`);
+  const dogs = useDogsStoreAsync(s => s.dogs);
+  const incrementCount = useDogsStore(s => s.increasePopulation.trigger);
+  logWithEnv(`count: ${dogs.value}`);
   // NOTE: Uncomment this code in Chapter 7
 
   const { yAxisLabels, topLabel } = generateYAxis(revenue);
@@ -40,8 +40,8 @@ export default function RevenueChart({
         Recent Revenue
       </h2>
       <div>
-        <p>Count: {count}</p>
-        <button onClick={() => incrementCount()}>Increment</button>
+        <p>Count: {dogs.value}</p>
+        <button onClick={incrementCount}>Increment</button>
       </div>
       {/* NOTE: Uncomment this code in Chapter 7 */}
 

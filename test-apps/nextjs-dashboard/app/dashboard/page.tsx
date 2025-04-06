@@ -3,12 +3,12 @@ import RevenueChart from '@/app/ui/dashboard/revenue-chart';
 import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
 import { lusitana } from '@/app/ui/fonts';
 import { fetchRevenue, fetchLatestInvoices } from '@/app/lib/data';
-import { CounterStoreProvider } from '@/app/store/provider';
+import { DogsStoreProvider } from '@/app/store/provider';
 export default async function Page() {
   const revenue = await fetchRevenue();
   const latestInvoices = await fetchLatestInvoices();
   return (
-    <CounterStoreProvider>
+    <DogsStoreProvider>
       <main>
         <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
           Dashboard
@@ -28,6 +28,6 @@ export default async function Page() {
           <LatestInvoices latestInvoices={latestInvoices} />
         </div>
       </main>
-    </CounterStoreProvider>
+    </DogsStoreProvider>
   );
 }
