@@ -30,7 +30,7 @@ function DogCounter() {
   useEffect(() => {
     useDogStore.setState(state => {
       return {
-        dogs: state.dogs.setValueSync(100, {updateStore: false})
+        dogs: state.dogs.setValue(100, {updateStore: false})
       };
     });
   }, []);

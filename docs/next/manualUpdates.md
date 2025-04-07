@@ -1,6 +1,6 @@
 # Manual Updates
 
-Sometimes you may want to manually update query data rather than trigger an async query to fetch data. You can use `setValueSync` to update query data. You can use `setValueSync` inside or outside of a React component. This is most commonly used to implement optimitic updates.
+Sometimes you may want to manually update query data rather than trigger an async query to fetch data. You can use `setValue` to update query data. You can use `setValue` inside or outside of a React component. This is most commonly used to implement optimitic updates.
 
 ## Usage
 
@@ -17,7 +17,7 @@ const useDogStoreAsync = hook(useDogStore);
 
 const MyComponent = () => {
   useEffect(() => {
-    useDogStore.getState().dogs.setValueSync(100):
+    useDogStore.getState().dogs.setValue(100):
   }, []);
 };
 ```
@@ -31,5 +31,5 @@ const useDogStore = create<DogsState>(() => ({
   dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs], {initialValue: 100}) 
 }));
 
-useDogStore.getState().dgos.setValueSync(100);
+useDogStore.getState().dgos.setValue(100);
 ```

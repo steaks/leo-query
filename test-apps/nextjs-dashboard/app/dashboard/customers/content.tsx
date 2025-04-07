@@ -1,6 +1,5 @@
 "use client";
 
-import { increasePopulation } from "@/app/store/data";
 import {useDogsStore, useDogsStoreAsync} from "@/app/store/provider";
 
 interface Props {

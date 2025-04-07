@@ -4,7 +4,12 @@ Leo Query provides helpers that follow [Zustand's guidance](https://zustand.docs
 
 ## Usage
 
-Integrate Zustand + Leo Query with Next in three steps. Create your store. Create your provider. 
+Integrate Zustand + Leo Query with Next in four steps.
+- Create your store
+- Create your provider
+- Wrap your components with the provider
+- Use the hooks in your component
+
 
 
 ```typescript

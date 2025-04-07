@@ -77,13 +77,13 @@ export interface Query<State, T> {
     trigger: () => Promise<T>;
     /** Mark the data as stale (i.e. needs a load). */
     markStale: () => void;
-    /** Manually set the value of the query synchronously. This is useful for optimistic updates, setting initial values, or setting values loaded in server components.
+    /** Manually set the value of the query. This is useful for optimistic updates, setting initial values, or setting values loaded in server components.
      * 
      * @param value - The value to set.
      * @param options - Options for the update.
      * @returns The updated query.
      */
-    setValueSync: (value: T, options?: SetValueSyncOptions<State, T>) => Query<State, T>; 
+    setValue: (value: T, options?: SetValueOptions<State, T>) => Query<State, T>; 
 }
 
 export type Primitive = string | number | boolean | null | undefined | bigint | symbol;
@@ -130,13 +130,13 @@ export interface GlobalOptions {
     query?: GlobalQueryOptions;
 }
 
-export interface SetValueSyncOptions<State, T> {
+export interface SetValueOptions<State, T> {
     /** If `true`, the store will be updated with the new value. Defaults to `true`. */
     readonly updateStore?: boolean;
     /** If `true`, this value is the initial value for the query. */
     readonly __isInitialValue?: boolean;
     /** Timestamp of the server value. */
-    readonly __serverValueTimestamp?: number;
+    readonly __timestamp?: number;
     /** The query to update. */
     readonly __query?: Query<State, T>;
 }
@@ -148,17 +148,18 @@ export interface UseBoundAsyncStoreOptions<T> {
    */
   readonly followDeps?: boolean;
   /**
-   * Initial value for the query.
+   * If `true`, this value is the initial value for the query.
    */
   readonly initialValue?: T;
   /**
-   * Server value for the query.
+   * Value for the query. This value many not be initial value. Provide a timestamp to tell Leo Query when the value was created.
+   * Leo Query will use this value if the timestamp is newer than the query value's current timestamp.
    */
-  readonly serverValue?: T;
+  readonly value?: T;
   /**
-   * Timestamp of the server value.
+   * Timestamp of the value. Leo Query will use this value if the timestamp is newer than the query value's current timestamp.
    */
-  readonly serverValueTimestamp?: number;
+  readonly timestamp?: number;
 }
 
 

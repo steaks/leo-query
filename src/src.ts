@@ -6,7 +6,7 @@ import {
   QueryOptions, 
   QueryValue, 
   GlobalOptions, 
-  SetValueSyncOptions, 
+  SetValueOptions, 
   UseBoundAsyncStoreWithoutSuspense,
   UseBoundAsyncStoreWithSuspense,
   UseBoundAsyncStoreOptions
@@ -160,7 +160,7 @@ const setupStaleTimeout = <Store extends object, R>(query: Query<Store, R>): num
   return undefined;
 };
 
-const setSync = <Store extends object, R>(query: Query<Store, R>, value?: R, error?: any, options: SetValueSyncOptions<Store, R> = {}): Query<Store, R> => {
+const setSync = <Store extends object, R>(query: Query<Store, R>, value?: R, error?: any, options: SetValueOptions<Store, R> = {}): Query<Store, R> => {
   let current: Query<Store, R>;
   if (options.__query) {
     current = options.__query;
@@ -174,7 +174,7 @@ const setSync = <Store extends object, R>(query: Query<Store, R>, value?: R, err
   if (options.__isInitialValue && current.__isInitialized) {
     return current;
   }
-  if (options.__serverValueTimestamp && options.__serverValueTimestamp < current.__valueTimestamp) {
+  if (options.__timestamp && options.__timestamp < current.__valueTimestamp) {
     return current;
   }
   const staleTimeout = setupStaleTimeout(current);
@@ -287,7 +287,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
         }
       } as Partial<Store>);
     },
-    setValueSync: (value: R, options: SetValueSyncOptions<Store, R> = {}): Query<Store, R> => 
+    setValue: (value: R, options: SetValueOptions<Store, R> = {}): Query<Store, R> => 
       setSync(q, value, /*error*/undefined, options)
   };
   return q;
@@ -433,20 +433,26 @@ const subscribe = <T extends object>(store: UseBoundStore<StoreApi<T>>) => {
   });
 };
 
-const setInitialValue = <T>(query: Query<any, T>, initialValue: T) => {
-  query.setValueSync(initialValue, {__isInitialValue: true});
+const setInitialValue = <T>(query: Query<any, T>, value: T) => {
+  query.setValue(value, {__isInitialValue: true});
 };
 
-const setServerValue = <T>(query: Query<any, T>, serverValue: T, timestamp: number) => {
-  query.setValueSync(serverValue, {__serverValueTimestamp: timestamp});
+const setValue = <T>(query: Query<any, T>, value: T, timestamp: number) => {
+  query.setValue(value, {__timestamp: timestamp});
 };
+
+const needsInitialValue = <T>(query: Query<any, T>, opts: UseBoundAsyncStoreOptions<T>) =>
+  !query.__isInitialized && opts.initialValue !== undefined;
+
+const needsValue = <T>(query: Query<any, T>, opts: UseBoundAsyncStoreOptions<T>) =>
+  opts.value !== undefined && query.__valueTimestamp < opts.timestamp!;
 
 const assertOptions = <T>(opts: UseBoundAsyncStoreOptions<T>) => {
-  if (opts.serverValue !== undefined && opts.serverValueTimestamp === undefined) {
-    throw new Error("serverValueTimestamp is required when serverValue is provided");
+  if (opts.value !== undefined && !opts.timestamp) {
+    throw new Error("Timestamp must be provided if value is provided");
   }
-  if (opts.serverValueTimestamp !== undefined && opts.serverValue === undefined) {
-    throw new Error("serverValue is required when serverValueTimestamp is provided");
+  if (opts.timestamp && opts.value === undefined) {
+    throw new Error("Value must be provided if timestamp is provided");
   }
 };
 
@@ -454,14 +460,14 @@ const withSuspenseQuery = <T>(values: [Query<any, T>, ...QueryOrEffect<any>[]], 
   assertOptions(opts);
   const v = values[0] as Query<any, T>;
   const needsTrigger = v.__needsLoad || v.isLoading;
-  const needsInitialValue = needsTrigger && opts.initialValue !== undefined && !v.__isInitialized;
-  const needsServerValue = opts.serverValue !== undefined && v.__valueTimestamp < opts.serverValueTimestamp!;
+  const _needsInitialValue = needsInitialValue(v, opts);
+  const _needsValue = needsValue(v, opts);
   let queryTrigger = [] as Promise<T>[];
   let depTriggers = [] as Promise<any>[];
-  if (needsInitialValue) {
+  if (_needsInitialValue) {
     wait().then(() => { setInitialValue(v, opts.initialValue!); });
-  } else if (needsServerValue) {
-    wait().then(() => { setServerValue(v, opts.serverValue!, opts.serverValueTimestamp!); });
+  } else if (_needsValue) {
+    wait().then(() => { setValue(v, opts.value!, opts.timestamp!); });
   } else if (needsTrigger) {
     if (v.__trigger) {
       queryTrigger = [v.__trigger];
@@ -479,10 +485,10 @@ const withSuspenseQuery = <T>(values: [Query<any, T>, ...QueryOrEffect<any>[]], 
     });
   } 
   const allTriggers = [...queryTrigger, ...depTriggers];
-  if (needsInitialValue) {
-    return {value: opts.initialValue, error: undefined, isLoading: false};
-  } else if (needsServerValue) {
-    return {value: opts.serverValue, error: undefined, isLoading: false};
+  if (_needsInitialValue) {
+    return {value: opts.initialValue!, error: undefined, isLoading: false};
+  } else if (_needsValue) {
+    return {value: opts.value!, error: undefined, isLoading: false};
   } else if (allTriggers.length === 0) {
     return {value: v.value, error: v.error, isLoading: false};
   } else {

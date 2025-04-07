@@ -94,6 +94,8 @@ interface QueryOptions {
   retryDelay?: (attempt: number) => number;
   /** Time in ms before data is considered stale */
   staleTime?: number;
+    /** The initial value of the query. */
+  initialValue?: T;
 }
 ```
 
@@ -136,5 +138,21 @@ export interface Query<State, T> {
     trigger: () => Promise<T>;
     /** Mark the data as stale (i.e. needs a load). */
     markStale: () => void;
+    /** Manually set the value of the query. This is useful for optimistic updates, setting initial values, or setting values loaded in server components.
+     * 
+     * @param value - The value to set.
+     * @param options - Options for the update.
+     * @returns The updated query.
+     */
+    setValue: (value: T, options?: SetValue) => Query<State, T>;
+
+}
+```
+
+#### SetValueOptions
+```typescript
+export interface SetValueOptions {
+    /** If `true`, the store will be updated with the new value. Defaults to `true`. */
+    readonly updateStore?: boolean;
 }
 ```
