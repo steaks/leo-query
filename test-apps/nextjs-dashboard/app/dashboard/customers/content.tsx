@@ -4,6 +4,7 @@ import {useDogsStore, useDogsStoreAsync} from "@/app/store/provider";
 
 interface Props {
   initialDogs: number;
+  timestamp: number;
 }
 
 export const Content = (p: Props) => {
