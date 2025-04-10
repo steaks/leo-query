@@ -10,7 +10,7 @@ Sometimes you may want to manually update query data rather than trigger an asyn
 const useDogStore = create<DogsState>(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllDogs: effect(removeAllDogs),
-  dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs], {initialValue: 100}) 
+  dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]) 
 }));
 
 const useDogStoreAsync = hook(useDogStore);
@@ -28,8 +28,28 @@ const MyComponent = () => {
 const useDogStore = create<DogsState>(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllDogs: effect(removeAllDogs),
-  dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs], {initialValue: 100}) 
+  dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]) 
 }));
 
-useDogStore.getState().dgos.setValue(100);
+useDogStore.getState().dogs.setValue(100);
+```
+
+### Batch updates
+
+You can batch updates manually. When you batch use Zustand's built-in set functions.
+
+```typescript
+const useDogStore = create<DogsState>(() => ({
+  smallDogs: query(fetchSmallDogs, s => [s.increasePopulation, s.removeAllDogs]),
+  largeDogs: query(fetchLargeDogs, s => [s.increasePopulation, s.removeAllDogs]),
+  increasePopulation: effect(increasePopulation),
+  removeAllDogs: effect(removeAllDogs),
+}));
+
+useDogStore.setState(state => {
+  return {
+    dogs: state.dogs.setValue(100, {updateStore: false}),
+    cats: state.cats.setValue(100, {updateStore: false}),
+  };
+})
 ```

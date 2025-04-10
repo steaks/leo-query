@@ -22,46 +22,47 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: "Home", link: "/" },
-      { text: "Guide", link: "/query" },
-      { text: "Examples", link: "/examples" },
-      { text: "Blog", link: "/blog" },
-      {component: "VersionSwitcher"}
+      {component: "NavLink", props: {text: "Home", latestLink: "/", nextLink: "/next"}},
+      {component: "NavLink", props: {text: "Docs", latestLink: "/query", nextLink: "/next/introduction/why"}},
+      {component: "NavLink", props: {text: "Examples", latestLink: "/examples", nextLink: "/next/examples/examples"}},
+      {component: "NavLink", props: {text: "Blog", latestLink: "/blog", nextLink: "/next/blog"}},
+      {component: "VersionSwitcher"},
     ],
     sidebar: {
       "/next/": [
         {
           text: "Introduction",
           items: [
-            { text: "Why Leo Query?", link: "/next/why" },
-            { text: "Getting Started", link: "/next/gettingStarted" },
+            { text: "Why Leo Query?", link: "/next/introduction/why" },
+            { text: "Getting Started", link: "/next/introduction/gettingStarted" },
           ]
-        },
+        }, 
         {
           text: "Guide",
           items: [
-            { text: "Query", link: "/next/query" },
-            { text: "Effect", link: "/next/effect" },
-            { text: "Hook", link: "/next/hook" },
-            { text: "Global Config", link: "/next/globalConfig" },
+            { text: "Query", link: "/next/guide/query" },
+            { text: "Effect", link: "/next/guide/effect" },
+            { text: "Hook", link: "/next/guide/hook" },
+            { text: "Global Config", link: "/next/guide/globalConfig" },
+            { text: "Initial Data", link: "/next/guide/initialData" },
+            { text: "Persisting Data", link: "/next/guide/persistingData" },
+            { text: "Optimistic Updates", link: "/next/guide/optimisticUpdates" },
+            { text: "Setup with Next", link: "/next/guide/setupWithNext" },
           ]
         },
         {
           text: "Advanced Concepts",
           items: [
-            { text: "Caching", link: "/next/caching" },
-            { text: "Optimistic Updates", link: "/next/optimisticUpdates" },
-            { text: "Retries", link: "/next/retries" },
-            { text: "Persisting Data", link: "/next/persistingData" },
-            { text: "Initial Data", link: "/next/initialData" },
-            { text: "Manual Updates", link: "/next/manualUpdates" },
-            { text: "Setup with Next", link: "/next/setupWithNext" },
+            { text: "Caching", link: "/next/advancedConcepts/caching" },
+            { text: "Retries", link: "/next/advancedConcepts/retries" },
+            { text: "Manual Updates", link: "/next/advancedConcepts/manualUpdates" },
+            { text: "Timestamped Values", link: "/next/advancedConcepts/timestampedValues" },
           ]
         },
         {
           text: "Examples",
           items: [
-            { text: "All Examples", link: "/next/examples" },
+            { text: "All Examples", link: "/next/examples/examples" },
             { text: "Dogs JS", link: "https://codesandbox.io/p/sandbox/leo-query-dogs-demo-js-wmwlgt?file=%2Fsrc%2FApp.jsx" },
             { text: "Dogs TS", link: "https://codesandbox.io/p/sandbox/leo-query-dogs-demo-ts-7f2c34?file=%2Fsrc%2FApp.tsx" },
             { text: "Task Manager", link: "https://xsh8c4.csb.app/" },
