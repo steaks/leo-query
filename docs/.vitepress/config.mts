@@ -40,8 +40,8 @@ export default defineConfig({
         {
           text: "Guide",
           items: [
-            { text: "Query", link: "/next/guide/query" },
-            { text: "Effect", link: "/next/guide/effect" },
+            { text: "Query (Fetches)", link: "/next/guide/query" },
+            { text: "Effect (Mutations)", link: "/next/guide/effect" },
             { text: "Hook", link: "/next/guide/hook" },
             { text: "Global Config", link: "/next/guide/globalConfig" },
             { text: "Initial Data", link: "/next/guide/initialData" },
@@ -71,9 +71,9 @@ export default defineConfig({
         {
           text: "Blog",
           items: [
-            { text: "Recent Posts", link: "/blog" },
-            { text: "Implementing Retry Logic", link: "/blog/implementingRetryLogic" },
-            { text: "Delaying Execution with Wait", link: "/blog/delayingExecutionWithWait" },
+            { text: "Recent Posts", link: "/next/blog" },
+            { text: "Implementing Retry Logic", link: "/next/blog/implementingRetryLogic" },
+            { text: "Delaying Execution with Wait", link: "/next/blog/delayingExecutionWithWait" },
           ]
         }
       ],
@@ -105,7 +105,7 @@ export default defineConfig({
         {
           text: "Examples",
           items: [
-            { text: "All Examples", link: "/next/examples" },
+            { text: "All Examples", link: "/examples" },
             { text: "Dogs JS", link: "https://codesandbox.io/p/sandbox/leo-query-dogs-demo-js-wmwlgt?file=%2Fsrc%2FApp.jsx" },
             { text: "Dogs TS", link: "https://codesandbox.io/p/sandbox/leo-query-dogs-demo-ts-7f2c34?file=%2Fsrc%2FApp.tsx" },
             { text: "Task Manager", link: "https://xsh8c4.csb.app/" },
@@ -114,9 +114,9 @@ export default defineConfig({
         {
           text: "Blog",
           items: [
-            { text: "Recent Posts", link: "/next/blog" },
-            { text: "Implementing Retry Logic", link: "/next/blog/implementingRetryLogic" },
-            { text: "Delaying Execution with Wait", link: "/next/blog/delayingExecutionWithWait" },
+            { text: "Recent Posts", link: "/blog" },
+            { text: "Implementing Retry Logic", link: "/blog/implementingRetryLogic" },
+            { text: "Delaying Execution with Wait", link: "/blog/delayingExecutionWithWait" },
           ]
         }
       ]

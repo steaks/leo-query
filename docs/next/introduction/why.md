@@ -38,19 +38,23 @@ const useStore = create<TodoStore>(() => ({
 
 ## Leo Query vs. TanStack Query
 
-Zustand + Tanstack Query is a popular combination. Tanstack Query is a powerful and robust library. But Leo Query gives you similar features with one state system, less boilerplate, and less complexity.
+Zustand + Tanstack Query is a popular combination. Tanstack Query is a powerful and robust library. But Tanstack Query and Zustand use different patterns and live in separate places. Managing data with two systems is harder than it needs to be. Leo Query follows the same patterns as Zustand and lives in your store. It gives you similar features with one state system, less boilerplate, and less complexity.
 
-Here is a comparison of how you may build a TODOs app with Tanstack Query vs. Leo Query:
+Here is a comparison of how you may build a TODOs app with Tanstack Query vs. Leo Query. This app fetches TODOs from the server and filters on the frontend.
 
 ### Zustand + TanStack Query Approach
+Zustand handles the frontend state. Tanstack Query handles async state outside of the store.
 
 ```typescript
-// Store frontend state in Zustand
-const useStore = create<FilterStore>((set) => ({
+// store.ts
+export const useStore = create<FilterStore>((set) => ({
   filter: "all", // all | active | completed
   setFilter: (filter) => set({ filter }),
 }));
+```
 
+```typescript
+// view.tsx
 const filterTodos = (todos: Todo[], filter: string) => {
   if (filter === "all") return todos;
   if (filter === "active") return todos.filter(todo => !todo.completed);
@@ -58,30 +62,31 @@ const filterTodos = (todos: Todo[], filter: string) => {
   throw new Error(`Invalid filter: ${filter}`);
 };
 
-function TodoItems() {
+export function TodoItems() {
   const filter = useStore(state => state.filter);
-  // Fetch todos with Tanstack Query
-  const {data: todos} = useQuery({queryKey: ["todos"], queryFn: fetchTodos });
+  // Fetch todos with Tanstack Query.
+  const {data: todos} = useQuery({queryKey: ["todos"], queryFn: fetchTodos});
   const filteredTodos = filterTodos(todos ?? [], filter);
 
   return <ul>{filteredTodos.map(/.../)}</ul>;
 }
+```
 
-function CreateTodo() {
+```typescript
+//create.tsx
+export function CreateTodo() {
   const queryClient = useQueryClient();
   // Create todo with Tanstack Query
   const mutation = useMutation({
     mutationFn: createTodo,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({queryKey: ["todos"]});
     },
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = e.currentTarget;
-    const content = e.currentTarget.content.value;
-    mutation.mutate(content);
+    mutation.mutate(e.currentTarget.content.value);
     form.reset();
   };
 
@@ -97,9 +102,11 @@ function CreateTodo() {
 ```
 
 ### Zustand + Leo Query Approach
+Zustand and Leo Query handle frontend state and async state in the store.
 
 ```typescript
-const useStore = create<TodoStore>((set) => ({
+//store.ts
+export const useStore = create<TodoStore>((set) => ({
   // Async state
   todos: query(fetchTodos, s => [s.createTodo]),
   createTodo: effect(createTodo),
@@ -108,8 +115,11 @@ const useStore = create<TodoStore>((set) => ({
   setFilter: (filter) => set({ filter }),
 }));
 
-const useStoreAsync = hook(useStore); //Hook into async state
+export const useStoreAsync = hook(useStore); //Hook into async state
+```
 
+```typescript
+//view.tsx
 const filterTodos = (todos: Todo[], filter: string) => {
   if (filter === "all") return todos;
   if (filter === "active") return todos.filter(todo => !todo.completed);
@@ -124,15 +134,16 @@ function TodoItems() {
 
   return <ul>{filteredTodos.map(/.../)}</ul>;
 }
+```
 
+```typescript
+//create.tsx
 function CreateTodo() {
   const createTodo = useStore(state => state.createTodo.trigger);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = e.currentTarget;
-    const content = form.content.value;
-    createTodo(content);
+    createTodo(e.currentTarget.content.value);
     form.reset();
   };
 

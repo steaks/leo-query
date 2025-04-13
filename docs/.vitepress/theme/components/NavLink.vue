@@ -1,5 +1,5 @@
 <template>
-  <a class="VPLink link VPNavBarMenuLink" :class="{ active: isActive }" :href="fullLink" tabindex="0">
+  <a class="VPLink link VPNavBarMenuLink" :href="fullLink" tabindex="0">
     <span>{{ text }}</span>
   </a>
 </template>
@@ -12,7 +12,6 @@ const props = defineProps<{latestLink: string, nextLink: string, text: string}>(
 const route = useRoute();
 const isNextVersionSelected = computed(() => route.path.startsWith('/next'));
 const fullLink = computed(() => isNextVersionSelected.value ? props.nextLink : props.latestLink);
-const isActive = computed(() => route.path === props.latestLink);
 </script>
 
 <style scoped>

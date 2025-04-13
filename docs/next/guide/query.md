@@ -1,4 +1,4 @@
-# Query
+# Query (Fetches)
 
 The `query` function allows you to integrate asynchronous queries with Zustand stores, handling data fetching, caching, dependencies, debouncing, retrying, and state management.
 
@@ -144,7 +144,7 @@ export interface Query<State, T> {
      * @param options - Options for the update.
      * @returns The updated query.
      */
-    setValue: (value: T, options?: SetValue) => Query<State, T>;
+    setValue: (value: T, options?: SetValueOptions) => Query<State, T>;
 
 }
 ```
