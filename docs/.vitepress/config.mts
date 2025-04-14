@@ -47,7 +47,7 @@ export default defineConfig({
             { text: "Initial Data", link: "/next/guide/initialData" },
             { text: "Persisting Data", link: "/next/guide/persistingData" },
             { text: "Optimistic Updates", link: "/next/guide/optimisticUpdates" },
-            { text: "Setup with Next", link: "/next/guide/setupWithNext" },
+            { text: "Setup with Next.js", link: "/next/guide/setupWithNextJs" },
           ]
         },
         {

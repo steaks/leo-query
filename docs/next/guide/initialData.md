@@ -17,7 +17,7 @@ const useDogStore = create<DogsState>(() => ({
 
 ### Hook
 Pass initialValue in your React component
-```
+```typescript
 const useDogStore = create<DogsState>(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllDogs: effect(removeAllDogs),

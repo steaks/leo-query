@@ -1,4 +1,4 @@
-# Setup with Next
+# Setup with Next.js
 
 Leo Query provides helpers that follow [Zustand's guidance](https://zustand.docs.pmnd.rs/guides/nextjs) to integrate with [Next.js](https://nextjs.org/). This guide will walk you through setting up Leo Query in your Next.js application.
 
@@ -35,8 +35,6 @@ export const createDogsStore = () =>
     removeAllDogs: effect(removeAllDogs),
     dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]) // Re-fetch when increasePopulation or removeAllDogs succeeds 
   }));
-
-export type DogsStateApi = ReturnType<typeof createDogsStore>;
 ```
 
 ### 2. Create Your Provider
