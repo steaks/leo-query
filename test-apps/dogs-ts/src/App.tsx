@@ -1,4 +1,4 @@
-import React, {Suspense, useEffect} from 'react';
+import React, {Suspense} from 'react';
 import {create} from "zustand";
 import {persist} from "zustand/middleware";
 import {hook, effect, query, partialize, merge, Query, Effect} from "leo-query";
@@ -22,18 +22,9 @@ const useDogStore = create<DogsState>()(persist(() => ({
   })
 );
 
-// const foo: UseBoundStore<Write<StoreApi<DogsState>, StorePersist<DogsState, Partial<DogsState>>>> = useDogStore;
-
 const useDogStoreAsync = hook<DogsState>(useDogStore);
 
 function DogCounter() {
-  useEffect(() => {
-    useDogStore.setState(state => {
-      return {
-        dogs: state.dogs.withValue(100)
-      };
-    });
-  }, []);
   const dogs = useDogStoreAsync(state => state.dogs);
   return <h1 className="dog-counter">{dogs} around here...</h1>;
 }
@@ -59,11 +50,10 @@ function App() {
         <Suspense fallback={<Loading />}>
           <DogCounter/>
         </Suspense>
+      </div>
+      <Controls/>
     </div>
-  <Controls/>
-</div>
-)
-  ;
+  );
 }
 
 export default App;
