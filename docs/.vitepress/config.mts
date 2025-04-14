@@ -63,9 +63,9 @@ export default defineConfig({
           text: "Examples",
           items: [
             { text: "All Examples", link: "/next/examples/examples" },
-            { text: "Dogs JS", link: "https://codesandbox.io/p/sandbox/leo-query-dogs-demo-js-wmwlgt?file=%2Fsrc%2FApp.jsx" },
-            { text: "Dogs TS", link: "https://codesandbox.io/p/sandbox/leo-query-dogs-demo-ts-7f2c34?file=%2Fsrc%2FApp.tsx" },
-            { text: "Task Manager", link: "https://xsh8c4.csb.app/" },
+            { text: "Dogs JS", link: "https://codesandbox.io/p/devbox/leo-query-dogs-demo-js-forked-tt6tq6?workspaceId=ws_CTu2uAaf7QNEGg4Jxmo6VN" },
+            { text: "Dogs TS", link: "https://codesandbox.io/p/devbox/leo-query-dogs-demo-ts-forked-wnxn3w?workspaceId=ws_CTu2uAaf7QNEGg4Jxmo6VN" },
+            { text: "Task Manager", link: "https://zhzgv5.csb.app/" },
           ]
         },
         {

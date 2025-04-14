@@ -61,7 +61,7 @@ export const {
 
 ### 3. Wrap Your Components
 
-Wrap your components with the provider. You will typically put your provider in a route. You can also fetch initial data on the server and pass it to your components.
+Wrap your components with the provider. You can also fetch initial data on the server and pass it to your components.
 
 ```typescript
 //page.tsx
