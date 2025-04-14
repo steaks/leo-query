@@ -160,26 +160,19 @@ const setupStaleTimeout = <Store extends object, R>(query: Query<Store, R>): num
   return undefined;
 };
 
-const setSync = <Store extends object, R>(query: Query<Store, R>, value?: R, error?: any, options: SetValueOptions<Store, R> = {}): Query<Store, R> => {
-  let current: Query<Store, R>;
-  if (options.__query) {
-    current = options.__query;
-  } else {
-    const state = query.__store().getState();
-    current = state[query.__key] as Query<Store, R>;
+export const setSync = <Store extends object, R>(query: Query<Store, R>, value?: R, error?: any, options: SetValueOptions<Store, R> = {}): Query<Store, R> => {
+  if (equals(query.value, value)) {
+    return query;
   }
-  if (equals(current.value, value)) {
-    return current;
+  if (options.__isInitialValue && query.__isInitialized) {
+    return query;
   }
-  if (options.__isInitialValue && current.__isInitialized) {
-    return current;
+  if (options.__timestamp && options.__timestamp < query.__valueTimestamp) {
+    return query;
   }
-  if (options.__timestamp && options.__timestamp < current.__valueTimestamp) {
-    return current;
-  }
-  const staleTimeout = setupStaleTimeout(current);
+  const staleTimeout = setupStaleTimeout(query);
   const next = {
-    ...current,
+    ...query,
     __isInitialized: true,
     __trigger: undefined,
     __triggerStart: 0,
@@ -192,7 +185,7 @@ const setSync = <Store extends object, R>(query: Query<Store, R>, value?: R, err
     error
   };
 
-  if (options.updateStore || options.updateStore === undefined) {
+  if (options.__updateStore || options.__updateStore === undefined) {
     query.__store().setState({
       [query.__key]: next
     } as Partial<Store>);
@@ -270,7 +263,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
           return;
         }
 
-        setSync(q, value, error);
+        setSync(next, value, error);
       });
       return promise;
     },
@@ -287,8 +280,10 @@ export function query<Store extends object, R>(): Query<Store, R> {
         }
       } as Partial<Store>);
     },
-    setValue: (value: R, options: SetValueOptions<Store, R> = {}): Query<Store, R> => 
-      setSync(q, value, /*error*/undefined, options)
+    setValue: (value: R): Query<Store, R> => 
+      setSync(q, value, /*error*/undefined),
+    withValue: (value: R): Query<Store, R> => 
+      setSync(q, value, /*error*/undefined, {__updateStore: false})
   };
   return q;
 }
@@ -434,11 +429,15 @@ const subscribe = <T extends object>(store: UseBoundStore<StoreApi<T>>) => {
 };
 
 const setInitialValue = <T>(query: Query<any, T>, value: T) => {
-  query.setValue(value, {__isInitialValue: true});
+  const state = query.__store().getState();
+  const current = state[query.__key] as Query<any, T>;
+  setSync(current, value, /*error*/undefined, {__isInitialValue: true});
 };
 
 const setValue = <T>(query: Query<any, T>, value: T, timestamp: number) => {
-  query.setValue(value, {__timestamp: timestamp});
+  const state = query.__store().getState();
+  const current = state[query.__key] as Query<any, T>;
+  setSync(current, value, /*error*/undefined, {__timestamp: timestamp});
 };
 
 const needsInitialValue = <T>(query: Query<any, T>, opts: UseBoundAsyncStoreOptions<T>) =>

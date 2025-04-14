@@ -40,8 +40,8 @@ export default defineConfig({
         {
           text: "Guide",
           items: [
-            { text: "Query (Fetches)", link: "/next/guide/query" },
-            { text: "Effect (Mutations)", link: "/next/guide/effect" },
+            { text: "Query (fetching data)", link: "/next/guide/query" },
+            { text: "Effect (mutating data)", link: "/next/guide/effect" },
             { text: "Hook", link: "/next/guide/hook" },
             { text: "Global Config", link: "/next/guide/globalConfig" },
             { text: "Initial Data", link: "/next/guide/initialData" },
@@ -65,6 +65,9 @@ export default defineConfig({
             { text: "All Examples", link: "/next/examples/examples" },
             { text: "Dogs JS", link: "https://codesandbox.io/p/devbox/leo-query-dogs-demo-js-forked-tt6tq6?workspaceId=ws_CTu2uAaf7QNEGg4Jxmo6VN" },
             { text: "Dogs TS", link: "https://codesandbox.io/p/devbox/leo-query-dogs-demo-ts-forked-wnxn3w?workspaceId=ws_CTu2uAaf7QNEGg4Jxmo6VN" },
+            { text: "Optimistic Updates", link: "https://codesandbox.io/p/sandbox/hcfp9y" },
+            { text: "Persisting Data", link: "https://codesandbox.io/p/sandbox/xtq66z" },
+            { text: "Next.js Integration", link: "https://codesandbox.io/p/devbox/next-js-example-0-3-0-y6w29t" },
             { text: "Task Manager", link: "https://zhzgv5.csb.app/" },
           ]
         },

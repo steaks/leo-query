@@ -36,7 +36,7 @@ useDogStore.getState().dogs.setValue(100);
 
 ### Batch updates
 
-You can batch updates manually. When you batch use Zustand's built-in set functions.
+You can batch updates manually. When you batch use Zustand's built-in `set` or `setState` functions to update the store. Use `withValue` rather than `setValue` to get an updated query with out updating the store.
 
 ```typescript
 const useDogStore = create<DogsState>(() => ({
@@ -48,8 +48,8 @@ const useDogStore = create<DogsState>(() => ({
 
 useDogStore.setState(state => {
   return {
-    dogs: state.dogs.setValue(100, {updateStore: false}),
-    cats: state.cats.setValue(100, {updateStore: false}),
+    dogs: state.dogs.withValue(100),
+    cats: state.cats.withValue(100),
   };
 })
 ```

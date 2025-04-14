@@ -10,6 +10,8 @@ Leo Query's merge function properly handles queries and effects when merging dat
 Pass in merge and partialize to the persist options to handle Leo Query's effects and queries properly.
 
 ```typescript
+import {create} from 'zustand'
+import {persist} from 'zustand/middleware'
 import {effect, query, partialize, merge} from "leo-query";
 
 const useDogStore = create<DogsState>()(persist(() => ({

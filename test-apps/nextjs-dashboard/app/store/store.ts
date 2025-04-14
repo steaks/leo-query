@@ -1,6 +1,6 @@
 import {createStore, StoreApi} from "zustand";
 import {query, effect, Effect, Query} from "leo-query";
-import {fetchDogs, increasePopulation, removeAllDogs } from "./data";
+import {fetchDogs, increasePopulation, removeAllDogs } from "./db";
 
 export interface DogsState {
   dogs: Query<DogsState, number>;

@@ -1,4 +1,4 @@
-# Query (Fetches)
+# Query (fetching data)
 
 The `query` function allows you to integrate asynchronous queries with Zustand stores, handling data fetching, caching, dependencies, debouncing, retrying, and state management.
 
@@ -141,18 +141,15 @@ export interface Query<State, T> {
     /** Manually set the value of the query. This is useful for optimistic updates, setting initial values, or setting values loaded in server components.
      * 
      * @param value - The value to set.
-     * @param options - Options for the update.
      * @returns The updated query.
      */
-    setValue: (value: T, options?: SetValueOptions) => Query<State, T>;
-
-}
-```
-
-#### SetValueOptions
-```typescript
-export interface SetValueOptions {
-    /** If `true`, the store will be updated with the new value. Defaults to `true`. */
-    readonly updateStore?: boolean;
+    setValue: (value: T) => Query<State, T>; 
+    /** 
+     * Manually set the value of the query without updating the store. This is useful for batch updates when you want to make changes to multiple parts of the store then do one update.
+     * 
+     * @param value - The value to set.
+     * @returns The updated query.
+     */
+    withValue: (value: T) => Query<State, T>; 
 }
 ```

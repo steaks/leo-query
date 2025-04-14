@@ -80,10 +80,16 @@ export interface Query<State, T> {
     /** Manually set the value of the query. This is useful for optimistic updates, setting initial values, or setting values loaded in server components.
      * 
      * @param value - The value to set.
-     * @param options - Options for the update.
      * @returns The updated query.
      */
-    setValue: (value: T, options?: SetValueOptions<State, T>) => Query<State, T>; 
+    setValue: (value: T) => Query<State, T>; 
+    /** 
+     * Manually set the value of the query without updating the store. This is useful for batch updates when you want to make changes to multiple parts of the store then do one update.
+     * 
+     * @param value - The value to set.
+     * @returns The updated query.
+     */
+    withValue: (value: T) => Query<State, T>; 
 }
 
 export type Primitive = string | number | boolean | null | undefined | bigint | symbol;
@@ -132,13 +138,11 @@ export interface GlobalOptions {
 
 export interface SetValueOptions<State, T> {
     /** If `true`, the store will be updated with the new value. Defaults to `true`. */
-    readonly updateStore?: boolean;
+    readonly __updateStore?: boolean;
     /** If `true`, this value is the initial value for the query. */
     readonly __isInitialValue?: boolean;
     /** Timestamp of the server value. */
     readonly __timestamp?: number;
-    /** The query to update. */
-    readonly __query?: Query<State, T>;
 }
 
 

@@ -13,11 +13,14 @@ Managing async state is hard - harder than managing frontend state. There are mo
 - Automatic cache invalidation on mutations
 
 ## Why Choose Leo Query?
-- **Single Source of Truth** - Keep all your state (UI and async) in one Zustand store
-- **Familiar Zustand Patterns** - If you know Zustand, Leo Query is quick to pick up
-- **Minimal Boilerplate** - No query clients, providers, or complex configuration needed
-- **Robust Async Features** - Built-in caching, debouncing, dependencies, stale time, retries, etc. 
-- **Type Safety** - Full TypeScript support with minimal type configuration
+
+Leo Query is an async data library built specifically for Zustand, so it works more idomatically with Zustand than other async data libraries. It handles the tricky edge cases of async data including **caching**, **loading state**, **error handling**, and more.
+
+If you're coming from **Redux**, think of this library as RTK Query for Zustand.
+
+If you're coming from **Tanstack Query**, think of this library as a Zustand-first replacement.
+
+If you're coming from **Zustand native**, think of this library as your caching, loading state, error-handling layer of your app.
 
 ## Integrating with Zustand
 

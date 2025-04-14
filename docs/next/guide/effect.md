@@ -1,4 +1,4 @@
-# Effect (Mutations)
+# Effect (mutating data)
 
 The `effect` function allows you to integrate asynchronous effects (e.g., HTTP requests or other side effects) into Zustand stores, managing triggers and loading states.
 
