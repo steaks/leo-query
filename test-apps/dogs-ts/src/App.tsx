@@ -5,13 +5,13 @@ import {hook, effect, query, partialize, merge, Query, Effect} from "leo-query";
 import {fetchDogs, increasePopulation, removeAllDogs} from "./db";
 import "./App.css";
 
-interface DogsState {
-  dogs: Query<DogsState, number>;
-  increasePopulation: Effect<DogsState, []>;
-  removeAllDogs: Effect<DogsState, []>;
+interface DogState {
+  dogs: Query<DogState, number>;
+  increasePopulation: Effect<DogState, []>;
+  removeAllDogs: Effect<DogState, []>;
 }
 
-const useDogStore = create<DogsState>()(persist(() => ({
+const useDogStore = create<DogState>()(persist(() => ({
     increasePopulation: effect(increasePopulation),
     removeAllDogs: effect(removeAllDogs),
     dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]),
@@ -22,7 +22,7 @@ const useDogStore = create<DogsState>()(persist(() => ({
   })
 );
 
-const useDogStoreAsync = hook<DogsState>(useDogStore);
+const useDogStoreAsync = hook<DogState>(useDogStore);
 
 function DogCounter() {
   const dogs = useDogStoreAsync(state => state.dogs);

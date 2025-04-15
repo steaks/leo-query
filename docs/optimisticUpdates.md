@@ -13,9 +13,9 @@ Optimistically updating the UI without waiting for the server can create a more 
 This is an example of an optimistic update with dogs.
 
 ```typescript
-interface DogsState {
-  dogs: Query<DogsState, number>;
-  increaseDogs: Effect<DogsState, []>;
+interface DogState {
+  dogs: Query<DogState, number>;
+  increaseDogs: Effect<DogState, []>;
 }
 
 const api = {
@@ -23,7 +23,7 @@ const api = {
   increaseDogs: async () => fetch("/api/dogs/increase", {method: "POST"}),
 };
 
-const increaseDogs = (set: (s: Partial<DogsState> => void), get: () => DogsState) => async () => {
+const increaseDogs = (set: (s: Partial<DogState> => void), get: () => DogState) => async () => {
   const dogs = get().dogs;
   set({dogs: {...dogs, value: dogs.value + 1}});
   try {

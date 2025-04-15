@@ -14,7 +14,7 @@ import {create} from 'zustand'
 import {persist} from 'zustand/middleware'
 import {effect, query, partialize, merge} from "leo-query";
 
-const useDogStore = create<DogsState>()(persist(() => ({
+const useDogStore = create<DogState>()(persist(() => ({
     increasePopulation: effect(increasePopulation),
     removeAllDogs: effect(removeAllDogs),
     dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]),

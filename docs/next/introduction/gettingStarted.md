@@ -31,13 +31,13 @@ Create a Zustand store. Connect your async functions with Leo Query's `query` an
 import {create} from "zustand";
 import {effect, query, hook, Query, Effect} from "leo-query";
 
-interface DogsState {
-  dogs: Query<DogsState, number>;
-  increasePopulation: Effect<DogsState, []>;
-  removeAllDogs: Effect<DogsState, []>;
+interface DogState {
+  dogs: Query<DogState, number>;
+  increasePopulation: Effect<DogState, []>;
+  removeAllDogs: Effect<DogState, []>;
 }
 
-const useDogStore = create<DogsState>(() => ({
+const useDogStore = create<DogState>(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllDogs: effect(removeAllDogs),
   dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]) // Re-fetch when increasePopulation or removeAllDogs succeeds 
