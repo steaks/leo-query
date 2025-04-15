@@ -1,9 +1,9 @@
 import React, {Suspense} from 'react';
 import {create} from "zustand";
-import {hook, effect, query, Query, Effect} from "leo-query";
+import {persist} from "zustand/middleware";
+import {hook, effect, query, partialize, merge, Query, Effect} from "leo-query";
 import {fetchDogs, increasePopulation, removeAllDogs} from "./db";
 import "./App.css";
-
 
 interface DogsState {
   dogs: Query<DogsState, number>;
@@ -11,14 +11,18 @@ interface DogsState {
   removeAllDogs: Effect<DogsState, []>;
 }
 
-const useDogStore = create<DogsState>(() => ({
+const useDogStore = create<DogsState>()(persist(() => ({
     increasePopulation: effect(increasePopulation),
     removeAllDogs: effect(removeAllDogs),
     dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]),
+  }), {
+    name: "dogs-storage",
+    merge,
+    partialize
   })
 );
 
-const useDogStoreAsync = hook(useDogStore);
+const useDogStoreAsync = hook<DogsState>(useDogStore);
 
 function DogCounter() {
   const dogs = useDogStoreAsync(state => state.dogs);
@@ -46,11 +50,10 @@ function App() {
         <Suspense fallback={<Loading />}>
           <DogCounter/>
         </Suspense>
+      </div>
+      <Controls/>
     </div>
-  <Controls/>
-</div>
-)
-  ;
+  );
 }
 
 export default App;

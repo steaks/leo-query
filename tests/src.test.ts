@@ -1,6 +1,6 @@
-import {equals} from "../src";
-import {Effect, Query} from "../src/types";
 import {StoreApi} from "zustand";
+import {equals} from "../src/src";
+import {Effect, Query} from "../src/types";
 import {defaultRetryDelay} from "../src/retry";
 
 test("1 equals 1", () => {

@@ -1,4 +1,5 @@
-import {StoreApi} from "zustand/vanilla";
+import { ReactNode } from "react";
+import {UseBoundStore, StoreApi} from "zustand";
 
 /**
  * Represents an asynchronous effect tied to a Zustand store.
@@ -62,6 +63,10 @@ export interface Query<State, T> {
     __staleTimeout: number | undefined;
     /** Function to access the Zustand store. */
     __store: () => StoreApi<State>;
+    /** Whether the query has been initialized. */
+    __isInitialized: boolean;
+    /** Timestamp of when the value was set. */
+    __valueTimestamp: number;
     /** The current value returned by the query. */
     value: T | undefined;
     /** Indicates if the query is currently fetching data. */
@@ -72,9 +77,22 @@ export interface Query<State, T> {
     trigger: () => Promise<T>;
     /** Mark the data as stale (i.e. needs a load). */
     markStale: () => void;
+    /** Manually set the value of the query. This is useful for optimistic updates, setting initial values, or setting values loaded in server components.
+     * 
+     * @param value - The value to set.
+     * @returns The updated query.
+     */
+    setValue: (value: T) => Query<State, T>; 
+    /** 
+     * Manually set the value of the query without updating the store. This is useful for batch updates when you want to make changes to multiple parts of the store then do one update.
+     * 
+     * @param value - The value to set.
+     * @returns The updated query.
+     */
+    withValue: (value: T) => Query<State, T>; 
 }
 
-type Primitive = string | number | boolean | null | undefined | bigint | symbol;
+export type Primitive = string | number | boolean | null | undefined | bigint | symbol;
 
 export interface QueryValue<T> {
     /** The current value returned by the query. */
@@ -94,7 +112,7 @@ export interface QueryValue<T> {
  */
 export type Dependencies<Store> = (s: Store) => (Query<Store, any> | Effect<Store, any> | Primitive)[];
 
-export interface QueryOptions {
+export interface GlobalQueryOptions {
     /** If set to `true`, the query will fetch data as needed. Default is `true`. */
     readonly lazy?: boolean;
     /** The delay (in ms) between query triggers. Default is 300ms. */
@@ -107,6 +125,104 @@ export interface QueryOptions {
     readonly staleTime?: number;
 }
 
+interface IndividualQueryOptions<T> {
+    /** The initial value of the query. */
+    readonly initialValue?: T;
+}
+
+export type QueryOptions<T> = GlobalQueryOptions & IndividualQueryOptions<T>;
+
 export interface GlobalOptions {
-    query?: QueryOptions;
+    query?: GlobalQueryOptions;
+}
+
+export interface SetValueOptions<State, T> {
+    /** If `true`, the store will be updated with the new value. Defaults to `true`. */
+    readonly __updateStore?: boolean;
+    /** If `true`, this value is the initial value for the query. */
+    readonly __isInitialValue?: boolean;
+    /** Timestamp of the server value. */
+    readonly __timestamp?: number;
+}
+
+
+export interface UseBoundAsyncStoreOptions<T> {
+  /**
+   * Trigger suspense when the query's dependencies are loading.
+   */
+  readonly followDeps?: boolean;
+  /**
+   * If `true`, this value is the initial value for the query.
+   */
+  readonly initialValue?: T;
+  /**
+   * Value for the query. This value many not be initial value. Provide a timestamp to tell Leo Query when the value was created.
+   * Leo Query will use this value if the timestamp is newer than the query value's current timestamp.
+   */
+  readonly value?: T;
+  /**
+   * Timestamp of the value. Leo Query will use this value if the timestamp is newer than the query value's current timestamp.
+   */
+  readonly timestamp?: number;
+}
+
+
+export type UseBoundAsyncStoreWithSuspense<T> = {
+  /**
+   * Select a query from the store. Handle async data concerns:
+   *   - Fetch data for the query as needed
+   *   - Leverage caching
+   *   - Re-render component when query value updates
+   *   - Trigger suspense when the query is loading
+   *   - Consider dependencies
+   * @param selector Select the query from the store.
+   * @param opts Options
+   */
+  <R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions<R>): R;
+  /**
+   * Select an effect from the store. Handle async data concerns:
+   *   - Trigger suspense when the effect is loading
+   *   - Consider dependencies
+   * @param selector Select the effect from the store.
+   * @param opts Options
+   */
+  <Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): () => Promise<void>
+};
+
+export type UseBoundAsyncStoreWithoutSuspense<T> = {
+  /**
+   * Select a query from the store. Handle async data concerns:
+   *   - Fetch data for the query as needed
+   *   - Leverage caching
+   *   - Re-render component when query value updates
+   *   - Trigger suspense when the query is loading
+   *   - Consider dependencies
+   * @param selector Select the query from the store.
+   */
+    <R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions<R>): QueryValue<R>;
+  /**
+   * Select an effect from the store. Handle async data concerns:
+   *   - Trigger suspense when the effect is loading
+   *   - Consider dependencies
+   * @param selector Select the effect from the store.
+   */
+    <Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): () => Promise<void>
+};
+
+export interface StoreProviderProps {
+  children: ReactNode;
+}
+
+export interface StoreHooks<T> {
+  readonly hook: UseBoundStore<StoreApi<T>>;
+  readonly hookAsync: UseBoundAsyncStoreWithoutSuspense<T>;
+  readonly hookAsyncSuspense: UseBoundAsyncStoreWithSuspense<T>;
+}
+
+export interface StoreProvider<T> {
+  Provider: React.FC<StoreProviderProps>;
+  Context: React.Context<StoreHooks<T> | null>;
+  useStore: UseBoundStore<StoreApi<T>>;
+  useStoreAsync: UseBoundAsyncStoreWithoutSuspense<T>;
+  useStoreSuspense: UseBoundAsyncStoreWithSuspense<T>;
 }
