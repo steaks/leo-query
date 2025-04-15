@@ -19,10 +19,10 @@ query(fetchDogs, s => [], {staleTime: 60000}); // 1 minute
 You can manually mark a query stale by calling `markStale()`.
 
 ```typescript
-const useDogsStoreAsync = hook(useDogStore, /*suspense*/ false);
+const useDogStoreAsync = hook(useDogStore, /*suspense*/ false);
 
 const MyComponent = () => {
-  const dogs = useDogsStoreAsync(fetchDogs, s => []);
+  const dogs = useDogStoreAsync(fetchDogs, s => []);
 
   const markDogsStale = () => {
     dogs.markStale();

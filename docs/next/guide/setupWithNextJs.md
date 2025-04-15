@@ -23,14 +23,14 @@ import {createStore} from "zustand/vanilla";
 import {query, effect, Effect, Query} from "leo-query";
 import {fetchDogs, increasePopulation, removeAllDogs } from "./data";
 
-export interface DogsState {
-  dogs: Query<DogsState, number>;
-  increasePopulation: Effect<DogsState, []>;
-  removeAllDogs: Effect<DogsState, []>;
+export interface DogState {
+  dogs: Query<DogState, number>;
+  increasePopulation: Effect<DogState, []>;
+  removeAllDogs: Effect<DogState, []>;
 }
 
-export const createDogsStore = () => 
-  createStore<DogsState>(() => ({
+export const createDogStore = () => 
+  createStore<DogState>(() => ({
     increasePopulation: effect(increasePopulation),
     removeAllDogs: effect(removeAllDogs),
     dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]) // Re-fetch when increasePopulation or removeAllDogs succeeds 
@@ -45,16 +45,16 @@ Next, create a provider using Leo Query's `createStoreProvider`. With Next.js it
 //provider.tsx
 "use client";
 
-import { createDogsStore } from "./store";
+import { createDogStore } from "./store";
 import { createStoreProvider } from "leo-query";
 
 export const {
-    Provider: DogsStoreProvider, 
-    Context: DogsStoreContext, 
-    useStore: useDogsStore, 
-    useStoreAsync: useDogsStoreAsync, 
-    useStoreSuspense: useDogsStoreSuspense
-} = createStoreProvider(createDogsStore);
+    Provider: DogStoreProvider, 
+    Context: DogStoreContext, 
+    useStore: useDogStore, 
+    useStoreAsync: useDogStoreAsync, 
+    useStoreSuspense: useDogStoreSuspense
+} = createStoreProvider(createDogStore);
 ```
 
 ### 3. Wrap Your Components
@@ -63,7 +63,7 @@ Wrap your components with the provider. You can also fetch initial data on the s
 
 ```typescript
 //page.tsx
-import {DogsStoreProvider} from "@/app/store/provider";
+import {DogStoreProvider} from "@/app/store/provider";
 import {Content} from "./content";
 
 const fetchInitialDogs = async () => 
@@ -72,10 +72,10 @@ const fetchInitialDogs = async () =>
 export default async function Page() {
   const initialDogs = await fetchInitialDogs();
   return (
-    <DogsStoreProvider>
+    <DogStoreProvider>
       <p>Initial Dogs: {initialDogs}</p>
       <Content initialDogs={initialDogs} />
-    </DogsStoreProvider>
+    </DogStoreProvider>
   );
 }
 ```
@@ -91,15 +91,15 @@ Finally, use the hooks in your client components. Leo Query provides three types
 //content.tsx
 "use client";
 
-import {useDogsStore, useDogsStoreAsync} from "@/app/store/provider";
+import {useDogStore, useDogStoreAsync} from "@/app/store/provider";
 
 interface Props {
   initialDogs: number;
 }
 
 export const Content = (p: Props) => {
-  const dogs = useDogsStoreAsync(s => s.dogs, {initialValue: p.initialDogs}); 
-  const increasePopulation = useDogsStore(s => s.increasePopulation.trigger);
+  const dogs = useDogStoreAsync(s => s.dogs, {initialValue: p.initialDogs}); 
+  const increasePopulation = useDogStore(s => s.increasePopulation.trigger);
 
   if (dogs.isLoading) {
     return <>Loading...</>;
@@ -136,7 +136,7 @@ The `initialValue` works seamlessly with Leo Query's caching and revalidation sy
 Fetch data in the server component. Pass it to client components through props.
 ```typescript
 //page.tsx
-import {DogsStoreProvider} from "@/app/store/provider";
+import {DogStoreProvider} from "@/app/store/provider";
 import {Content} from "./content";
 
 const fetchInitialDogs = async () => 
@@ -145,10 +145,10 @@ const fetchInitialDogs = async () =>
 export default async function Page() {
   const initialDogs = await fetchInitialDogs(); //fetch data in the server component.
   return (
-    <DogsStoreProvider>
+    <DogStoreProvider>
       <p>Initial Dogs: {initialDogs}</p>
       <Content initialDogs={initialDogs} />
-    </DogsStoreProvider>
+    </DogStoreProvider>
   );
 }
 ```
@@ -159,15 +159,15 @@ Use the data in props as the initial value in your client component.
 //content.tsx
 "use client";
 
-import {useDogsStore, useDogsStoreAsync} from "@/app/store/provider";
+import {useDogStore, useDogStoreAsync} from "@/app/store/provider";
 
 interface Props {
   initialDogs: number;
 }
 
 export const Content = (p: Props) => {
-  const dogs = useDogsStoreAsync(s => s.dogs, {initialValue: p.initialDogs}); 
-  const increasePopulation = useDogsStore(s => s.increasePopulation.trigger);
+  const dogs = useDogStoreAsync(s => s.dogs, {initialValue: p.initialDogs}); 
+  const increasePopulation = useDogStore(s => s.increasePopulation.trigger);
 
   if (dogs.isLoading) {
     return <>Loading...</>;
@@ -191,7 +191,7 @@ Leo Query provides the option to pass a value along with a timestamp. This is a 
 Fetch data in the server component and create a timestamp. Pass it to client components through props.
 ```typescript
 //page.tsx
-import {DogsStoreProvider} from "@/app/store/provider";
+import {DogStoreProvider} from "@/app/store/provider";
 import {Content} from "./content";
 
 const fetchInitialDogs = async () => 
@@ -201,10 +201,10 @@ export default async function Page() {
   const initialDogs = await fetchInitialDogs(); //fetch data in the server component.
   const initialDogsTimestamp = Date.now();
   return (
-    <DogsStoreProvider>
+    <DogStoreProvider>
       <p>Initial Dogs: {initialDogs}</p>
       <Content initialDogs={initialDogs} initialDogsTimestamp={initialDogsTimestamp} />
-    </DogsStoreProvider>
+    </DogStoreProvider>
   );
 }
 ```
@@ -215,7 +215,7 @@ Use the data and timestamp in props as the value in your client component.
 //content.tsx
 "use client";
 
-import {useDogsStore, useDogsStoreAsync} from "@/app/store/provider";
+import {useDogStore, useDogStoreAsync} from "@/app/store/provider";
 
 interface Props {
   initialDogs: number;
@@ -223,8 +223,8 @@ interface Props {
 }
 
 export const Content = (p: Props) => {
-  const dogs = useDogsStoreAsync(s => s.dogs, {value: p.initialDogs, timestamp: p.initialDogsTimestamp}); 
-  const increasePopulation = useDogsStore(s => s.increasePopulation.trigger);
+  const dogs = useDogStoreAsync(s => s.dogs, {value: p.initialDogs, timestamp: p.initialDogsTimestamp}); 
+  const increasePopulation = useDogStore(s => s.increasePopulation.trigger);
 
   if (dogs.isLoading) {
     return <>Loading...</>;

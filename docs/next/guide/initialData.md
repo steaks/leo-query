@@ -8,7 +8,7 @@ Sometimes you may want to set initial data for your queries. You can set initial
 Pass initialValue as an option to the query.
 
 ```typescript
-const useDogStore = create<DogsState>(() => ({
+const useDogStore = create<DogState>(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllDogs: effect(removeAllDogs),
   dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs], {initialValue: 100}) 
@@ -18,7 +18,7 @@ const useDogStore = create<DogsState>(() => ({
 ### Hook
 Pass initialValue in your React component
 ```typescript
-const useDogStore = create<DogsState>(() => ({
+const useDogStore = create<DogState>(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllDogs: effect(removeAllDogs),
   dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs])

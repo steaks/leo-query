@@ -7,7 +7,7 @@ The query function provides a method for providing data and a timestamp the data
 
 ```typescript
 //server component
-import {DogsStoreProvider} from "@/app/store/provider";
+import {DogStoreProvider} from "@/app/store/provider";
 import {Content} from "./content";
 
 const fetchInitialDogs = async () => 
@@ -17,10 +17,10 @@ export default async function Page() {
   const initialDogs = await fetchInitialDogs();
   const timestamp = Date.now();
   return (
-    <DogsStoreProvider>
+    <DogStoreProvider>
       <p>Initial Dogs: {initialDogs}</p>
       <Content initialDogs={initialDogs} timestamp={timestamp} />
-    </DogsStoreProvider>
+    </DogStoreProvider>
   );
 }
 ```
@@ -28,7 +28,7 @@ export default async function Page() {
 //client component
 "use client";
 
-import {useDogsStoreAsync} from "@/app/store/provider";
+import {useDogStoreAsync} from "@/app/store/provider";
 
 interface Props {
   initialDogs: number;
@@ -36,7 +36,7 @@ interface Props {
 }
 
 export const Content = (p: Props) => {
-  const dogs = useDogsStoreAsync(s => s.dogs, {value: p.initialDogs, timestamp: p.timestamp}); //Use the value only if it's newer than the current value
+  const dogs = useDogStoreAsync(s => s.dogs, {value: p.initialDogs, timestamp: p.timestamp}); //Use the value only if it's newer than the current value
 
   return (
     <div>

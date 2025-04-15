@@ -4,7 +4,7 @@ import { generateYAxis } from '@/app/lib/utils';
 import { CalendarIcon } from '@heroicons/react/24/outline';
 import { lusitana } from '@/app/ui/fonts';
 import { Revenue } from '@/app/lib/definitions';
-import { useDogsStore, useDogsStoreAsync } from '@/app/store/provider';
+import { useDogStore, useDogStoreAsync } from '@/app/store/provider';
 // This component is representational only.
 // For data visualization UI, check out:
 // https://www.tremor.so/
@@ -23,8 +23,8 @@ export default function RevenueChart({
   revenue: Revenue[];
 }) {
   const chartHeight = 350;
-  const dogs = useDogsStoreAsync(s => s.dogs);
-  const incrementCount = useDogsStore(s => s.increasePopulation.trigger);
+  const dogs = useDogStoreAsync(s => s.dogs);
+  const incrementCount = useDogStore(s => s.increasePopulation.trigger);
   logWithEnv(`count: ${dogs.value}`);
   // NOTE: Uncomment this code in Chapter 7
 

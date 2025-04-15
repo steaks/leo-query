@@ -1,6 +1,6 @@
 "use client";
 
-import {useDogsStore, useDogsStoreAsync} from "@/app/store/provider";
+import {useDogStore, useDogStoreAsync} from "@/app/store/provider";
 
 interface Props {
   initialDogs: number;
@@ -8,8 +8,8 @@ interface Props {
 }
 
 export const Content = (p: Props) => {
-  const dogs = useDogsStoreAsync(s => s.dogs, {initialValue: p.initialDogs});
-  const increasePopulation = useDogsStore(s => s.increasePopulation.trigger);
+  const dogs = useDogStoreAsync(s => s.dogs, {initialValue: p.initialDogs});
+  const increasePopulation = useDogStore(s => s.increasePopulation.trigger);
 
   if (dogs.isLoading) {
     return <>Loading...</>;

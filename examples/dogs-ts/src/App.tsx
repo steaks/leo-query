@@ -5,13 +5,13 @@ import {fetchDogs, increasePopulation, removeAllDogs} from "./db";
 import "./App.css";
 
 
-interface DogsState {
-  dogs: Query<DogsState, number>;
-  increasePopulation: Effect<DogsState, []>;
-  removeAllDogs: Effect<DogsState, []>;
+interface DogState {
+  dogs: Query<DogState, number>;
+  increasePopulation: Effect<DogState, []>;
+  removeAllDogs: Effect<DogState, []>;
 }
 
-const useDogStore = create<DogsState>(() => ({
+const useDogStore = create<DogState>(() => ({
     increasePopulation: effect(increasePopulation),
     removeAllDogs: effect(removeAllDogs),
     dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]),
