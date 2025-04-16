@@ -14,8 +14,13 @@
           </a>
         </div>
         <div class="VPNavBarMenuLink">
+          <a class="VPNavBarMenuLinkText" :class="{ active: isPrevVersionSelected }" href="/prev/" @click="isOpen = false">
+            {{ versions.prev }}
+          </a>
+        </div>
+        <div class="VPNavBarMenuLink" v-if="versions.next">
           <a class="VPNavBarMenuLinkText" :class="{ active: isNextVersionSelected }" href="/next/" @click="isOpen = false">
-            {{ versions.next }} (next)
+            {{ versions.next }}
           </a>
         </div>
       </div>
@@ -32,11 +37,21 @@ const isOpen = ref<boolean>(false);
 
 // Hardcoded versions
 const versions = {
-  latest: 'v0.2.0',
-  next: 'v0.3.0-rc.2'
+  prev: 'v0.2.0',
+  latest: 'v0.3.0',
+  next: ''
 }
 const isNextVersionSelected = computed(() => route.path.startsWith('/next'));
-const selectedVersion = computed(() => isNextVersionSelected.value ? `${versions.next}` : `${versions.latest}`);
+const isPrevVersionSelected = computed(() => route.path.startsWith('/prev'));
+const isLatestVersionSelected = computed(() => !isNextVersionSelected.value && !isPrevVersionSelected.value);
+const selectedVersion = computed(() => {
+  if (isNextVersionSelected.value) {
+    return versions.next;
+  } else if (isPrevVersionSelected.value) {
+    return versions.prev;
+  }
+  return versions.latest;
+});
 
 </script>
 

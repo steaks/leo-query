@@ -8,10 +8,24 @@
 import { computed } from 'vue';
 import { useRoute } from 'vitepress';
 
-const props = defineProps<{latestLink: string, nextLink: string, text: string}>();
+const props = defineProps<{prevLink: string, nextLink?: string, latestLink: string, text: string}>();
 const route = useRoute();
-const isNextVersionSelected = computed(() => route.path.startsWith('/next'));
-const fullLink = computed(() => isNextVersionSelected.value ? props.nextLink : props.latestLink);
+const selectedVersion = computed(() => {
+  if (route.path.startsWith('/next')) {
+    return 'next';
+  } else if (route.path.startsWith('/prev')) {
+    return 'prev';
+  }
+  return 'latest';
+});
+const fullLink = computed(() => {
+  if (selectedVersion.value === 'next') {
+    return props.nextLink;
+  } else if (selectedVersion.value === 'prev') {
+    return props.prevLink;
+  }
+  return props.latestLink;
+});
 </script>
 
 <style scoped>
