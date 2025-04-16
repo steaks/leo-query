@@ -161,7 +161,7 @@ const setupStaleTimeout = <Store extends object, R>(query: Query<Store, R>): num
 };
 
 export const setSync = <Store extends object, R>(query: Query<Store, R>, value?: R, error?: any, options: SetValueOptions<Store, R> = {}): Query<Store, R> => {
-  if (equals(query.value, value)) {
+  if (!query.isLoading && !query.error && equals(query.value, value)) {
     return query;
   }
   if (options.__isInitialValue && query.__isInitialized) {

@@ -33,7 +33,7 @@ const isOpen = ref<boolean>(false);
 // Hardcoded versions
 const versions = {
   latest: 'v0.2.0',
-  next: 'v0.3.0-rc.1'
+  next: 'v0.3.0-rc.2'
 }
 const isNextVersionSelected = computed(() => route.path.startsWith('/next'));
 const selectedVersion = computed(() => isNextVersionSelected.value ? `${versions.next}` : `${versions.latest}`);
