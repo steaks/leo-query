@@ -24,10 +24,22 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      {component: "NavLink", props: {text: "Home", latestLink: "/", nextLink: "/next"}},
-      {component: "NavLink", props: {text: "Docs", latestLink: "/query", nextLink: "/next/introduction/why"}},
-      {component: "NavLink", props: {text: "Examples", latestLink: "/examples", nextLink: "/next/examples/examples"}},
-      {component: "NavLink", props: {text: "Blog", latestLink: "/blog", nextLink: "/next/blog"}},
+      {
+        component: "NavLink", 
+        props: {text: "Home", prevLink: "/prev/", latestLink: "/latest/", nextLink: "/next/"}
+      },
+      {
+        component: "NavLink", 
+        props: {text: "Docs", prevLink: "/prev/query", latestLink: "/latest/query", nextLink: "/next/introduction/why"}
+      },
+      {
+        component: "NavLink", 
+        props: {text: "Examples", prevLink: "/prev/examples", latestLink: "/latest/examples", nextLink: "/next/examples/examples"}
+      },
+      {
+        component: "NavLink", 
+        props: {text: "Blog", prevLink: "/prev/blog", latestLink: "/latest/blog", nextLink: "/next/blog"}
+      },
       {component: "VersionSwitcher"},
     ],
     sidebar: {
@@ -83,35 +95,35 @@ export default defineConfig({
           ]
         }
       ],
-      "/": [
+      "/latest/": [
         {
           text: "Introduction",
           items: [
-            { text: "Why Leo Query?", link: "/why" },
-            { text: "Getting Started", link: "/gettingStarted" },
+            { text: "Why Leo Query?", link: "/latest/why" },
+            { text: "Getting Started", link: "/latest/gettingStarted" },
           ]
         },
         {
           text: "Guide",
           items: [
-            { text: "Query", link: "/query" },
-            { text: "Effect", link: "/effect" },
-            { text: "Hook", link: "/hook" },
-            { text: "Global Config", link: "/globalConfig" },
+            { text: "Query", link: "/latest/query" },
+            { text: "Effect", link: "/latest/effect" },
+            { text: "Hook", link: "/latest/hook" },
+            { text: "Global Config", link: "/latest/globalConfig" },
           ]
         },
         {
           text: "Advanced Concepts",
           items: [
-            { text: "Caching", link: "/caching" },
-            { text: "Optimistic Updates", link: "/optimisticUpdates" },
-            { text: "Retries", link: "/retries" },
+            { text: "Caching", link: "/latest/caching" },
+            { text: "Optimistic Updates", link: "/latest/optimisticUpdates" },
+            { text: "Retries", link: "/latest/retries" },
           ]
         },
         {
           text: "Examples",
           items: [
-            { text: "All Examples", link: "/examples" },
+            { text: "All Examples", link: "/latest/examples" },
             { text: "Dogs JS", link: "https://codesandbox.io/p/sandbox/leo-query-dogs-demo-js-wmwlgt?file=%2Fsrc%2FApp.jsx" },
             { text: "Dogs TS", link: "https://codesandbox.io/p/sandbox/leo-query-dogs-demo-ts-7f2c34?file=%2Fsrc%2FApp.tsx" },
             { text: "Task Manager", link: "https://xsh8c4.csb.app/" },
@@ -120,11 +132,13 @@ export default defineConfig({
         {
           text: "Blog",
           items: [
-            { text: "Recent Posts", link: "/blog" },
-            { text: "Implementing Retry Logic", link: "/blog/implementingRetryLogic" },
-            { text: "Delaying Execution with Wait", link: "/blog/delayingExecutionWithWait" },
+            { text: "Recent Posts", link: "/latest/blog" },
+            { text: "Implementing Retry Logic", link: "/latest/blog/implementingRetryLogic" },
+            { text: "Delaying Execution with Wait", link: "/latest/blog/delayingExecutionWithWait" },
           ]
         }
+      ], 
+      "/prev/": [
       ]
     },
     socialLinks: [

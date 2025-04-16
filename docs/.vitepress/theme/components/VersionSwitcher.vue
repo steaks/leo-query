@@ -2,19 +2,24 @@
   <div class="VPNavBarMenuGroup">
     <button type="button" class="VPNavBarMenuButton" :aria-expanded="isOpen" @click="isOpen = !isOpen">
       <span class="VPNavBarMenuButtonText">
-        <span>{{ selectedVersion }}</span>
+        <span>{{ selectedVersion.version }}</span>
         <span class="VPNavBarMenuButtonIcon"><i class="vpi-chevron-down" /></span>
       </span>
     </button>
     <div v-show="isOpen" class="VPNavBarMenu">
       <div class="VPNavBarMenuItems">
-        <div class="VPNavBarMenuLink">
-          <a class="VPNavBarMenuLinkText" :class="{ active: !isNextVersionSelected }" href="/" @click="isOpen = false">
+        <div class="VPNavBarMenuLink" v-if="versions.latest">
+          <a class="VPNavBarMenuLinkText" :class="{ active: selectedVersion.type === 'latest' }" href="/latest/" @click="isOpen = false">
             {{ versions.latest }} (latest)
           </a>
         </div>
-        <div class="VPNavBarMenuLink">
-          <a class="VPNavBarMenuLinkText" :class="{ active: isNextVersionSelected }" href="/next/" @click="isOpen = false">
+        <div class="VPNavBarMenuLink" v-if="versions.prev">
+          <a class="VPNavBarMenuLinkText" :class="{ active: selectedVersion.type === 'prev' }" href="/prev/" @click="isOpen = false">
+            {{ versions.prev }}
+          </a>
+        </div>
+        <div class="VPNavBarMenuLink" v-if="versions.next">
+          <a class="VPNavBarMenuLinkText" :class="{ active: selectedVersion.type === 'next' }" href="/next/" @click="isOpen = false">
             {{ versions.next }} (next)
           </a>
         </div>
@@ -24,20 +29,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useRoute } from 'vitepress';
+import { ref } from 'vue';
+import { useVersion } from '../composables/useVersion';
 
-const route = useRoute()
 const isOpen = ref<boolean>(false);
-
-// Hardcoded versions
-const versions = {
-  latest: 'v0.2.0',
-  next: 'v0.3.0-rc.2'
-}
-const isNextVersionSelected = computed(() => route.path.startsWith('/next'));
-const selectedVersion = computed(() => isNextVersionSelected.value ? `${versions.next}` : `${versions.latest}`);
-
+const {selectedVersion, versions} = useVersion();
 </script>
 
 <style scoped>
