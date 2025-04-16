@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## v0.3.0
+
+### Changes
+
+🐶 Features
+* Support for persisting data (#71)
+* Support for Next.js (#71)
+* Added option to set a query's initial value (#71)
+* Added option to set a query value manaully (#71)
+
+🐝 Fixes
+* Skip some unnecessary re-nders when new query value equals existing query value (#71 #74)
+
+### Breaking Changes
+None
+
+
 ## v0.2.0
 
 ### Changes
