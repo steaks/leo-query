@@ -21,3 +21,20 @@ jobs:
       - run: cd docs
       - run: npm install
       - run: npm run docs:build
+  build-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: test
+    needs: test
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: Install dependencies
+        working-directory: ./docs
+        run: npm install
+      - name: Build with VitePress
+        run: npm run docs:build # or pnpm docs:build / yarn docs:build / bun run docs:build
