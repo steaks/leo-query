@@ -1,6 +1,6 @@
 # Retries
 
-Leo Query supports retries. By default queries will retry 5 times with an exponential backoff. You can override the default retry behavior globally via [configure()](/globalConfig#configure) or for individual queries.
+Leo Query supports retries. By default queries will retry 5 times with an exponential backoff. You can override the default retry behavior globally via [configure()](/next/guide/globalConfig#configure) or for individual queries.
 
 ### Overriding retry count
 
