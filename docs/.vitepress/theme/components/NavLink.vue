@@ -6,22 +6,15 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRoute } from 'vitepress';
+import { useVersion } from '../composables/useVersion';
 
-const props = defineProps<{prevLink: string, nextLink?: string, latestLink: string, text: string}>();
-const route = useRoute();
-const selectedVersion = computed(() => {
-  if (route.path.startsWith('/next')) {
-    return 'next';
-  } else if (route.path.startsWith('/prev')) {
-    return 'prev';
-  }
-  return 'latest';
-});
+const props = defineProps<{prevLink: string, nextLink: string, latestLink: string, text: string}>();
+const {selectedVersion} = useVersion();
+
 const fullLink = computed(() => {
-  if (selectedVersion.value === 'next') {
+  if (selectedVersion.value.type === 'next') {
     return props.nextLink;
-  } else if (selectedVersion.value === 'prev') {
+  } else if (selectedVersion.value.type === 'prev') {
     return props.prevLink;
   }
   return props.latestLink;

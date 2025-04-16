@@ -9,13 +9,13 @@ hero:
   actions:
     - theme: brand
       text: Why Leo Query?
-      link: /latest/introduction/why
+      link: /latest/why
     - theme: alt
       text: Getting Started
-      link: /latest/introduction/gettingStarted
+      link: /latest/gettingStarted
     - theme: alt
       text: Examples
-      link: /latest/examples/examples
+      link: /latest/examples
   image: /leo-without-background.png
 
 features:
