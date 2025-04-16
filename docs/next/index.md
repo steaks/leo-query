@@ -3,7 +3,7 @@
 layout: home
 
 hero:
-  name: "Leo Query"
+  name: "Leo Query (next)"
   text: "A simple library to connect async queries to Zustand stores."
   tagline: Async Queries for Zustand
   actions:
