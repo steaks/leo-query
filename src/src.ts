@@ -31,18 +31,27 @@ export const configure = (options: GlobalOptions) => {
  * @param store
  */
 const bind = <T extends object>(store: UseBoundStore<StoreApi<T>>) => {
+  const state = store.getState();
   const init = store.getInitialState();
   Object
     .keys(init)
     .forEach(k => {
       const key = k as keyof T
-      const v = init[key];
-      if (isQuery(v)) {
+      const v = state[key];
+      const initV = init[key];
+      if (isQuery(v) && v.__key === "NOT_YET_SET") {
         v.__key = key;
         v.__store = () => store;
-      } else if (isEffect(v)) {
+      } else if (isEffect(v) && v.__key === "NOT_SET_YET") {
         v.__key = key;
         v.__store = () => store;
+      }
+      if (v !== initV && isQuery(initV) && initV.__key === "NOT_YET_SET") {
+        initV.__key = key;
+        initV.__store = () => store;
+      } else if (v !== initV && isEffect(initV) && initV.__key === "NOT_SET_YET") {
+        initV.__key = key;
+        initV.__store = () => store;
       }
     });
 };

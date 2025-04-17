@@ -1,21 +1,25 @@
 # Setup with Next.js
 
-Leo Query provides helpers that follow [Zustand's guidance](https://zustand.docs.pmnd.rs/guides/nextjs) to integrate with [Next.js](https://nextjs.org/). This guide will walk you through setting up Leo Query in your Next.js application.
+Leo Query provides helpers that follow [Zustand's guidance](https://zustand.docs.pmnd.rs/guides/nextjs) to integrate with [Next.js](https://nextjs.org/). This guide will walk you through setting up Leo Query in your Next.js application. 
+
+Please read Zustand's documentation about [SSR and Hydration](https://zustand.docs.pmnd.rs/guides/ssr-and-hydration) and [Setup with Next.js](https://zustand.docs.pmnd.rs/guides/nextjs) before this guide.
 
 ## Overview
 
-When using Leo Query with Next.js, there are four main steps to get your app working:
+There are four steps to integrate the Leo Query + Zustand stack with Next.js.
 
-1. Create your store
-2. Create your provider
-3. Wrap your components with the provider
-4. Use the hooks in client components
+1. Create a store
+2. Create a [React Context](https://react.dev/reference/react/createContext) to hold the store
+3. Provide your context
+4. Access the store using your context
+
+If you'd like to skip the step-by-step guide you can browse a working implementation [here](https://codesandbox.io/p/devbox/next-js-example-0-3-0-y6w29t).
 
 ## Step-by-Step Guide
 
-### 1. Create Your Store
+### 1. Create a Store
 
-First, create your Zustand store using Leo Query's `query` and `effect` functions. This is identical to how you would create a store in a regular React app.
+Create a store in a similar way to how you normally create stores. Use `createStore` from `zustand/vanilla` rather than the React-specific `create` function.
 
 ```typescript
 //store.ts
@@ -37,16 +41,16 @@ export const createDogStore = () =>
   }));
 ```
 
-### 2. Create Your Provider
+### 2. Create a React Context
 
-Next, create a provider using Leo Query's `createStoreProvider`. With Next.js it's important to provide your store through React's context rather than a global store.
+Create a React context using Leo Query's `createStoreContext`. This function will create the Context, Provider, and hooks to access the store via the context.
 
 ```typescript
 //provider.tsx
 "use client";
 
 import { createDogStore } from "./store";
-import { createStoreProvider } from "leo-query";
+import { createStoreContext } from "leo-query";
 
 export const {
     Provider: DogStoreProvider, 
@@ -54,17 +58,17 @@ export const {
     useStore: useDogStore, 
     useStoreAsync: useDogStoreAsync, 
     useStoreSuspense: useDogStoreSuspense
-} = createStoreProvider(createDogStore);
+} = createStoreContext(createDogStore);
 ```
 
-### 3. Wrap Your Components
+### 3. Provide Your Context
 
-Wrap your components with the provider. You can also fetch initial data on the server and pass it to your components.
+Use the Provider in your route. Follow [Zustand's guidance](https://zustand.docs.pmnd.rs/guides/nextjs#using-the-store-with-different-architectures) for where you should put your provider.
 
 ```typescript
 //page.tsx
 import {DogStoreProvider} from "@/app/store/provider";
-import {Content} from "./content";
+import {Dogs} from "./dogs";
 
 const fetchInitialDogs = async () => 
   Promise.resolve(100);
@@ -82,13 +86,13 @@ export default async function Page() {
 
 ### 4. Use the Hooks
 
-Finally, use the hooks in your client components. Leo Query provides three types of hooks:
-- `useStore`: For synchronous state access
-- `useStoreAsync`: For async state with loading/error handling
-- `useStoreSuspense`: For async state with React Suspense
+Use the hooks in your client components to access the store. Leo Query provides three hooks:
+- `useStore`: For synchronous state access. This is Zustand's native hook.
+- `useStoreAsync`: For async state with loading/error handling created with [hook](/next/guide/hook).
+- `useStoreSuspense`: For async state with React Suspense created with [hook](/next/guide/hook).
 
 ```typescript
-//content.tsx
+//dogs.tsx
 "use client";
 
 import {useDogStore, useDogStoreAsync} from "@/app/store/provider";
@@ -97,7 +101,7 @@ interface Props {
   initialDogs: number;
 }
 
-export const Content = (p: Props) => {
+export const Dogs = (p: Props) => {
   const dogs = useDogStoreAsync(s => s.dogs, {initialValue: p.initialDogs}); 
   const increasePopulation = useDogStore(s => s.increasePopulation.trigger);
 
@@ -115,48 +119,32 @@ export const Content = (p: Props) => {
 ```
 ## Passing Initial Data
 
-When working with Next.js, you often want to fetch initial data on the server and pass it to your client components. This is particularly useful for:
-
-1. **Server-Side Rendering (SSR)**: Fetch data during the initial page load to avoid client-side loading states
-2. **Static Site Generation (SSG)**: Pre-render pages with data at build time
-3. **Incremental Static Regeneration (ISR)**: Revalidate and update static pages periodically
-
-Leo Query supports this pattern through the `initialValue` option in the `useStoreAsync` hook. This allows you to:
-
-- Pass server-fetched data directly to your client components
-- Avoid unnecessary loading states on initial render
-- Maintain consistency between server and client state
-- Improve performance by reducing client-side data fetching
-
-The `initialValue` works seamlessly with Leo Query's caching and revalidation system. When you provide an initial value, it's used as the first value rather than exist in a loading state initially.
-
+When working with Next.js, you often want to fetch initial data in a server component and pass it to your client components to avoid unnecessary fetches. With Leo Query you can pass an `initialValue` to your hook.
 
 ### Example
 
-Fetch data in the server component. Pass it to client components through props.
 ```typescript
 //page.tsx
-import {DogStoreProvider} from "@/app/store/provider";
-import {Content} from "./content";
+import { DogStoreProvider } from "@/app/store/provider";
+import Dogs from "@/app/ui/dogs";
 
-const fetchInitialDogs = async () => 
-  Promise.resolve(100);
+const fetchInitialDogs = async () => Promise.resolve(100);
 
 export default async function Page() {
-  const initialDogs = await fetchInitialDogs(); //fetch data in the server component.
+  const initialDogs = await fetchInitialDogs();
   return (
     <DogStoreProvider>
-      <p>Initial Dogs: {initialDogs}</p>
-      <Content initialDogs={initialDogs} />
+      <p className="initial-dogs">
+        Initial Dogs (loaded in server component): {initialDogs}
+      </p>
+      <Dogs initialDogs={initialDogs} />
     </DogStoreProvider>
   );
 }
+
 ```
-
-Use the data in props as the initial value in your client component.
-
 ```typescript
-//content.tsx
+//dogs.tsx
 "use client";
 
 import {useDogStore, useDogStoreAsync} from "@/app/store/provider";
@@ -182,13 +170,16 @@ export const Content = (p: Props) => {
 };
 ```
 
-### Passing Data with a Timestamp
+Browse a working implementation [here](https://codesandbox.io/p/devbox/next-js-example-0-3-0-y6w29t).
 
-Leo Query provides the option to pass a value along with a timestamp. This is a way to provide data in a more precise way. Leo Query will look at the timestamp provided to deterime if the data provided is fresher than the existing data. Use this for advanced edge-cases and more precise data passing when working with Next.js.
+## Passing Data with a Timestamp
+
+For a more advanced data passing technique you can pass a value and timestamp to the hook. Leo Query will look at the timestamp provided. If the timestamp is newer than the timestamp when the last value was set the query will receive the updated value. If the timestamp is older the value will be ignored.
+
+This technique is useful when you are concerned about race-conditions or the Zustand store having stale data.
 
 ### Example
 
-Fetch data in the server component and create a timestamp. Pass it to client components through props.
 ```typescript
 //page.tsx
 import {DogStoreProvider} from "@/app/store/provider";
@@ -208,9 +199,6 @@ export default async function Page() {
   );
 }
 ```
-
-Use the data and timestamp in props as the value in your client component.
-
 ```typescript
 //content.tsx
 "use client";
@@ -238,3 +226,7 @@ export const Content = (p: Props) => {
   );
 };
 ```
+
+## Hydrating your store
+
+If you are [hydrating your store](https://zustand.docs.pmnd.rs/integrations/persisting-store-data#usage-in-next.js) using the persist middleware you may need more control. Hydration is typically done in a `useEffect`. You can use [manual updates](/next/advancedConcepts/manualUpdates) in a `useEffect` to set values in your store.
