@@ -2,7 +2,7 @@
 
 Leo Query is an **async state** library for Zustand. 
 
-Zustand provides guidance for handling [async state](https://github.com/pmndrs/zustand?tab=readme-ov-file#async-actions). But devs resort to more robust libries like [Tanstack Query](https://tanstack.com/query/latest) or [Vercel SWR](https://swr.vercel.app/) because they handle difficult edge-cases like **cache busting**, **race-conditions**, **retries**, **loading states**, and **error handling**. 
+Zustand provides guidance for handling [async state](https://github.com/pmndrs/zustand?tab=readme-ov-file#async-actions). But devs resort to more robust libraries like [Tanstack Query](https://tanstack.com/query/latest) or [Vercel SWR](https://swr.vercel.app/) because they handle difficult edge-cases like **cache-busting**, **race-conditions**, **retries**, **loading states**, and **error handling**. 
 
 Bringing in a **second system** to handle async state and integrating two state systems complicates architecture. It makes building and maintaining apps harder.
 
@@ -230,7 +230,7 @@ const Filter = () => {
 
 ### Putting It All Together
 
-Now let's put together the full app. Notice your state and data loading logic is **centeralized** in one place with Leo Query stack and dispersed with the TanStack Query stack. Having your state and data logic in a centralized place will make tracking bugs and building enhancements easier.
+Now let's put together the full app. Notice your state and data loading logic is **centralized** in one place with Leo Query stack and dispersed with the TanStack Query stack. Having your state and data logic in a centralized place will make tracking bugs and building enhancements easier.
 
 Dive in deeper by looking at working examples with a [Leo Query](https://codesandbox.io/p/sandbox/todos-0-3-0-d75vj5) stack and a [TanStack Query](https://codesandbox.io/p/sandbox/todos-tanstack-query-zy9zyc) stack.
 
