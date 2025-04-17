@@ -11,6 +11,6 @@ export {
     partialize
 } from "./persist";
 export {
-    createStoreProvider
+    createStoreContext
 } from "./ssr";
 export * from "./types";

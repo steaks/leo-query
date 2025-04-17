@@ -3,7 +3,7 @@ import {StoreApi, useStore, UseBoundStore} from "zustand";
 import {hook} from "./src";
 import {UseBoundAsyncStoreWithSuspense, UseBoundAsyncStoreWithoutSuspense, StoreProvider, StoreHooks, StoreProviderProps} from "./types";
 
-export const createStoreProvider = <T extends object, >(createStore: () => StoreApi<T>): StoreProvider<T> => {
+export const createStoreContext = <T extends object, >(createStore: () => StoreApi<T>): StoreProvider<T> => {
   const Context = createContext<StoreHooks<T> | null>(null);
 
   const Provider = (p: StoreProviderProps) => {
