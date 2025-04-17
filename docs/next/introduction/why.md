@@ -2,11 +2,11 @@
 
 Leo Query is an **async state** library for Zustand. 
 
-Zustand provides guidance for handling [async state](https://github.com/pmndrs/zustand?tab=readme-ov-file#async-actions). But devs resort to more robust libries like [Tanstack Query](https://tanstack.com/query/latest) or [Vercel SWR](https://swr.vercel.app/) because the guidance doesn't handle difficult edge-cases like **cache busting**, **race-conditions**, **retries**, **loading states**, and **error handling**. 
+Zustand provides guidance for handling [async state](https://github.com/pmndrs/zustand?tab=readme-ov-file#async-actions). But devs resort to more robust libries like [Tanstack Query](https://tanstack.com/query/latest) or [Vercel SWR](https://swr.vercel.app/) because they handle difficult edge-cases like **cache busting**, **race-conditions**, **retries**, **loading states**, and **error handling**. 
 
-So they bring in a **second system** to handle async state. Integrating two systems to handle state complicates architecture. And it makes building and maintaining apps harder.
+Bringing in a **second system** to handle async state and integrating two state systems complicates architecture. It makes building and maintaining apps harder.
 
-Leo Query integrates directly with Zustand and handles complex async state edge-cases like TanStack Query and SWR. So with Leo Query devs can build **simpler** architecture with **one state system** that makes apps **easier to build** and **easier to maintain**. Read the [Leo Query vs. TanStack Query](#leo-query-vs-tanstack-query) comparison to see this in practice.
+Leo Query integrates directly with Zustand and handles complex async state edge-cases like TanStack Query and SWR. So with Leo Query devs can build apps with **one state system** and a **simpler** architecture. This makes apps **easier to build** and **easier to maintain**. Read the [Leo Query vs. TanStack Query](#leo-query-vs-tanstack-query) comparison to see this in practice.
 
 ## Key Features
 
