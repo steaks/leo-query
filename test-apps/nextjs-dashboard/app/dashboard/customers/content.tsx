@@ -1,15 +1,10 @@
 "use client";
+import {useDogStore, useDogStoreAsync, useDogStoreIsHydrated} from "@/app/store/provider";
 
-import {useDogStore, useDogStoreAsync} from "@/app/store/provider";
-
-interface Props {
-  initialDogs: number;
-  timestamp: number;
-}
-
-export const Content = (p: Props) => {
-  const dogs = useDogStoreAsync(s => s.dogs, {initialValue: p.initialDogs});
+export const Dogs = () => {
+  const dogs = useDogStoreAsync(s => s.dogs);
   const increasePopulation = useDogStore(s => s.increasePopulation.trigger);
+  const isHydrated = useDogStoreIsHydrated();
 
   if (dogs.isLoading) {
     return <>Loading...</>;
@@ -18,6 +13,7 @@ export const Content = (p: Props) => {
   return (
     <div>
       <p>Dogs: {dogs.value}</p>
+      <p>Is Hydrated: {isHydrated.toString()}</p>
       <button onClick={increasePopulation}>Add Dog</button>
     </div>
   );
