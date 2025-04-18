@@ -164,6 +164,10 @@ export interface UseBoundAsyncStoreOptions<T> {
    * Timestamp of the value. Leo Query will use this value if the timestamp is newer than the query value's current timestamp.
    */
   readonly timestamp?: number;
+  /**
+   * If `true`, the query will wait until the store is hydrated before triggering a new fetch.
+   */
+  readonly hydration?: Promise<void>;
 }
 
 
@@ -209,20 +213,39 @@ export type UseBoundAsyncStoreWithoutSuspense<T> = {
     <Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): () => Promise<void>
 };
 
-export interface StoreProviderProps {
-  children: ReactNode;
+export interface StoreProviderProps<T> {
+  readonly children: ReactNode;
+}
+
+export interface StoreProviderPropsWithServerSideData<T, D> {
+  readonly children: ReactNode;
+  readonly serverSideData: D;
 }
 
 export interface StoreHooks<T> {
   readonly hook: UseBoundStore<StoreApi<T>>;
   readonly hookAsync: UseBoundAsyncStoreWithoutSuspense<T>;
   readonly hookAsyncSuspense: UseBoundAsyncStoreWithSuspense<T>;
+  readonly store: StoreApi<T>;
+  isHydrated: boolean;
+  readonly hydration?: Promise<void>;
+  readonly __resolve?: Function;
 }
 
 export interface StoreProvider<T> {
-  Provider: React.FC<StoreProviderProps>;
-  Context: React.Context<StoreHooks<T> | null>;
-  useStore: UseBoundStore<StoreApi<T>>;
-  useStoreAsync: UseBoundAsyncStoreWithoutSuspense<T>;
-  useStoreSuspense: UseBoundAsyncStoreWithSuspense<T>;
+  readonly Provider: React.FC<StoreProviderProps<T>>;
+  readonly Context: React.Context<StoreHooks<T> | null>;
+  readonly useStore: UseBoundStore<StoreApi<T>>;
+  readonly useStoreAsync: UseBoundAsyncStoreWithoutSuspense<T>;
+  readonly useStoreSuspense: UseBoundAsyncStoreWithSuspense<T>;
+  readonly useIsHydrated: () => boolean;
+}
+
+export interface StoreProviderWithServerSideData<T, D> {
+  readonly Provider: React.FC<StoreProviderPropsWithServerSideData<T, D>>;
+  readonly Context: React.Context<StoreHooks<T> | null>;
+  readonly useStore: UseBoundStore<StoreApi<T>>;
+  readonly useStoreAsync: UseBoundAsyncStoreWithoutSuspense<T>;
+  readonly useStoreSuspense: UseBoundAsyncStoreWithSuspense<T>;
+  readonly useIsHydrated: () => boolean;
 }

@@ -18,7 +18,11 @@ export const merge = <T extends object>(persistedState: unknown, currentState: T
       if (isQuery(currentValue)) {
         try {
           const persistedValue = leoPersistedState[key] as any;
-          leoPersistedState[key] = setSync(currentValue, persistedValue.value, /*error*/undefined, {__isInitialValue: true, __updateStore: false});
+          if (persistedValue && persistedValue.value !== undefined) {
+            leoPersistedState[key] = setSync(currentValue, persistedValue.value, /*error*/undefined, {__updateStore: false});
+          } else {
+            leoPersistedState[key] = currentValue; 
+          }
         } catch (error) {
           console.error(`Failed to merge persisted state for query ${key}:`, error);
         }

@@ -237,6 +237,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
     value: p.options.initialValue as unknown as R,
     error: undefined,
     trigger: async (): Promise<R> => {
+      console.log("trigger", q.__key);
       const state = q.__store().getState();
       const current = state[q.__key] as Query<Store, R>;
       const now = Date.now();
@@ -476,6 +477,8 @@ const withSuspenseQuery = <T>(values: [Query<any, T>, ...QueryOrEffect<any>[]], 
     wait().then(() => { setInitialValue(v, opts.initialValue!); });
   } else if (_needsValue) {
     wait().then(() => { setValue(v, opts.value!, opts.timestamp!); });
+  } else if (needsTrigger && opts.hydration) {
+    depTriggers = [opts.hydration];
   } else if (needsTrigger) {
     if (v.__trigger) {
       queryTrigger = [v.__trigger];
