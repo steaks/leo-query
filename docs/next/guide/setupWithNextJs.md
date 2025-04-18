@@ -117,7 +117,7 @@ export const Dogs = () => {
 ```
 ## Alternative Ways to Pass Server-Side Data
 
-The easiest way is to pass server-side data is through the provider. If this isn't possible you can pass it to the [hook](/latest/guide/initialData#hook) when you access data or [manually](/latest/advancedConcepts/manualUpdates) in a `useEffect`.
+The easiest way is to pass server-side data is through the provider. If this isn't possible you can pass it to the [hook](/next/guide/initialData#hook) when you access data or [manually](/next/advancedConcepts/manualUpdates) in a `useEffect`.
 
 ### Passing Data to the hook
 
