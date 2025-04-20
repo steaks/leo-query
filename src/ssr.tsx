@@ -4,6 +4,35 @@ import {StoreApi, useStore, UseBoundStore} from "zustand";
 import {hook} from "./src";
 import {UseBoundAsyncStoreWithSuspense, UseBoundAsyncStoreWithoutSuspense, StoreProvider, StoreHooks, StoreProviderProps, StoreProviderPropsWithServerSideData, StoreProviderWithServerSideData} from "./types";
 
+const validatePersist = <T, >(store: StoreApi<T>) => {
+  const s = store as any;
+  const options = s.persist.getOptions();
+  if (!options.skipHydration) {
+    throw new Error("Persist must be skipped for SSR.");
+  }
+  if (!options.merge) {
+    throw new Error("Persist must have a Leo Query merge function.");
+  }
+  if (!options.partialize) {
+    throw new Error("Persist must have a Leo Query partialize function.");
+  }
+  if (s.persist.hasHydrated()) {
+    throw new Error("Persist has already been hydrated. Do not manually call rehydrate.");
+  }
+};
+
+const setupPersist = <T, >(store: StoreApi<T>) => {
+  if ((store as any).persist) {
+    validatePersist(store);
+    const s = store as any;
+    let resolve: Function | undefined = undefined;
+    const hydration = s.persist !== undefined ? new Promise<void>(r => resolve = r) : undefined;
+    const hasHydrated = s.persist.hasHydrated();
+    return {hydration, hasHydrated, resolve};
+  }
+  return {hydration: undefined, hasHydrated: true, resolve: undefined};
+};
+
 const onHydrate = <T, >(storeRef: RefObject<StoreHooks<T> | null>) => {
   if (storeRef.current && storeRef.current.hasHydrated === true) {
     storeRef.current.hasHydrated = false;
@@ -16,17 +45,6 @@ const onFinishHydration = <T, >(storeRef: RefObject<StoreHooks<T> | null>) => {
     storeRef.current.__resolve!();
     storeRef.current.hasHydrated = true;
   }
-};
-
-const setupPersist = <T, >(store: StoreApi<T>) => {
-  if ((store as any).persist) {
-    const s = store as any;
-    let resolve: Function | undefined = undefined;
-    const hydration = s.persist !== undefined ? new Promise<void>(r => resolve = r) : undefined;
-    const hasHydrated = s.persist.hasHydrated();
-    return {hydration, hasHydrated, resolve};
-  }
-  return {hydration: undefined, hasHydrated: true, resolve: undefined};
 };
 
 export function createStoreContext<T extends object>(createStore: () => StoreApi<T>): StoreProvider<T>
