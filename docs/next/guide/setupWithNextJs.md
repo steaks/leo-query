@@ -231,9 +231,9 @@ export const Dogs = (p: Props) => {
 
 Working with persist middleware and Next.js can be tricky. Leo Query handles the edge cases for you by re-hydrating the store at the appropriate time. 
 
-Use the persist middleware as you normally would. Pass in `skipHydration: true`. Leo Query will hydrate the store for you at the appropriate time. Use the `useHasHydrated` hook to check if your store has been hydrated.
+Use the persist middleware as you normally would. Pass Leo Query's `merge` and `partialize` functions. And set `skipHydration: true`. Leo Query will hydrate the store for you at the appropriate time. Use the `useHasHydrated` hook to check if your store has been hydrated.
 
-```typescript {27}
+```typescript {25-27}
 //store.ts
 "use client";
 import {createStore} from "zustand";
