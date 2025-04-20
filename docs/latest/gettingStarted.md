@@ -33,8 +33,8 @@ import {effect, query, hook, Query, Effect} from "leo-query";
 
 interface DogState {
   dogs: Query<DogState, number>;
-  increasePopulation: Effect<DogState, []>;
-  removeAllDogs: Effect<DogState, []>;
+  increasePopulation: Effect<DogState>;
+  removeAllDogs: Effect<DogState>;
 }
 
 const useDogStore = create<DogState>(() => ({

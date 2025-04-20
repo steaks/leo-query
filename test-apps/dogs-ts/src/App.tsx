@@ -6,8 +6,8 @@ import "./App.css";
 
 interface DogState {
   dogs: Query<DogState, number>;
-  increasePopulation: Effect<DogState, []>;
-  removeAllDogs: Effect<DogState, []>;
+  increasePopulation: Effect<DogState>;
+  removeAllDogs: Effect<DogState>;
 }
 
 const useDogStore = create<DogState>(() => ({
