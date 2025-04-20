@@ -237,7 +237,6 @@ export function query<Store extends object, R>(): Query<Store, R> {
     value: p.options.initialValue as unknown as R,
     error: undefined,
     trigger: async (): Promise<R> => {
-      console.log("trigger", q.__key);
       const state = q.__store().getState();
       const current = state[q.__key] as Query<Store, R>;
       const now = Date.now();

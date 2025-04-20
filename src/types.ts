@@ -165,7 +165,7 @@ export interface UseBoundAsyncStoreOptions<T> {
    */
   readonly timestamp?: number;
   /**
-   * If `true`, the query will wait until the store is hydrated before triggering a new fetch.
+   * If `true`, the query will wait until the store has been hydrated before triggering a new fetch.
    */
   readonly hydration?: Promise<void>;
 }
@@ -227,9 +227,9 @@ export interface StoreHooks<T> {
   readonly hookAsync: UseBoundAsyncStoreWithoutSuspense<T>;
   readonly hookAsyncSuspense: UseBoundAsyncStoreWithSuspense<T>;
   readonly store: StoreApi<T>;
-  isHydrated: boolean;
-  readonly hydration?: Promise<void>;
-  readonly __resolve?: Function;
+  hasHydrated: boolean;
+  hydration?: Promise<void>;
+  __resolve?: Function;
 }
 
 export interface StoreProvider<T> {
@@ -238,7 +238,7 @@ export interface StoreProvider<T> {
   readonly useStore: UseBoundStore<StoreApi<T>>;
   readonly useStoreAsync: UseBoundAsyncStoreWithoutSuspense<T>;
   readonly useStoreSuspense: UseBoundAsyncStoreWithSuspense<T>;
-  readonly useIsHydrated: () => boolean;
+  readonly useHasHydrated: () => boolean;
 }
 
 export interface StoreProviderWithServerSideData<T, D> {
@@ -247,5 +247,5 @@ export interface StoreProviderWithServerSideData<T, D> {
   readonly useStore: UseBoundStore<StoreApi<T>>;
   readonly useStoreAsync: UseBoundAsyncStoreWithoutSuspense<T>;
   readonly useStoreSuspense: UseBoundAsyncStoreWithSuspense<T>;
-  readonly useIsHydrated: () => boolean;
+  readonly useHasHydrated: () => boolean;
 }

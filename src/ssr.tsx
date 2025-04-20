@@ -1,9 +1,22 @@
 "use client";
-import {createContext, useContext, useRef, useEffect} from "react";
+import {createContext, useContext, useRef, useEffect, RefObject} from "react";
 import {StoreApi, useStore, UseBoundStore} from "zustand";
 import {hook} from "./src";
 import {UseBoundAsyncStoreWithSuspense, UseBoundAsyncStoreWithoutSuspense, StoreProvider, StoreHooks, StoreProviderProps, StoreProviderPropsWithServerSideData, StoreProviderWithServerSideData} from "./types";
 
+const onHydrate = <T, >(storeRef: RefObject<StoreHooks<T> | null>) => {
+  if (storeRef.current && storeRef.current.hasHydrated === true) {
+    storeRef.current.hasHydrated = false;
+    storeRef.current.hydration = new Promise<void>(r => storeRef.current!.__resolve = r);
+  }
+};
+
+const onFinishHydration = <T, >(storeRef: RefObject<StoreHooks<T> | null>) => {
+  if (storeRef.current && storeRef.current.hasHydrated === false) {
+    storeRef.current.__resolve!();
+    storeRef.current.hasHydrated = true;
+  }
+};
 
 export function createStoreContext<T extends object>(createStore: () => StoreApi<T>): StoreProvider<T>
 export function createStoreContext<T extends object, D = undefined>(createStore: (serverSideData: D) => StoreApi<T>): StoreProviderWithServerSideData<T, D>
@@ -20,14 +33,22 @@ export function createStoreContext<T extends object, D = undefined>(createStore:
       const hookAsyncSuspense = hook(syncHook, true);
       let resolve: Function | undefined = undefined;
       const hydration = (store as any).persist !== undefined ? new Promise<void>(r => resolve = r) : undefined;
-      const isHydrated = !hydration;
-      storeRef.current = {hook: syncHook, hookAsync, hookAsyncSuspense, store, isHydrated, hydration, __resolve: resolve};
+      const hasHydrated = (store as any).persist.hasHydrated();
+      storeRef.current = {hook: syncHook, hookAsync, hookAsyncSuspense, store, hasHydrated, hydration, __resolve: resolve};
     }
     useEffect(() => {
-      if ((storeRef.current!.store as any).persist) {
-        (storeRef.current!.store as any).persist.rehydrate();
-        storeRef.current!.__resolve!();
-        storeRef.current!.isHydrated = true;
+      const storeWithPersist = (storeRef.current!.store as any);
+      let unsubHydrate: Function | undefined = undefined;
+      let unsubFinishHydration: Function | undefined = undefined;
+      if (storeWithPersist.persist) {
+        storeRef.current!.hasHydrated = storeWithPersist.persist.hasHydrated();
+        unsubHydrate = storeWithPersist.persist.onHydrate(() => { onHydrate(storeRef); });
+        unsubFinishHydration = storeWithPersist.persist.onFinishHydration(() => { onFinishHydration(storeRef); });
+        storeWithPersist.persist.rehydrate();
+      }
+      return () => {
+        if (unsubHydrate) { unsubHydrate(); }
+        if (unsubFinishHydration) { unsubFinishHydration(); }
       }
     }, []);
     return (
@@ -47,7 +68,7 @@ export function createStoreContext<T extends object, D = undefined>(createStore:
     const store = useContext(Context);
     if (!store) throw new Error("Store not found");
     let __opts = opts;
-    if (!store.isHydrated) {
+    if (!store.hasHydrated) {
       __opts = {...opts, hydration: store.hydration};
     }     
     return store.hookAsync(selector, __opts);
@@ -57,16 +78,16 @@ export function createStoreContext<T extends object, D = undefined>(createStore:
     const store = useContext(Context);
     if (!store) throw new Error("Store not found");
     let __opts = opts;
-    if (!store.isHydrated) {
+    if (!store.hasHydrated) {
       __opts = {...opts, hydration: store.hydration};
     }
     return store.hookAsyncSuspense(selector, __opts);
   };
 
-  const useIsHydrated = () => {
+  const useHasHydrated = () => {
     const store = useContext(Context);
     if (!store) throw new Error("Store not found");
-    return store.isHydrated;
+    return store.hasHydrated;
   };
 
   return {
@@ -75,6 +96,6 @@ export function createStoreContext<T extends object, D = undefined>(createStore:
     useStore: useStoreSync as UseBoundStore<StoreApi<T>>, 
     useStoreAsync: useStoreAsync as UseBoundAsyncStoreWithoutSuspense<T>, 
     useStoreSuspense: useStoreSuspense as UseBoundAsyncStoreWithSuspense<T>,
-    useIsHydrated
+    useHasHydrated
   };
 };

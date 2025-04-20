@@ -231,7 +231,7 @@ export const Dogs = (p: Props) => {
 
 Working with persist middleware and Next.js can be tricky. Leo Query handles the edge cases for you by re-hydrating the store at the appropriate time. 
 
-Use the persist middleware as you normally would. Pass in `skipHydration: true`. Leo Query will hydrate the store for you at the appropriate time. Use the `useIsHydrated` hook for more granular control.
+Use the persist middleware as you normally would. Pass in `skipHydration: true`. Leo Query will hydrate the store for you at the appropriate time. Use the `useHasHydrated` hook to check if your store has been hydrated.
 
 ```typescript {27}
 //store.ts
@@ -276,7 +276,7 @@ export const {
     useStore: useDogStore, 
     useStoreAsync: useDogStoreAsync, 
     useStoreSuspense: useDogStoreSuspense,
-    useIsHydrated: useDogStoreIsHydrated
+    useHasHydrated: useDogStoreHasHydrated
 } = createStoreContext(createDogStore);
 ```
 ```typescript
@@ -300,12 +300,12 @@ export default async function Page() {
 ```typescript {8,17}
 //dogs.tsx
 "use client";
-import {useDogStore, useDogStoreAsync, useDogStoreIsHydrated} from "@/app/store/provider";
+import {useDogStore, useDogStoreAsync, useDogStoreHasHydrated} from "@/app/store/provider";
 
 export const Dogs = () => {
   const dogs = useDogStoreAsync(s => s.dogs);
   const increasePopulation = useDogStore(s => s.increasePopulation.trigger);
-  const isHydrated = useDogStoreIsHydrated();
+  const hasHydrated = useDogStoreHasHydrated();
 
   if (dogs.isLoading) {
     return <>Loading...</>;
@@ -314,7 +314,7 @@ export const Dogs = () => {
   return (
     <div>
       <p>Dogs: {dogs.value}</p>
-      <p>Is Hydrated: {isHydrated.toString()}</p>
+      <p>Has Hydrated: {hasHydrated.toString()}</p>
       <button onClick={increasePopulation}>Add Dog</button>
     </div>
   );

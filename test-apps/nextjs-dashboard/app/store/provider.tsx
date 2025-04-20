@@ -8,5 +8,5 @@ export const {
     useStore: useDogStore, 
     useStoreAsync: useDogStoreAsync, 
     useStoreSuspense: useDogStoreSuspense,
-    useIsHydrated: useDogStoreIsHydrated
+    useHasHydrated: useDogStoreHasHydrated
 } = createStoreContext(createDogStore);
