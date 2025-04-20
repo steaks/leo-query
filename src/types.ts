@@ -220,7 +220,7 @@ export interface StoreProviderProps<T> {
 export interface StoreProviderPropsWithServerSideData<T, D> {
   readonly children: ReactNode;
   /**
-   * Server side data to hydrate the store. This data will be passed to the stores creation function.
+   * Server side data to hydrate the store. This data will be passed to the store's creation function.
    */
   readonly serverSideData: D;
 }
