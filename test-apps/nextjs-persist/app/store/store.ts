@@ -1,6 +1,7 @@
 "use client";
 import {createStore} from "zustand";
-import {query, effect, Effect, Query} from "leo-query";
+import {persist} from "zustand/middleware";
+import {query, effect, merge, partialize, Effect, Query} from "leo-query";
 import {fetchDogs, increasePopulation, removeAllDogs } from "./db";
 
 export interface DogState {
@@ -14,9 +15,14 @@ interface ServerSideData {
 }
 
 export const createDogStore = (d: ServerSideData) => 
-  createStore<DogState>(() => ({
+  createStore<DogState>()(persist((set) => ({
     increasePopulation: effect(increasePopulation),
     removeAllDogs: effect(removeAllDogs),
-    dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs], {initialValue: d.dogs}) // Re-fetch when increasePopulation or removeAllDogs succeeds 
+    dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]) // Re-fetch when increasePopulation or removeAllDogs succeeds 
+  }), {
+    name: "dogs-storage",
+    merge,
+    partialize,
+    skipHydration: true
   })
 );
