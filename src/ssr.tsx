@@ -18,6 +18,17 @@ const onFinishHydration = <T, >(storeRef: RefObject<StoreHooks<T> | null>) => {
   }
 };
 
+const setupPersist = <T, >(store: StoreApi<T>) => {
+  if ((store as any).persist) {
+    const s = store as any;
+    let resolve: Function | undefined = undefined;
+    const hydration = s.persist !== undefined ? new Promise<void>(r => resolve = r) : undefined;
+    const hasHydrated = s.persist.hasHydrated();
+    return {hydration, hasHydrated, resolve};
+  }
+  return {hydration: undefined, hasHydrated: true, resolve: undefined};
+};
+
 export function createStoreContext<T extends object>(createStore: () => StoreApi<T>): StoreProvider<T>
 export function createStoreContext<T extends object, D = undefined>(createStore: (serverSideData: D) => StoreApi<T>): StoreProviderWithServerSideData<T, D>
 export function createStoreContext<T extends object, D = undefined>(createStore: (serverSideData?: D) => StoreApi<T>): StoreProvider<T> | StoreProviderWithServerSideData<T, D> {
@@ -31,9 +42,7 @@ export function createStoreContext<T extends object, D = undefined>(createStore:
       const syncHook = Object.assign(useBoundStore, store) as UseBoundStore<StoreApi<T>>;
       const hookAsync = hook(syncHook, false);
       const hookAsyncSuspense = hook(syncHook, true);
-      let resolve: Function | undefined = undefined;
-      const hydration = (store as any).persist !== undefined ? new Promise<void>(r => resolve = r) : undefined;
-      const hasHydrated = (store as any).persist.hasHydrated();
+      const {hydration, hasHydrated, resolve} = setupPersist(store);
       storeRef.current = {hook: syncHook, hookAsync, hookAsyncSuspense, store, hasHydrated, hydration, __resolve: resolve};
     }
     useEffect(() => {
