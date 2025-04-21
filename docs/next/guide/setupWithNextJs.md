@@ -47,7 +47,7 @@ export const createDogStore = (d: ServerSideData): StoreApi<DogState> =>
 
 ### 2. Create a React Context to Hold the Store
 
-Create a React context using Leo Query's `createStoreContext`. This function will create the context, provider, and hooks to access the store.
+Create a React Context using Leo Query's `createStoreContext`. This function will create the context, provider, and hooks to access the store.
 
 ```typescript
 //provider.tsx
@@ -87,7 +87,7 @@ export default async function Page() {
 }
 ```
 
-### 4. Use the Hooks
+### 4. Access the Store
 
 Use the hooks in your client components to access the store. Leo Query provides three hooks:
 - `useStore`: For synchronous state access. This is Zustand's native hook.
@@ -117,11 +117,14 @@ export const Dogs = () => {
 ```
 ## Alternative Ways to Pass Server-Side Data
 
-The easiest way is to pass server-side data is through the provider. If this isn't possible you can pass it to the [hook](/next/guide/initialData#hook) when you access data or [manually](/next/advancedConcepts/manualUpdates) in a `useEffect`.
+The easiest way is to pass server-side data is through the provider. If this isn't possible you can pass it other ways:
+- Via [initial value](/next/guide/initialData#hook) property in the hook in your client component 
+- Via [timestamped value](/next/advancedConcepts/timestampedValues) in the hook in your client component
+- Via a `useEffect` with [manual updates](/next/advancedConcepts/manualUpdates)
 
-### Passing Data to the hook
+### Via initial value
 
-Pass server-side data to the hook's `initialValue` option.
+Pass server-side data to the hook's [initialValue](/next/guide/initialData#hook) option.
 
 ```typescript
 //page.tsx
@@ -143,7 +146,7 @@ export default async function Page() {
 }
 
 ```
-```typescript
+```typescript {10}
 //dogs.tsx
 "use client";
 import {useDogStore, useDogStoreAsync} from "@/app/store/provider";
@@ -169,11 +172,9 @@ export const Dogs = (p: Props) => {
 };
 ```
 
-Browse a working implementation [here](https://codesandbox.io/p/devbox/next-js-example-0-3-0-y6w29t).
+### Via a Timestamped Value
 
-### Passing Data to the hook with a Timestamp
-
-You can pass data with a timestamp the data was fetched to be more precise. Leo Query will compare the provided timestamp with the timestamp the value was last set. 
+You can pass [data with a timestamp when data was fetched](/next/advancedConcepts/timestampedValues) to be more precise. Leo Query will compare the provided timestamp with the timestamp the value was last set. 
 
 If the timestamp is newer than the timestamp when the last value was set the query will receive the updated value. If the timestamp is older the value will be ignored. 
 
@@ -226,6 +227,10 @@ export const Dogs = (p: Props) => {
   );
 };
 ```
+
+### Via UseEffect
+
+See the guidance for updating the store [manually](/next/advancedConcepts/manualUpdates).
 
 ## Working with Persist
 
