@@ -233,6 +233,8 @@ Working with persist middleware and Next.js can be tricky. Leo Query handles the
 
 Use the persist middleware as you normally would. Pass Leo Query's `merge` and `partialize` functions. And set `skipHydration: true`. Leo Query will hydrate the store for you at the appropriate time. Use the `useHasHydrated` hook to check if your store has been hydrated.
 
+You can browse a working implementation [here](https://codesandbox.io/p/devbox/next-js--persist-example-0-3-0-forked-tcssj5).
+
 ```typescript {25-27}
 //store.ts
 "use client";
