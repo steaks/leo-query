@@ -6,7 +6,7 @@ export const fetchDogs = (): Promise<number> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(db.dogs);
-    }, 500);
+    }, 5000);
   });
 };
 
@@ -15,7 +15,7 @@ export const increasePopulation = (): Promise<void> => {
     setTimeout(() => {
       db.dogs = db.dogs + 1;
       resolve();
-    }, 500);
+    }, 5000);
   });
 };
 

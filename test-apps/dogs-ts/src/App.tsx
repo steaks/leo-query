@@ -6,21 +6,25 @@ import "./App.css";
 
 interface DogState {
   dogs: Query<DogState, number>;
-  increasePopulation: Effect<DogState, []>;
-  removeAllDogs: Effect<DogState, []>;
+  increasePopulation: Effect<DogState>;
+  removeAllDogs: Effect<DogState>;
 }
 
 const useDogStore = create<DogState>(() => ({
   increasePopulation: effect(increasePopulation),
   removeAllDogs: effect(removeAllDogs),
-  dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]),
+  dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs], {lazy: false}),
 }));
 
-const useDogStoreAsync = hook<DogState>(useDogStore);
+const useDogStoreAsync = hook(useDogStore, /*suspense*/false);
 
 function DogCounter() {
+  console.log("Rendering DogCounter");
   const dogs = useDogStoreAsync(state => state.dogs);
-  return <h1 className="dog-counter">{dogs} around here...</h1>;
+  if (dogs.isLoading) {
+    return <Loading />;
+  }
+  return <h1 className="dog-counter">{dogs.value} around here...</h1>;
 }
 
 function Loading () {
@@ -28,11 +32,13 @@ function Loading () {
 }
 
 function Controls() {
+  console.log("Rendering Controls");
   const increasePopulation = useDogStore(state => state.increasePopulation.trigger)
   return <button className="cool-button" onClick={increasePopulation}>one up</button>;
 }
 
 function App() {
+  console.log("Rendering App");
   return (
     <div className="app-container">
       <img
@@ -41,9 +47,7 @@ function App() {
         alt="Leo Logo"
       />
       <div className="dog-counter-container">
-        <Suspense fallback={<Loading />}>
-          <DogCounter/>
-        </Suspense>
+        <DogCounter/>
       </div>
       <Controls/>
     </div>

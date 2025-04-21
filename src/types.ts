@@ -164,6 +164,11 @@ export interface UseBoundAsyncStoreOptions<T> {
    * Timestamp of the value. Leo Query will use this value if the timestamp is newer than the query value's current timestamp.
    */
   readonly timestamp?: number;
+  /**
+   * Promise that resolves when the store has been hydrated by the persist middleware. The query will wait until this promise 
+   * resolves rather than triggering a new fetch.
+   */
+  readonly hydration?: Promise<void>;
 }
 
 
@@ -209,20 +214,99 @@ export type UseBoundAsyncStoreWithoutSuspense<T> = {
     <Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): () => Promise<void>
 };
 
-export interface StoreProviderProps {
-  children: ReactNode;
+export interface StoreProviderProps<T> {
+  readonly children: ReactNode;
+}
+
+export interface StoreProviderPropsWithServerSideData<T, D> {
+  readonly children: ReactNode;
+  /**
+   * Server side data to use when initializing the store. This data will be passed to the store's creation function.
+   */
+  readonly serverSideData: D;
 }
 
 export interface StoreHooks<T> {
+  /**
+   * Promise that resolves when the store has been hydrated by the persist middleware. Internal use only.
+   */
+  __resolve?: Function;
+  /**
+   * Hook to access the store.
+   */
   readonly hook: UseBoundStore<StoreApi<T>>;
+  /**
+   * Hook to access a query or effect from the store.
+   */
   readonly hookAsync: UseBoundAsyncStoreWithoutSuspense<T>;
+  /**
+   * Hook to access a query or effect from the store with suspense.
+   */
   readonly hookAsyncSuspense: UseBoundAsyncStoreWithSuspense<T>;
+  /**
+   * The store.
+   */
+  readonly store: StoreApi<T>;
+  /**
+   * Whether the store has been hydrated by the persist middleware.
+   */ 
+  hasHydrated: boolean;
+  /**
+   * Promise that resolves when the store has been hydrated by the persist middware. Undefined if persist middleware is not used.
+   */
+  hydration?: Promise<void>;
 }
 
 export interface StoreProvider<T> {
-  Provider: React.FC<StoreProviderProps>;
-  Context: React.Context<StoreHooks<T> | null>;
-  useStore: UseBoundStore<StoreApi<T>>;
-  useStoreAsync: UseBoundAsyncStoreWithoutSuspense<T>;
-  useStoreSuspense: UseBoundAsyncStoreWithSuspense<T>;
+  /**
+   * Provider for the store.
+   */
+  readonly Provider: React.FC<StoreProviderProps<T>>;
+  /**
+   * Context for the store.
+   */
+  readonly Context: React.Context<StoreHooks<T> | null>;
+  /**
+   * Hook to access the store.
+   */
+  readonly useStore: UseBoundStore<StoreApi<T>>;
+  /**
+   * Hook to access a query or effect from the store.
+   */
+  readonly useStoreAsync: UseBoundAsyncStoreWithoutSuspense<T>;
+  /**
+   * Hook to access a query or effect from the store with suspense.
+   */
+  readonly useStoreSuspense: UseBoundAsyncStoreWithSuspense<T>;
+  /**
+   * Hook to check if the store has been hydrated by the persist middleware.
+   */
+  readonly useHasHydrated: () => boolean;
+}
+
+export interface StoreProviderWithServerSideData<T, D> {
+  /**
+   * Provider for the store.
+   */
+  readonly Provider: React.FC<StoreProviderPropsWithServerSideData<T, D>>;
+  /**
+   * Context for the store.
+   */
+  readonly Context: React.Context<StoreHooks<T> | null>;
+  /**
+   * Hook to access the store.
+   */
+  readonly useStore: UseBoundStore<StoreApi<T>>;
+  /**
+   * Hook to access a query or effect from the store.
+   */
+  readonly useStoreAsync: UseBoundAsyncStoreWithoutSuspense<T>;
+  /**
+   * Hook to access a query or effect from the store with suspense.
+   */
+  readonly useStoreSuspense: UseBoundAsyncStoreWithSuspense<T>;
+  /**
+   * Hook to check if the store has been hydrated by the persist middleware.
+   */
+  readonly useHasHydrated: () => boolean;
 }

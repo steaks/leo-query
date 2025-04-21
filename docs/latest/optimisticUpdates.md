@@ -15,7 +15,7 @@ This is an example of an optimistic update with dogs.
 ```typescript
 interface DogState {
   dogs: Query<DogState, number>;
-  increaseDogs: Effect<DogState, []>;
+  increaseDogs: Effect<DogState>;
 }
 
 const api = {

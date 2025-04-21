@@ -1,7 +1,6 @@
 "use client";
-
-import { createDogStore } from "./store";
-import { createStoreContext } from "leo-query";
+import {createStoreContext} from "leo-query";
+import {createDogStore} from "./store";
 
 export const {
     Provider: DogStoreProvider, 
