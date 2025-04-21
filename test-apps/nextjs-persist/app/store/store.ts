@@ -15,10 +15,10 @@ interface ServerSideData {
 }
 
 export const createDogStore = (d: ServerSideData) => 
-  createStore<DogState>()(persist((set) => ({
+  createStore<DogState>()(persist(() => ({
     increasePopulation: effect(increasePopulation),
     removeAllDogs: effect(removeAllDogs),
-    dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]) // Re-fetch when increasePopulation or removeAllDogs succeeds 
+    dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs], {initialValue: d.dogs}) // Re-fetch when increasePopulation or removeAllDogs succeeds 
   }), {
     name: "dogs-storage",
     merge,

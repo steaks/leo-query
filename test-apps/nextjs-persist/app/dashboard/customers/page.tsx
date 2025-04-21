@@ -5,6 +5,7 @@ const fetchInitialDogs = async () =>
 
 export default async function Page() {
   const dogs = await fetchInitialDogs();
+  console.log("page.tsx", dogs);
   return (
     <DogStoreProvider serverSideData={{dogs}}>
       <p>Initial Dogs: {dogs}</p>

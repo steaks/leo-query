@@ -1,5 +1,5 @@
 "use client";
-import {createContext, useContext, useRef, useEffect, RefObject} from "react";
+import {createContext, useContext, useEffect, useState} from "react";
 import {StoreApi, useStore, UseBoundStore} from "zustand";
 import {hook} from "./src";
 import {UseBoundAsyncStoreWithSuspense, UseBoundAsyncStoreWithoutSuspense, StoreProvider, StoreHooks, StoreProviderProps, StoreProviderPropsWithServerSideData, StoreProviderWithServerSideData} from "./types";
@@ -26,60 +26,70 @@ const setupPersist = <T, >(store: StoreApi<T>) => {
     validatePersist(store);
     const s = store as any;
     let resolve: Function | undefined = undefined;
-    const hydration = s.persist !== undefined ? new Promise<void>(r => resolve = r) : undefined;
+    const hydration = new Promise<void>(r => resolve = r);
     const hasHydrated = s.persist.hasHydrated();
     return {hydration, hasHydrated, resolve};
   }
-  return {hydration: undefined, hasHydrated: true, resolve: undefined};
+  return {hydration: undefined, hasHydrated: false, resolve: undefined};
 };
 
-const onHydrate = <T, >(storeRef: RefObject<StoreHooks<T> | null>) => {
-  if (storeRef.current && storeRef.current.hasHydrated === true) {
-    storeRef.current.hasHydrated = false;
-    storeRef.current.hydration = new Promise<void>(r => storeRef.current!.__resolve = r);
+const onHydrate = <T, >(store: StoreHooks<T> | null, setStore: (store: StoreHooks<T>) => void) => {
+  if (store && store.hasHydrated === true) {
+    let resolve: Function | undefined = undefined;
+    const storeWithPersist = (store!.store as any);
+    const hasHydrated = storeWithPersist.persist.hasHydrated();
+    const hydration = new Promise<void>(r => resolve = r);
+    setStore({...store, hasHydrated, hydration, __resolve: resolve});
   }
 };
 
-const onFinishHydration = <T, >(storeRef: RefObject<StoreHooks<T> | null>) => {
-  if (storeRef.current && storeRef.current.hasHydrated === false) {
-    storeRef.current.__resolve!();
-    storeRef.current.hasHydrated = true;
+const onFinishHydration = <T, >(store: StoreHooks<T> | null, setStore: (store: StoreHooks<T>) => void) => {
+  if (store && store.hasHydrated === false) {
+    const storeWithPersist = (store!.store as any);
+    const hasHydrated = storeWithPersist.persist.hasHydrated();
+    store.__resolve!();
+    setStore({...store, hasHydrated});
   }
+};
+
+const rehydrate = <T, >(store: StoreHooks<T> | null, setStore: (store: StoreHooks<T>) => void) => {
+  let unsubHydrate: Function | undefined = undefined;
+  let unsubFinishHydration: Function | undefined = undefined;
+  const storeWithPersist = (store!.store as any);
+  if (storeWithPersist.persist) {
+    validatePersist(storeWithPersist);
+    unsubHydrate = storeWithPersist.persist.onHydrate(() => { onHydrate(store, setStore); });
+    unsubFinishHydration = storeWithPersist.persist.onFinishHydration(() => { onFinishHydration(store, setStore); });
+    storeWithPersist.persist.rehydrate();
+  }
+  return {unsubHydrate, unsubFinishHydration};
 };
 
 export function createStoreContext<T extends object>(createStore: () => StoreApi<T>): StoreProvider<T>
-export function createStoreContext<T extends object, D = undefined>(createStore: (serverSideData: D) => StoreApi<T>): StoreProviderWithServerSideData<T, D>
-export function createStoreContext<T extends object, D = undefined>(createStore: (serverSideData?: D) => StoreApi<T>): StoreProvider<T> | StoreProviderWithServerSideData<T, D> {
+export function createStoreContext<T extends object, D>(createStore: (serverSideData: D) => StoreApi<T>): StoreProviderWithServerSideData<T, D>
+export function createStoreContext<T extends object, D>(createStore: (serverSideData?: D) => StoreApi<T>): StoreProvider<T> | StoreProviderWithServerSideData<T, D> {
   const Context = createContext<StoreHooks<T> | null>(null);
 
   const Provider = (p: StoreProviderProps<T> | StoreProviderPropsWithServerSideData<T, D>) => {
-    const storeRef = useRef<StoreHooks<T> | null>(null);
-    if (storeRef.current === null) {
+    const [store, setStore] = useState<StoreHooks<T> | null>(null);
+    if (store === null) {
       const store = createStore((p as StoreProviderPropsWithServerSideData<T, D>).serverSideData);
       const useBoundStore: any = (selector?: any) => useStore(store, selector);
       const syncHook = Object.assign(useBoundStore, store) as UseBoundStore<StoreApi<T>>;
       const hookAsync = hook(syncHook, false);
       const hookAsyncSuspense = hook(syncHook, true);
       const {hydration, hasHydrated, resolve} = setupPersist(store);
-      storeRef.current = {hook: syncHook, hookAsync, hookAsyncSuspense, store, hasHydrated, hydration, __resolve: resolve};
+      setStore({hook: syncHook, hookAsync, hookAsyncSuspense, store, hasHydrated, hydration, __resolve: resolve})
     }
     useEffect(() => {
-      const storeWithPersist = (storeRef.current!.store as any);
-      let unsubHydrate: Function | undefined = undefined;
-      let unsubFinishHydration: Function | undefined = undefined;
-      if (storeWithPersist.persist) {
-        storeRef.current!.hasHydrated = storeWithPersist.persist.hasHydrated();
-        unsubHydrate = storeWithPersist.persist.onHydrate(() => { onHydrate(storeRef); });
-        unsubFinishHydration = storeWithPersist.persist.onFinishHydration(() => { onFinishHydration(storeRef); });
-        storeWithPersist.persist.rehydrate();
-      }
+      const {unsubHydrate, unsubFinishHydration} = rehydrate(store, setStore);
       return () => {
         if (unsubHydrate) { unsubHydrate(); }
         if (unsubFinishHydration) { unsubFinishHydration(); }
       }
     }, []);
     return (
-      <Context.Provider value={storeRef.current}>
+      <Context.Provider value={store}>
         {p.children}
       </Context.Provider>
     );

@@ -13,6 +13,7 @@ import {
 } from "./types";
 import {wait} from "./util";
 import {setupRetries} from "./retry";
+import {useShallow} from "zustand/react/shallow";
 
 export const isEffect = (v: any): v is Effect<any, any> =>
   v && (v as Effect<any, any>).__type === "Effect";
@@ -299,6 +300,26 @@ export function query<Store extends object, R>(): Query<Store, R> {
 
 type QueryOrEffect<T> = Query<T, any> | Effect<T, any>
 
+const select = <T, R, Args extends any[]>(selector: (s: T) => QueryOrEffect<T>) => (state: T): ([Query<T, R>, ...QueryOrEffect<T>[]] | [Effect<T, Args>, ...QueryOrEffect<T>[]]) => {
+  const value = selector(state);
+  if (isQuery(value)) {
+    const query = value as unknown as Query<T, any>;
+    let deps = [] as QueryOrEffect<T>[];
+    if (deps || deps === undefined) {
+      const state = query.__store().getState();
+      deps = query.__deps(state).flatMap(v => {
+        return isQuery(v) || isEffect(v) ? [v] : [];
+      }) as (Query<T, any> | Effect<T, any>)[];
+    }
+    return [query, ...deps];
+  } else if (isEffect(value)) {
+    const effect = value as unknown as Effect<T, any>;
+    return [effect];
+  } else {
+    throw new Error("Must return Query or Effect");
+  }
+}
+
 /**
  * React hook to retrieve queries or effects from your store. This hook will automatically trigger Suspense when a query is loading.
  * @param store - Your Zustand store
@@ -309,25 +330,8 @@ const withSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>): 
   function useBoundAsyncStore<Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): (() => Promise<void>);
   function useBoundAsyncStore<R, Args extends any[] = []>(selector: (state: T) => Query<T, R> | Effect<T, Args>, opts?: UseBoundAsyncStoreOptions<R>): R | (() => Promise<void>) {
     const _opts = opts || {};
-    const theSelector = (state: T): [Query<T, R>, ...QueryOrEffect<T>[]] | [Effect<T, Args>, ...QueryOrEffect<T>[]] => {
-      const value = selector(state);
-      if (isQuery(value)) {
-        const query = value as unknown as Query<T, R>;
-        let deps = [] as QueryOrEffect<T>[];
-        if (_opts.followDeps || _opts.followDeps === undefined) {
-          deps = query.__deps(state).flatMap(v => {
-            return isQuery(v) || isEffect(v) ? [v] : [];
-          }) as (Query<T, any> | Effect<T, any>)[];
-        }
-        return [query, ...deps];
-      } else if (isEffect(value)) {
-        const effect = value as unknown as Effect<T, any>;
-        return [effect];
-      } else {
-        throw new Error("Must return Query or Effect");
-      }
-    };
-    const value = store(theSelector);
+    const theSelector = select(selector);
+    const value = store(useShallow(theSelector));
     if (isQuery(value[0])) {
       const v = withSuspense(value as [Query<T, R>, ...QueryOrEffect<T>[]], _opts as UseBoundAsyncStoreOptions<R>);
       if (v.error) {
@@ -355,25 +359,8 @@ const withoutSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>
   function useBoundAsyncStoreWithoutSuspense<Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): (() => Promise<void>);
   function useBoundAsyncStoreWithoutSuspense<R, Args extends any[] = []>(selector: (state: T) => Query<T, R> | Effect<T, Args>, opts?: UseBoundAsyncStoreOptions<R>): QueryValue<R> | (() => Promise<void>) {
     const _opts = opts || {};
-    const theSelector = (state: T): [Query<T, R>, ...QueryOrEffect<T>[]] | [Effect<T, Args>, ...QueryOrEffect<T>[]] => {
-      const value = selector(state);
-      if (isQuery(value)) {
-        const query = value as unknown as Query<T, R>;
-        let deps = [] as QueryOrEffect<T>[];
-        if (_opts.followDeps || _opts.followDeps === undefined) {
-          deps = query.__deps(state).flatMap(v => {
-            return isQuery(v) || isEffect(v) ? [v] : [];
-          }) as (Query<T, any> | Effect<T, any>)[];
-        }
-        return [query, ...deps];
-      } else if (isEffect(value)) {
-        const effect = value as unknown as Effect<T, any>;
-        return [effect];
-      } else {
-        throw new Error("Must return Query or Effect");
-      }
-    };
-    const value = store(theSelector);
+    const theSelector = select(selector);
+    const value = store(useShallow(theSelector));
     if (isQuery(value[0])) {
       const v = value[0] as Query<T, R>;
       try {
@@ -470,20 +457,32 @@ const withSuspenseQuery = <T>(values: [Query<any, T>, ...QueryOrEffect<any>[]], 
   const needsTrigger = v.__needsLoad || v.isLoading;
   const _needsInitialValue = needsInitialValue(v, opts);
   const _needsValue = needsValue(v, opts);
-  let queryTrigger = [] as Promise<T>[];
-  let depTriggers = [] as Promise<any>[];
+  let queryTrigger: undefined | Promise<T>[] = undefined;
+  let depTriggers: undefined | Promise<any>[] = undefined;
+
   if (_needsInitialValue) {
     wait().then(() => { setInitialValue(v, opts.initialValue!); });
+    queryTrigger = [];
   } else if (_needsValue) {
     wait().then(() => { setValue(v, opts.value!, opts.timestamp!); });
+    queryTrigger = [];
   } else if (needsTrigger && opts.hydration) {
-    depTriggers = [opts.hydration];
+    queryTrigger = [opts.hydration as Promise<T>];
+  } else if (needsTrigger && v.__trigger) {
+    queryTrigger = [v.__trigger];
   } else if (needsTrigger) {
-    if (v.__trigger) {
-      queryTrigger = [v.__trigger];
-    } else {
-      queryTrigger = [wait().then(v.trigger)];
-    }
+    queryTrigger = [wait().then(v.trigger)];
+  } else {
+    queryTrigger = [];
+  }
+
+  if (_needsInitialValue) {
+    depTriggers = [];
+  } else if (_needsValue) {
+    depTriggers = [];
+  } else if (opts.hydration) {
+    depTriggers = [];
+  } else {
     depTriggers = values.slice(1).flatMap(vv => {
       if (isQuery(vv)) {
         return vv.__trigger ? [vv.__trigger] : [];
@@ -493,7 +492,7 @@ const withSuspenseQuery = <T>(values: [Query<any, T>, ...QueryOrEffect<any>[]], 
         return [];
       }
     });
-  } 
+  }
   const allTriggers = [...queryTrigger, ...depTriggers];
   if (_needsInitialValue) {
     return {value: opts.initialValue!, error: undefined, isLoading: false};

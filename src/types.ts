@@ -165,7 +165,8 @@ export interface UseBoundAsyncStoreOptions<T> {
    */
   readonly timestamp?: number;
   /**
-   * If `true`, the query will wait until the store has been hydrated before triggering a new fetch.
+   * Promise that resolves when the store has been hydrated by the persist middleware. The query will wait until this promise 
+   * resolves rather than triggering a new fetch.
    */
   readonly hydration?: Promise<void>;
 }
@@ -220,14 +221,14 @@ export interface StoreProviderProps<T> {
 export interface StoreProviderPropsWithServerSideData<T, D> {
   readonly children: ReactNode;
   /**
-   * Server side data to hydrate the store. This data will be passed to the store's creation function.
+   * Server side data to use when initializing the store. This data will be passed to the store's creation function.
    */
   readonly serverSideData: D;
 }
 
 export interface StoreHooks<T> {
   /**
-   * Promise that resolves when the store has been hydrated. Internal use only.
+   * Promise that resolves when the store has been hydrated by the persist middleware. Internal use only.
    */
   __resolve?: Function;
   /**
@@ -247,11 +248,11 @@ export interface StoreHooks<T> {
    */
   readonly store: StoreApi<T>;
   /**
-   * Whether the store has been hydrated. Only used when persist middleware is used.
+   * Whether the store has been hydrated by the persist middleware.
    */ 
   hasHydrated: boolean;
   /**
-   * Promise that resolves when the store has been hydrated. Only used when persist middleware is used.
+   * Promise that resolves when the store has been hydrated by the persist middware. Undefined if persist middleware is not used.
    */
   hydration?: Promise<void>;
 }
@@ -278,7 +279,7 @@ export interface StoreProvider<T> {
    */
   readonly useStoreSuspense: UseBoundAsyncStoreWithSuspense<T>;
   /**
-   * Hook to check if the store has been hydrated. Only used when persist middleware is used.
+   * Hook to check if the store has been hydrated by the persist middleware.
    */
   readonly useHasHydrated: () => boolean;
 }
@@ -305,7 +306,7 @@ export interface StoreProviderWithServerSideData<T, D> {
    */
   readonly useStoreSuspense: UseBoundAsyncStoreWithSuspense<T>;
   /**
-   * Hook to check if the store has been hydrated. Only used when persist middleware is used.
+   * Hook to check if the store has been hydrated by the persist middleware.
    */
   readonly useHasHydrated: () => boolean;
 }

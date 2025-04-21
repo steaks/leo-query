@@ -5,6 +5,8 @@ export const Dogs = () => {
   const dogs = useDogStoreAsync(s => s.dogs);
   const increasePopulation = useDogStore(s => s.increasePopulation.trigger);
   const hasHydrated = useDogStoreHasHydrated();
+  console.log("hasHydrated", hasHydrated);
+  console.log("dogs.tsx", dogs.isLoading, dogs.value);
 
   if (dogs.isLoading) {
     return <>Loading...</>;
