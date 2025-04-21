@@ -82,6 +82,7 @@ export default defineConfig({
             { text: "Optimistic Updates", link: "https://codesandbox.io/p/sandbox/hcfp9y" },
             { text: "Persisting Data", link: "https://codesandbox.io/p/sandbox/xtq66z" },
             { text: "Next.js Integration", link: "https://codesandbox.io/p/devbox/next-js-example-0-3-0-y6w29t" },
+            { text: "Next.js and Persist", link: "https://codesandbox.io/p/devbox/next-js--persist-example-0-3-0-forked-tcssj5" },
             { text: "Todos", link: "https://codesandbox.io/p/sandbox/todos-0-3-0-d75vj5" },
             { text: "Task Manager", link: "https://zhzgv5.csb.app/" },
           ]
