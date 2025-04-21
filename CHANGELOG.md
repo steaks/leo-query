@@ -14,8 +14,7 @@
 * Skip some unnecessary rerenders when new query value equals existing query value or when unrelated values in the store change (#71 #74 #80)
 
 ### Breaking Changes
-None
-
+* Require React version >=18.0.0 (#80)
 
 ## v0.2.0
 

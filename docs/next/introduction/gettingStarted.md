@@ -5,7 +5,7 @@ Welcome to the **Leo Query** documentation! This guide will help you integrate a
 ## Install 
 
 ```bash
-npm i leo-query
+npm i leo-query@0.3.0-rc.7
 ```
 
 ## Write async functions
