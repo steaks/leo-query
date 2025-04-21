@@ -5,13 +5,13 @@
 ### Changes
 
 🐶 Features
-* Support for persisting data (#71)
-* Support for Next.js (#71)
-* Added option to set a query's initial value (#71)
-* Added option to set a query value manaully (#71)
+* Support for persisting data (#71 #80)
+* Support for Next.js (#71 #80)
+* Added option to set a query's initial value (#71 #80)
+* Added option to set a query value manaully (#71 #80)
 
 🐝 Fixes
-* Skip some unnecessary re-nders when new query value equals existing query value (#71 #74)
+* Skip some unnecessary rerenders when new query value equals existing query value or when unrelated values in the store change (#71 #74 #80)
 
 ### Breaking Changes
 None
