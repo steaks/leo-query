@@ -1,4 +1,4 @@
-const db = {dogs: 0};
+const db = {dogs: 100};
 
 // Simulated async functions
 

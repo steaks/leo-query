@@ -4,6 +4,7 @@ import {persist} from "zustand/middleware";
 import {hook, effect, query, partialize, merge, Query, Effect} from "leo-query";
 import {fetchDogs, increasePopulation, removeAllDogs} from "./db";
 import "./App.css";
+import { syncMockDb } from "./syncmockdb";
 
 interface DogState {
   dogs: Query<DogState, number>;
@@ -11,7 +12,7 @@ interface DogState {
   removeAllDogs: Effect<DogState>;
 }
 
-const useDogStore = create<DogState>()(persist(() => ({
+export const useDogStore = create<DogState>()(persist(() => ({
     increasePopulation: effect(increasePopulation),
     removeAllDogs: effect(removeAllDogs),
     dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs]),
@@ -55,5 +56,7 @@ function App() {
     </div>
   );
 }
+
+syncMockDb();
 
 export default App;
