@@ -1,5 +1,7 @@
 import {Dogs} from "./dogs";
 import {DogStoreProvider} from "@/app/store/provider";
+import {SyncMockDb} from "./syncmockdb";
+
 const fetchInitialDogs = async () => 
   Promise.resolve(100);
 
@@ -10,6 +12,7 @@ export default async function Page() {
     <DogStoreProvider serverSideData={{dogs}}>
       <p>Initial Dogs: {dogs}</p>
       <Dogs />
+      <SyncMockDb />
     </DogStoreProvider>
   );
 }

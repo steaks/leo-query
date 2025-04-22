@@ -1,4 +1,4 @@
-const db = {dogs: 0};
+export const db = {dogs: 0};
 
 // Simulated async functions
 
