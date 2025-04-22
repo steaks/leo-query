@@ -7,7 +7,7 @@ export function useVersion() {
   const versions = {
     prev: '',
     latest: 'v0.2.0',
-    next: 'v0.3.0-rc.3'
+    next: 'v0.3.0-rc.7'
   };
   
   const selectedVersion = computed(() => {
