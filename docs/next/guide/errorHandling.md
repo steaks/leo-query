@@ -74,7 +74,7 @@ function Dogs() {
   if (dogs.error) {
     return <div>Error loading dogs</div>;
   }
-  return <div>Dogs: {dogs}</div>;
+  return <div>Dogs: {dogs.value}</div>;
 }
 
 function App() {
