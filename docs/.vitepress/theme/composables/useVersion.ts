@@ -5,9 +5,9 @@ export function useVersion() {
   const route = useRoute()
 
   const versions = {
-    prev: '',
-    latest: 'v0.2.0',
-    next: 'v0.3.0-rc.7'
+    prev: 'v0.2.0',
+    latest: 'v0.3.0',
+    next: ''
   };
   
   const selectedVersion = computed(() => {
