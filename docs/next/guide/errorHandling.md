@@ -7,11 +7,17 @@ There are two ways to handle errors depending on whether you are using suspense.
 
 Wrap your component in an ErrorBoundary. We recommend using [react-error-boundary](https://www.npmjs.com/package/react-error-boundary).
 
-```typescript {21,25}
+```typescript {27,31}
 import React, {Suspense} from 'react';
 import {create} from "zustand";
 import {hook, effect, query, Query, Effect} from "leo-query";
 import {ErrorBoundary} from 'react-error-boundary';
+
+interface DogState {
+  dogs: Query<DogState, number>;
+  increasePopulation: Effect<DogState>;
+  removeAllDogs: Effect<DogState>;
+}
 
 const useDogStore = create<DogState>(() => ({
   increasePopulation: effect(increasePopulation),
@@ -30,7 +36,7 @@ function App() {
   return (
     <ErrorBoundary fallback={<div>Error loading dogs</div>}>
       <Suspense fallback={<div>Loading...</div>}>
-        <Dogs/>
+        <Dogs />
       </Suspense>
     </ErrorBoundary>
   );
@@ -41,10 +47,16 @@ function App() {
 
 Handle the error in your component with the `error` property.
 
-```typescript {18-20}
+```typescript {24-26}
 import React from 'react';
 import {create} from "zustand";
 import {hook, effect, query, Query, Effect} from "leo-query";
+
+interface DogState {
+  dogs: Query<DogState, number>;
+  increasePopulation: Effect<DogState>;
+  removeAllDogs: Effect<DogState>;
+}
 
 const useDogStore = create<DogState>(() => ({
   increasePopulation: effect(increasePopulation),
@@ -66,6 +78,6 @@ function Dogs() {
 }
 
 function App() {
-  return <Dogs/>;
+  return <Dogs />;
 }
 ```
