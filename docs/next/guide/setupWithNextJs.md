@@ -41,7 +41,7 @@ export const createDogStore = (d: ServerSideData): StoreApi<DogState> =>
   createStore<DogState>(() => ({
     increasePopulation: effect(increasePopulation),
     removeAllDogs: effect(removeAllDogs),
-    dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs], {initialValue: d.initialDogs}) // Re-fetch when increasePopulation or removeAllDogs succeeds 
+    dogs: query(fetchDogs, s => [s.increasePopulation, s.removeAllDogs], {initialValue: d.dogs}) // Re-fetch when increasePopulation or removeAllDogs succeeds 
   }));
 ```
 
@@ -80,7 +80,7 @@ export default async function Page() {
   const dogs = await fetchInitialDogs();
   return (
     <DogStoreProvider serverSideData={{dogs}}>
-      <p>Initial Dogs: {initialDogs}</p>
+      <p>Initial Dogs: {}</p>
       <Dogs />
     </DogStoreProvider>
   );
@@ -134,13 +134,13 @@ import Dogs from "@/app/ui/dogs";
 const fetchInitialDogs = async () => Promise.resolve(100);
 
 export default async function Page() {
-  const initialDogs = await fetchInitialDogs();
+  const dogs = await fetchInitialDogs();
   return (
     <DogStoreProvider>
       <p className="initial-dogs">
-        Initial Dogs (loaded in server component): {initialDogs}
+        Initial Dogs (loaded in server component): {dogs}
       </p>
-      <Dogs initialDogs={initialDogs} />
+      <Dogs dogs={dogs} />
     </DogStoreProvider>
   );
 }
@@ -152,11 +152,11 @@ export default async function Page() {
 import {useDogStore, useDogStoreAsync} from "@/app/store/provider";
 
 interface Props {
-  initialDogs: number;
+  dogs: number;
 }
 
 export const Dogs = (p: Props) => {
-  const dogs = useDogStoreAsync(s => s.dogs, {initialValue: p.initialDogs}); 
+  const dogs = useDogStoreAsync(s => s.dogs, {initialValue: p.dogs}); 
   const increasePopulation = useDogStore(s => s.increasePopulation.trigger);
 
   if (dogs.isLoading) {
@@ -191,12 +191,12 @@ const fetchInitialDogs = async () =>
   Promise.resolve(100);
 
 export default async function Page() {
-  const initialDogs = await fetchInitialDogs(); //fetch data in the server component.
-  const initialDogsTimestamp = Date.now();
+  const dogs = await fetchInitialDogs(); //fetch data in the server component.
+  const dogsTimestamp = Date.now();
   return (
     <DogStoreProvider>
-      <p>Initial Dogs: {initialDogs}</p>
-      <Dogs initialDogs={initialDogs} initialDogsTimestamp={initialDogsTimestamp} />
+      <p>Initial Dogs: {dogs}</p>
+      <Dogs dogs={dogs} dogsTimestamp={dogsTimestamp} />
     </DogStoreProvider>
   );
 }
@@ -207,12 +207,12 @@ export default async function Page() {
 import {useDogStore, useDogStoreAsync} from "@/app/store/provider";
 
 interface Props {
-  initialDogs: number;
-  initialDogsTimestamp: number;
+  dogs: number;
+  dogsTimestamp: number;
 }
 
 export const Dogs = (p: Props) => {
-  const dogs = useDogStoreAsync(s => s.dogs, {value: p.initialDogs, timestamp: p.initialDogsTimestamp}); 
+  const dogs = useDogStoreAsync(s => s.dogs, {value: p.dogs, timestamp: p.dogsTimestamp}); 
   const increasePopulation = useDogStore(s => s.increasePopulation.trigger);
 
   if (dogs.isLoading) {
@@ -298,7 +298,7 @@ export default async function Page() {
   const dogs = await fetchInitialDogs();
   return (
     <DogStoreProvider serverSideData={{dogs}}>
-      <p>Initial Dogs: {initialDogs}</p>
+      <p>Initial Dogs: {dogs}</p>
       <Dogs />
     </DogStoreProvider>
   );
