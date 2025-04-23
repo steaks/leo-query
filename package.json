@@ -1,6 +1,6 @@
 {
   "name": "leo-query",
-  "version": "0.3.0-rc.7",
+  "version": "0.3.0",
   "description": "A simple library to connect async queries to Zustand stores.",
   "type": "module",
   "main": "./dist/index.cjs",
