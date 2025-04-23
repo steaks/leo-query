@@ -91,8 +91,8 @@ export default async function Page() {
 
 Use the hooks in your client components to access the store. Leo Query provides three hooks:
 - `useStore`: For synchronous state access. This is Zustand's native hook.
-- `useStoreAsync`: For async state with loading/error handling created with [hook](/next/guide/hook).
-- `useStoreSuspense`: For async state with React Suspense created with [hook](/next/guide/hook).
+- `useStoreAsync`: For async state with loading/error handling created with [hook](/latest/guide/hook).
+- `useStoreSuspense`: For async state with React Suspense created with [hook](/latest/guide/hook).
 
 ```typescript
 //dogs.tsx
@@ -118,13 +118,13 @@ export const Dogs = () => {
 ## Alternative Ways to Pass Server-Side Data
 
 The easiest way is to pass server-side data is through the provider. If this isn't possible you can pass it other ways:
-- Via [initial value](/next/guide/initialData#hook) property in the hook in your client component 
-- Via [timestamped value](/next/advancedConcepts/timestampedValues) in the hook in your client component
-- Via a `useEffect` with [manual updates](/next/advancedConcepts/manualUpdates)
+- Via [initial value](/latest/guide/initialData#hook) property in the hook in your client component 
+- Via [timestamped value](/latest/advancedConcepts/timestampedValues) in the hook in your client component
+- Via a `useEffect` with [manual updates](/latest/advancedConcepts/manualUpdates)
 
 ### Via initial value
 
-Pass server-side data to the hook's [initialValue](/next/guide/initialData#hook) option.
+Pass server-side data to the hook's [initialValue](/latest/guide/initialData#hook) option.
 
 ```typescript
 //page.tsx
@@ -174,7 +174,7 @@ export const Dogs = (p: Props) => {
 
 ### Via a Timestamped Value
 
-You can pass [data with a timestamp when data was fetched](/next/advancedConcepts/timestampedValues) to be more precise. Leo Query will compare the provided timestamp with the timestamp the value was last set. 
+You can pass [data with a timestamp when data was fetched](/latest/advancedConcepts/timestampedValues) to be more precise. Leo Query will compare the provided timestamp with the timestamp the value was last set. 
 
 If the timestamp is newer than the timestamp when the last value was set the query will receive the updated value. If the timestamp is older the value will be ignored. 
 
@@ -230,7 +230,7 @@ export const Dogs = (p: Props) => {
 
 ### Via UseEffect
 
-See the guidance for updating the store [manually](/next/advancedConcepts/manualUpdates).
+See the guidance for updating the store [manually](/latest/advancedConcepts/manualUpdates).
 
 ## Working with Persist
 

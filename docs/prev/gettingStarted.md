@@ -5,7 +5,7 @@ Welcome to the **Leo Query** documentation! This guide will help you integrate a
 ## Install 
 
 ```bash
-npm i leo-query
+npm i leo-query@0.2.0
 ```
 
 ## Write async functions
@@ -81,4 +81,4 @@ const App = () => {
 
 ## Why Leo?
 
-Leo Query is simple, robust, and designed for Zustand. Read more about why Leo Query is different from other libraries in [Why Leo Query?](/latest/why).
+Leo Query is simple, robust, and designed for Zustand. Read more about why Leo Query is different from other libraries in [Why Leo Query?](/prev/why).

@@ -28,4 +28,4 @@ const useDogStore = create<DogState>()(persist(() => ({
 
 ### Working with Next.js
 
-Using the persist middleware with Next.js can be tricky. See guidance for setting up persist with Next.js [here](/next/guide/setupWithNextJs#working-with-persist).
+Using the persist middleware with Next.js can be tricky. See guidance for setting up persist with Next.js [here](/latest/guide/setupWithNextJs#working-with-persist).

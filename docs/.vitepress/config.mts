@@ -30,11 +30,11 @@ export default defineConfig({
       },
       {
         component: "NavLink", 
-        props: {text: "Docs", prevLink: "/prev/query", latestLink: "/latest/query", nextLink: "/next/introduction/why"}
+        props: {text: "Docs", prevLink: "/prev/query", latestLink: "/latest/introduction/why", nextLink: "/next/"}
       },
       {
         component: "NavLink", 
-        props: {text: "Examples", prevLink: "/prev/examples", latestLink: "/latest/examples", nextLink: "/next/examples/examples"}
+        props: {text: "Examples", prevLink: "/prev/examples", latestLink: "/latest/examples/examples", nextLink: "/next/"}
       },
       {
         component: "NavLink", 
@@ -43,41 +43,41 @@ export default defineConfig({
       {component: "VersionSwitcher"},
     ],
     sidebar: {
-      "/next/": [
+      "/latest/": [
         {
           text: "Introduction",
           items: [
-            { text: "Why Leo Query?", link: "/next/introduction/why" },
-            { text: "Getting Started", link: "/next/introduction/gettingStarted" },
+            { text: "Why Leo Query?", link: "/latest/introduction/why" },
+            { text: "Getting Started", link: "/latest/introduction/gettingStarted" },
           ]
         }, 
         {
           text: "Guide",
           items: [
-            { text: "Query (fetching data)", link: "/next/guide/query" },
-            { text: "Effect (mutating data)", link: "/next/guide/effect" },
-            { text: "Hook", link: "/next/guide/hook" },
-            { text: "Global Config", link: "/next/guide/globalConfig" },
-            { text: "Initial Data", link: "/next/guide/initialData" },
-            { text: "Persisting Data", link: "/next/guide/persistingData" },
-            { text: "Optimistic Updates", link: "/next/guide/optimisticUpdates" },
-            { text: "Setup with Next.js", link: "/next/guide/setupWithNextJs" },
-            { text: "Error Handling", link: "/next/guide/errorHandling" },
+            { text: "Query (fetching data)", link: "/latest/guide/query" },
+            { text: "Effect (mutating data)", link: "/latest/guide/effect" },
+            { text: "Hook", link: "/latest/guide/hook" },
+            { text: "Global Config", link: "/latest/guide/globalConfig" },
+            { text: "Initial Data", link: "/latest/guide/initialData" },
+            { text: "Persisting Data", link: "/latest/guide/persistingData" },
+            { text: "Optimistic Updates", link: "/latest/guide/optimisticUpdates" },
+            { text: "Setup with Next.js", link: "/latest/guide/setupWithNextJs" },
+            { text: "Error Handling", link: "/latest/guide/errorHandling" },
           ]
         },
         {
           text: "Advanced Concepts",
           items: [
-            { text: "Caching", link: "/next/advancedConcepts/caching" },
-            { text: "Retries", link: "/next/advancedConcepts/retries" },
-            { text: "Manual Updates", link: "/next/advancedConcepts/manualUpdates" },
-            { text: "Timestamped Values", link: "/next/advancedConcepts/timestampedValues" },
+            { text: "Caching", link: "/latest/advancedConcepts/caching" },
+            { text: "Retries", link: "/latest/advancedConcepts/retries" },
+            { text: "Manual Updates", link: "/latest/advancedConcepts/manualUpdates" },
+            { text: "Timestamped Values", link: "/latest/advancedConcepts/timestampedValues" },
           ]
         },
         {
           text: "Examples",
           items: [
-            { text: "All Examples", link: "/next/examples/examples" },
+            { text: "All Examples", link: "/latest/examples/examples" },
             { text: "Dogs JS", link: "https://codesandbox.io/p/devbox/leo-query-dogs-demo-js-forked-tt6tq6?workspaceId=ws_CTu2uAaf7QNEGg4Jxmo6VN" },
             { text: "Dogs TS", link: "https://codesandbox.io/p/devbox/leo-query-dogs-demo-ts-forked-wnxn3w?workspaceId=ws_CTu2uAaf7QNEGg4Jxmo6VN" },
             { text: "Optimistic Updates", link: "https://codesandbox.io/p/sandbox/hcfp9y" },
@@ -91,41 +91,41 @@ export default defineConfig({
         {
           text: "Blog",
           items: [
-            { text: "Recent Posts", link: "/next/blog" },
-            { text: "Implementing Retry Logic", link: "/next/blog/implementingRetryLogic" },
-            { text: "Delaying Execution with Wait", link: "/next/blog/delayingExecutionWithWait" },
+            { text: "Recent Posts", link: "/latest/blog" },
+            { text: "Implementing Retry Logic", link: "/latest/blog/implementingRetryLogic" },
+            { text: "Delaying Execution with Wait", link: "/latest/blog/delayingExecutionWithWait" },
           ]
         }
       ],
-      "/latest/": [
+      "/prev/": [
         {
           text: "Introduction",
           items: [
-            { text: "Why Leo Query?", link: "/latest/why" },
-            { text: "Getting Started", link: "/latest/gettingStarted" },
+            { text: "Why Leo Query?", link: "/prev/why" },
+            { text: "Getting Started", link: "/prev/gettingStarted" },
           ]
         },
         {
           text: "Guide",
           items: [
-            { text: "Query", link: "/latest/query" },
-            { text: "Effect", link: "/latest/effect" },
-            { text: "Hook", link: "/latest/hook" },
-            { text: "Global Config", link: "/latest/globalConfig" },
+            { text: "Query", link: "/prev/query" },
+            { text: "Effect", link: "/prev/effect" },
+            { text: "Hook", link: "/prev/hook" },
+            { text: "Global Config", link: "/prev/globalConfig" },
           ]
         },
         {
           text: "Advanced Concepts",
           items: [
-            { text: "Caching", link: "/latest/caching" },
-            { text: "Optimistic Updates", link: "/latest/optimisticUpdates" },
-            { text: "Retries", link: "/latest/retries" },
+            { text: "Caching", link: "/prev/caching" },
+            { text: "Optimistic Updates", link: "/prev/optimisticUpdates" },
+            { text: "Retries", link: "/prev/retries" },
           ]
         },
         {
           text: "Examples",
           items: [
-            { text: "All Examples", link: "/latest/examples" },
+            { text: "All Examples", link: "/prev/examples" },
             { text: "Dogs JS", link: "https://codesandbox.io/p/sandbox/leo-query-dogs-demo-js-wmwlgt?file=%2Fsrc%2FApp.jsx" },
             { text: "Dogs TS", link: "https://codesandbox.io/p/sandbox/leo-query-dogs-demo-ts-7f2c34?file=%2Fsrc%2FApp.tsx" },
             { text: "Task Manager", link: "https://xsh8c4.csb.app/" },
@@ -134,13 +134,13 @@ export default defineConfig({
         {
           text: "Blog",
           items: [
-            { text: "Recent Posts", link: "/latest/blog" },
-            { text: "Implementing Retry Logic", link: "/latest/blog/implementingRetryLogic" },
-            { text: "Delaying Execution with Wait", link: "/latest/blog/delayingExecutionWithWait" },
+            { text: "Recent Posts", link: "/prev/blog" },
+            { text: "Implementing Retry Logic", link: "/prev/blog/implementingRetryLogic" },
+            { text: "Delaying Execution with Wait", link: "/prev/blog/delayingExecutionWithWait" },
           ]
         }
       ], 
-      "/prev/": [
+      "/next/": [
       ]
     },
     socialLinks: [
