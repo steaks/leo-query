@@ -8,6 +8,11 @@
     </button>
     <div v-show="isOpen" class="VPNavBarMenu">
       <div class="VPNavBarMenuItems">
+        <div class="VPNavBarMenuLink" v-if="versions.next">
+          <a class="VPNavBarMenuLinkText" :class="{ active: selectedVersion.type === 'next' }" href="/next/" @click="isOpen = false">
+            {{ versions.next }} (next)
+          </a>
+        </div>
         <div class="VPNavBarMenuLink" v-if="versions.latest">
           <a class="VPNavBarMenuLinkText" :class="{ active: selectedVersion.type === 'latest' }" href="/latest/" @click="isOpen = false">
             {{ versions.latest }} (latest)
@@ -17,12 +22,7 @@
           <a class="VPNavBarMenuLinkText" :class="{ active: selectedVersion.type === 'prev' }" href="/prev/" @click="isOpen = false">
             {{ versions.prev }}
           </a>
-        </div>
-        <div class="VPNavBarMenuLink" v-if="versions.next">
-          <a class="VPNavBarMenuLinkText" :class="{ active: selectedVersion.type === 'next' }" href="/next/" @click="isOpen = false">
-            {{ versions.next }} (next)
-          </a>
-        </div>
+        </div> 
       </div>
     </div>
   </div>
