@@ -1,6 +1,6 @@
 # Parallel Queries
 
-Querying data in parallel is critical for snappy UX. In suspense mode, you must use one hook to query data in parallel. Multiple hooks will cause a waterfall because each hook interrupts the render cycle as it puts the component in suspense.
+Querying data in parallel is critical for responsive user experience. In suspense mode, you must use one hook to query data in parallel. Multiple hooks will cause a waterfall because each hook interrupts the render cycle as it puts the component in suspense by throwing the promise as it loads.
 
 ## Example with Suspense Mode
 
@@ -49,5 +49,3 @@ const MyComponent2 = () => {
   const cats = useDogStoreAsync(s => s.cats);
 }
 ```
-
-
