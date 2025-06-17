@@ -5,7 +5,7 @@
 ### Changes
 
 🐶 Features
-* Support for parallel queries (#97)
+* Improved support for parallel queries (#97)
 * Guide to integrate with slices (#99)
 
 ## v0.3.0
