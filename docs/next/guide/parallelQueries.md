@@ -4,7 +4,7 @@ Querying data in parallel is critical for responsive user experience. In suspens
 
 ## Example with Suspense Mode
 
-Use one hook with multiple queries for the best performance in suspense mode.
+Use one hook with multiple queries for the best performance in suspense mode. See the full example [here](https://codesandbox.io/p/sandbox/vy9292).
 
 ```typescript {10}
 const useDogStore = create<PetsState>(() => ({
