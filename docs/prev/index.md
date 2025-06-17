@@ -3,19 +3,19 @@
 layout: home
 
 hero:
-  name: "Leo Query (v0.2.0)"
+  name: "Leo Query"
   text: "A simple library to connect async queries to Zustand stores."
   tagline: Async Queries for Zustand
   actions:
     - theme: brand
       text: Why Leo Query?
-      link: /prev/why
+      link: /prev/introduction/why
     - theme: alt
       text: Getting Started
-      link: /prev/gettingStarted
+      link: /prev/introduction/gettingStarted
     - theme: alt
       text: Examples
-      link: /prev/examples
+      link: /prev/examples/examples
   image: /leo-without-background.png
 
 features:

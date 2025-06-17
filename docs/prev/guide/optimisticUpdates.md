@@ -25,11 +25,11 @@ const api = {
 
 const increaseDogs = (set: (s: Partial<DogState> => void), get: () => DogState) => async () => {
   const dogs = get().dogs;
-  set({dogs: {...dogs, value: dogs.value + 1}});
+  dogs.setValue({value: dogs.value + 1});
   try {
     await api.increaseDogs();
   } catch (error) {
-    set({dogs: {...dogs, value: dogs.value - 1}});
+    dogs.setValue({value: dogs.value - 1});
   }
 };
 

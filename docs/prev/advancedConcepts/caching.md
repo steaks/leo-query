@@ -1,6 +1,6 @@
 # Caching
 
-Leo Query leverages the Zustand store to implement caching. When a query successfully completes Leo Query saves the data in the Zustand store. Cached data is evicted when new data is successfully fetched. Cached data may be marked stale when [dependencies](/prev/query#dependencies) change, the stale time expires, or manually by calling `markStale()`.
+Leo Query leverages the Zustand store to implement caching. When a query successfully completes Leo Query saves the data in the Zustand store. Cached data is evicted when new data is successfully fetched. Cached data may be marked stale when [dependencies](/prev/guide/query#dependencies) change, the stale time expires, or manually by calling `markStale()`.
 
 ## Stale Time
 

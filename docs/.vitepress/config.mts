@@ -30,11 +30,11 @@ export default defineConfig({
       },
       {
         component: "NavLink", 
-        props: {text: "Docs", prevLink: "/prev/query", latestLink: "/latest/introduction/why", nextLink: "/next/"}
+        props: {text: "Docs", prevLink: "/prev/introduction/why", latestLink: "/latest/introduction/why", nextLink: "/next/introduction/why"}
       },
       {
         component: "NavLink", 
-        props: {text: "Examples", prevLink: "/prev/examples", latestLink: "/latest/examples/examples", nextLink: "/next/"}
+        props: {text: "Examples", prevLink: "/prev/examples/examples", latestLink: "/latest/examples/examples", nextLink: "/next/examples/examples"}
       },
       {
         component: "NavLink", 
@@ -43,6 +43,60 @@ export default defineConfig({
       {component: "VersionSwitcher"},
     ],
     sidebar: {
+      "/prev/": [
+        {
+          text: "Introduction",
+          items: [
+            { text: "Why Leo Query?", link: "/prev/introduction/why" },
+            { text: "Getting Started", link: "/prev/introduction/gettingStarted" },
+          ]
+        }, 
+        {
+          text: "Guide",
+          items: [
+            { text: "Query (fetching data)", link: "/prev/guide/query" },
+            { text: "Effect (mutating data)", link: "/prev/guide/effect" },
+            { text: "Hook", link: "/prev/guide/hook" },
+            { text: "Global Config", link: "/prev/guide/globalConfig" },
+            { text: "Initial Data", link: "/prev/guide/initialData" },
+            { text: "Persisting Data", link: "/prev/guide/persistingData" },
+            { text: "Optimistic Updates", link: "/prev/guide/optimisticUpdates" },
+            { text: "Setup with Next.js", link: "/prev/guide/setupWithNextJs" },
+            { text: "Error Handling", link: "/prev/guide/errorHandling" },
+          ]
+        },
+        {
+          text: "Advanced Concepts",
+          items: [
+            { text: "Caching", link: "/prev/advancedConcepts/caching" },
+            { text: "Retries", link: "/prev/advancedConcepts/retries" },
+            { text: "Manual Updates", link: "/prev/advancedConcepts/manualUpdates" },
+            { text: "Timestamped Values", link: "/prev/advancedConcepts/timestampedValues" },
+          ]
+        },
+        {
+          text: "Examples",
+          items: [
+            { text: "All Examples", link: "/prev/examples/examples" },
+            { text: "Dogs JS", link: "https://codesandbox.io/p/devbox/leo-query-dogs-demo-js-forked-tt6tq6?workspaceId=ws_CTu2uAaf7QNEGg4Jxmo6VN" },
+            { text: "Dogs TS", link: "https://codesandbox.io/p/devbox/leo-query-dogs-demo-ts-forked-wnxn3w?workspaceId=ws_CTu2uAaf7QNEGg4Jxmo6VN" },
+            { text: "Optimistic Updates", link: "https://codesandbox.io/p/sandbox/hcfp9y" },
+            { text: "Persisting Data", link: "https://codesandbox.io/p/sandbox/xtq66z" },
+            { text: "Next.js Integration", link: "https://codesandbox.io/p/devbox/next-js-example-0-3-0-y6w29t" },
+            { text: "Next.js and Persist", link: "https://codesandbox.io/p/devbox/next-js--persist-example-0-3-0-forked-tcssj5" },
+            { text: "Todos", link: "https://codesandbox.io/p/sandbox/todos-0-3-0-d75vj5" },
+            { text: "Task Manager", link: "https://zhzgv5.csb.app/" },
+          ]
+        },
+        {
+          text: "Blog",
+          items: [
+            { text: "Recent Posts", link: "/prev/blog" },
+            { text: "Implementing Retry Logic", link: "/prev/blog/implementingRetryLogic" },
+            { text: "Delaying Execution with Wait", link: "/prev/blog/delayingExecutionWithWait" },
+          ]
+        }
+      ],
       "/latest/": [
         {
           text: "Introduction",
@@ -63,6 +117,8 @@ export default defineConfig({
             { text: "Optimistic Updates", link: "/latest/guide/optimisticUpdates" },
             { text: "Setup with Next.js", link: "/latest/guide/setupWithNextJs" },
             { text: "Error Handling", link: "/latest/guide/errorHandling" },
+            { text: "Parallel Queries", link: "/latest/guide/parallelQueries" },
+            { text: "Slices", link: "/latest/guide/slices" },
           ]
         },
         {
@@ -84,6 +140,8 @@ export default defineConfig({
             { text: "Persisting Data", link: "https://codesandbox.io/p/sandbox/xtq66z" },
             { text: "Next.js Integration", link: "https://codesandbox.io/p/devbox/next-js-example-0-3-0-y6w29t" },
             { text: "Next.js and Persist", link: "https://codesandbox.io/p/devbox/next-js--persist-example-0-3-0-forked-tcssj5" },
+            { text: "Parallel Queries", link: "https://codesandbox.io/p/sandbox/vy9292" },
+            { text: "Slices", link: "https://codesandbox.io/p/sandbox/gsfqs3" },
             { text: "Todos", link: "https://codesandbox.io/p/sandbox/todos-0-3-0-d75vj5" },
             { text: "Task Manager", link: "https://zhzgv5.csb.app/" },
           ]
@@ -94,49 +152,6 @@ export default defineConfig({
             { text: "Recent Posts", link: "/latest/blog" },
             { text: "Implementing Retry Logic", link: "/latest/blog/implementingRetryLogic" },
             { text: "Delaying Execution with Wait", link: "/latest/blog/delayingExecutionWithWait" },
-          ]
-        }
-      ],
-      "/prev/": [
-        {
-          text: "Introduction",
-          items: [
-            { text: "Why Leo Query?", link: "/prev/why" },
-            { text: "Getting Started", link: "/prev/gettingStarted" },
-          ]
-        },
-        {
-          text: "Guide",
-          items: [
-            { text: "Query", link: "/prev/query" },
-            { text: "Effect", link: "/prev/effect" },
-            { text: "Hook", link: "/prev/hook" },
-            { text: "Global Config", link: "/prev/globalConfig" },
-          ]
-        },
-        {
-          text: "Advanced Concepts",
-          items: [
-            { text: "Caching", link: "/prev/caching" },
-            { text: "Optimistic Updates", link: "/prev/optimisticUpdates" },
-            { text: "Retries", link: "/prev/retries" },
-          ]
-        },
-        {
-          text: "Examples",
-          items: [
-            { text: "All Examples", link: "/prev/examples" },
-            { text: "Dogs JS", link: "https://codesandbox.io/p/sandbox/leo-query-dogs-demo-js-wmwlgt?file=%2Fsrc%2FApp.jsx" },
-            { text: "Dogs TS", link: "https://codesandbox.io/p/sandbox/leo-query-dogs-demo-ts-7f2c34?file=%2Fsrc%2FApp.tsx" },
-            { text: "Task Manager", link: "https://xsh8c4.csb.app/" },
-          ]
-        },
-        {
-          text: "Blog",
-          items: [
-            { text: "Recent Posts", link: "/prev/blog" },
-            { text: "Implementing Retry Logic", link: "/prev/blog/implementingRetryLogic" },
-            { text: "Delaying Execution with Wait", link: "/prev/blog/delayingExecutionWithWait" },
           ]
         }
       ], 
