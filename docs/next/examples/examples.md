@@ -11,5 +11,6 @@ Here are live examples to see Leo Query in action.
 | [Next.js Integration](https://codesandbox.io/p/devbox/next-js-example-0-3-0-y6w29t)                                   | Data loading with Next.js                          |
 | [Next.js and Persist](https://codesandbox.io/p/devbox/next-js--persist-example-0-3-0-forked-tcssj5)                   | Data loading with Next.js and persist middleware   |
 | [Parallel Queries](https://codesandbox.io/p/sandbox/vy9292)                                                           | Parallel queries                                   |
+| [Slices](https://codesandbox.io/p/sandbox/gsfqs3)                                                                     | Slices with queries and effects                    |
 | [Todos](https://codesandbox.io/p/sandbox/todos-0-3-0-d75vj5)                                                          | A simple todos app                                 |
 | [Task Manager](https://zhzgv5.csb.app/)                                                                               | A more complex task manager app                    |
