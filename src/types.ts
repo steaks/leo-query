@@ -185,6 +185,17 @@ export type UseBoundAsyncStoreWithSuspense<T> = {
    */
   <R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions<R>): R;
   /**
+   * Select multiple queries from the store. Handle async data concerns:
+   *   - Fetch data for the query as needed
+   *   - Leverage caching
+   *   - Re-render component when query value updates
+   *   - Trigger suspense when the query is loading
+   *   - Consider dependencies
+   * @param selector Select the query from the store.
+   * @param opts Options
+   */
+  <R extends any[]>(selectors: {[K in keyof R]: ((state: T) => Query<T, R[K]>) | {selector: ((state: T) => Query<T, R[K]>), opts: UseBoundAsyncStoreOptions<R[K]>}}): R;
+  /**
    * Select an effect from the store. Handle async data concerns:
    *   - Trigger suspense when the effect is loading
    *   - Consider dependencies
@@ -204,14 +215,24 @@ export type UseBoundAsyncStoreWithoutSuspense<T> = {
    *   - Consider dependencies
    * @param selector Select the query from the store.
    */
-    <R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions<R>): QueryValue<R>;
+  <R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions<R>): QueryValue<R>;
+  /**
+   * Select multiple queries from the store. Handle async data concerns:
+   *   - Fetch data for the query as needed
+   *   - Leverage caching
+   *   - Re-render component when query value updates
+   *   - Trigger suspense when the query is loading
+   *   - Consider dependencies
+   * @param selector Select the query from the store.
+   */
+  <R extends any[]>(selectors: {[K in keyof R]: ((state: T) => Query<T, R[K]>) | {selector: ((state: T) => Query<T, R[K]>), opts: UseBoundAsyncStoreOptions<R[K]>}}): {[K in keyof R]: QueryValue<R[K]>};
   /**
    * Select an effect from the store. Handle async data concerns:
    *   - Trigger suspense when the effect is loading
    *   - Consider dependencies
    * @param selector Select the effect from the store.
    */
-    <Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): () => Promise<void>
+  <Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): () => Promise<void>
 };
 
 export interface StoreProviderProps<T> {

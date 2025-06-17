@@ -326,24 +326,46 @@ const select = <T, R, Args extends any[]>(selector: (s: T) => QueryOrEffect<T>) 
  */
 const withSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStoreWithSuspense<T> => {
   subscribe(store);
+  function useBoundAsyncStore<R extends any[]>(selectors: { [K in keyof R]: ((state: T) => Query<T, R[K]>) | {selector: ((state: T) => Query<T, R[K]>), opts: UseBoundAsyncStoreOptions<R[K]>} }): R;
   function useBoundAsyncStore<R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions<R>): R;
-  function useBoundAsyncStore<Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): (() => Promise<void>);
-  function useBoundAsyncStore<R, Args extends any[] = []>(selector: (state: T) => Query<T, R> | Effect<T, Args>, opts?: UseBoundAsyncStoreOptions<R>): R | (() => Promise<void>) {
-    const _opts = opts || {};
-    const theSelector = select(selector);
-    const value = store(useShallow(theSelector));
-    if (isQuery(value[0])) {
-      const v = withSuspense(value as [Query<T, R>, ...QueryOrEffect<T>[]], _opts as UseBoundAsyncStoreOptions<R>);
-      if (v.error) {
-        throw v.error;
+  function useBoundAsyncStore<Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): (() => Promise<void>); 
+  function useBoundAsyncStore(s: any, o?: any): any {
+    function single<R, Args extends any[] = []>(selector: (state: T) => Query<T, R> | Effect<T, Args>, opts?: UseBoundAsyncStoreOptions<R>): R | (() => Promise<void>) {
+      const _opts = opts || {};
+      const theSelector = select(selector);
+      const value = store(useShallow(theSelector));
+      if (isQuery(value[0])) {
+        const v = withSuspense(value as [Query<T, R>, ...QueryOrEffect<T>[]], _opts as UseBoundAsyncStoreOptions<R>);
+        if (v.error) {
+          throw v.error;
+        } else {
+          return v.value!;
+        }
+      } else if (isEffect(value[0])) {
+        return withSuspense(value as [Effect<T, Args>, ...QueryOrEffect<T>[]]);
       } else {
-        return v.value!;
+        throw new Error("Value must be Query or Effect");
       }
-    } else if (isEffect(value[0])) {
-      return withSuspense(value as [Effect<T, Args>, ...QueryOrEffect<T>[]]);
-    } else {
-      throw new Error("Value must be Query or Effect");
     }
+    function multiple<R extends any[]>(selectors: { [K in keyof R]: ((state: T) => Query<T, R[K]>) | {selector: ((state: T) => Query<T, R[K]>), opts: UseBoundAsyncStoreOptions<R[K]>} }): R {
+      const results = selectors.map(selector => {
+        try {
+          const value = typeof selector === "function" ? single(selector) : single(selector.selector, selector.opts);
+          return {value};
+        } catch (error) {
+          return {error};
+        }
+      });
+      const errors = results.filter(v => v.error).map(v => v.error!);
+      if (errors.length > 0 && errors.every(e => e instanceof Promise)) {
+        throw Promise.all(errors);
+      }
+      if (errors.length > 0) {
+        throw errors.find(e => !(e instanceof Promise))!;
+      }
+      return results.map(v => v.value) as R;
+    }
+    return Array.isArray(s) ? multiple(s) : single(s, o);
   }
   return useBoundAsyncStore;
 };
@@ -355,32 +377,41 @@ const withSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>): 
  */
 const withoutSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>): UseBoundAsyncStoreWithoutSuspense<T> => {
   subscribe(store);
+  function useBoundAsyncStoreWithoutSuspense<R extends any[]>(selectors: {[K in keyof R]: ((state: T) => Query<T, R[K]>) | {selector: ((state: T) => Query<T, R[K]>), opts: UseBoundAsyncStoreOptions<R[K]>}}): {[K in keyof R]: QueryValue<R[K]>};
   function useBoundAsyncStoreWithoutSuspense<R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions<R>): QueryValue<R>;
   function useBoundAsyncStoreWithoutSuspense<Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): (() => Promise<void>);
-  function useBoundAsyncStoreWithoutSuspense<R, Args extends any[] = []>(selector: (state: T) => Query<T, R> | Effect<T, Args>, opts?: UseBoundAsyncStoreOptions<R>): QueryValue<R> | (() => Promise<void>) {
-    const _opts = opts || {};
-    const theSelector = select(selector);
-    const value = store(useShallow(theSelector));
-    if (isQuery(value[0])) {
-      const v = value[0] as Query<T, R>;
-      try {
-        return withSuspense(value as [Query<T, R>, ...QueryOrEffect<T>[]], _opts);
-      } catch (e) {
-        return {
-          value: v.value,
-          isLoading: true,
-          error: v.error
+  function useBoundAsyncStoreWithoutSuspense(s: any, o?: any): any {
+    function single<R, Args extends any[] = []>(selector: (state: T) => Query<T, R> | Effect<T, Args>, opts?: UseBoundAsyncStoreOptions<R>): QueryValue<R> | (() => Promise<void>) {
+      const _opts = opts || {};
+      const theSelector = select(selector);
+      const value = store(useShallow(theSelector));
+      if (isQuery(value[0])) {
+        const v = value[0] as Query<T, R>;
+        try {
+          return withSuspense(value as [Query<T, R>, ...QueryOrEffect<T>[]], _opts);
+        } catch (e) {
+          return {
+            value: v.value,
+            isLoading: true,
+            error: v.error
+          }
         }
+      } else if (isEffect(value[0])) {
+        try {
+          return withSuspense(value as [Effect<T, Args>, ...QueryOrEffect<T>[]]);
+        } catch (e) {
+          return value[0].trigger;
+        }
+      } else {
+        throw new Error("Value must be Query or Effect");
       }
-    } else if (isEffect(value[0])) {
-      try {
-        return withSuspense(value as [Effect<T, Args>, ...QueryOrEffect<T>[]]);
-      } catch (e) {
-        return value[0].trigger;
-      }
-    } else {
-      throw new Error("Value must be Query or Effect");
     }
+    function multiple<R extends any[]>(selectors: {[K in keyof R]: ((state: T) => Query<T, R[K]>) | {selector: ((state: T) => Query<T, R[K]>), opts: UseBoundAsyncStoreOptions<R[K]>}}): {[K in keyof R]: QueryValue<R[K]>} {
+      return selectors.map(selector =>
+        typeof selector === "function" ? single(selector) : single(selector.selector, selector.opts)
+      ) as { [K in keyof R]: QueryValue<R[K]> };
+    }
+    return Array.isArray(s) ? multiple(s) : single(s, o);
   }
   return useBoundAsyncStoreWithoutSuspense;
 };
