@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.4.1
+
+### Changes
+
+🐝 Fixes
+* Properly recover from and capture effect errors (#106)
+
 ## v0.4.0
 
 ### Changes

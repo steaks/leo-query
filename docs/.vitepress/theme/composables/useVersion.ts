@@ -6,7 +6,7 @@ export function useVersion() {
 
   const versions = {
     prev: 'v0.3.0',
-    latest: 'v0.4.0',
+    latest: 'v0.4.1',
     next: 'v0.5.0'
   };
   
