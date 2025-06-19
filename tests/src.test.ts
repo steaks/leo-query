@@ -20,6 +20,8 @@ test("equal effects", () => {
     __valueCounter: 0,
     __triggers: [],
     isLoading: false,
+    error: undefined,
+    errors: [],
     trigger: () => Promise.resolve(),
     __store: () => { return null as unknown as StoreApi<any>; }
   } as Effect<any, any>;
@@ -32,6 +34,8 @@ test("equal effects", () => {
     __valueCounter: 0,
     __triggers: [],
     isLoading: false,
+    error: undefined,
+    errors: [],
     trigger: () => Promise.resolve(),
     __store: () => { return null as unknown as StoreApi<any>; }
   } as Effect<any>
@@ -48,6 +52,8 @@ test("not equal effects", () => {
     __valueCounter: 0,
     __triggers: [],
     isLoading: false,
+    error: undefined,
+    errors: [],
     trigger: () => Promise.resolve(),
     __store: () => { return null as unknown as StoreApi<any>; }
   } as Effect<any, any>;
@@ -60,6 +66,8 @@ test("not equal effects", () => {
     __valueCounter: 1,
     __triggers: [],
     isLoading: false,
+    error: undefined,
+    errors: [],
     trigger: () => Promise.resolve(),
     __store: () => { return null as unknown as StoreApi<any>; }
   } as Effect<any, any>
@@ -76,6 +84,8 @@ test("effect compared with non-effect", () => {
     __valueCounter: 0,
     __triggers: [],
     isLoading: false,
+    error: undefined,
+    errors: [],
     trigger: () => Promise.resolve(),
     __store: () => { return null as unknown as StoreApi<any>; }
   } as Effect<any, any>;
