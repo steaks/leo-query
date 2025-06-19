@@ -111,6 +111,8 @@ export function effect<Store extends object, Args extends any[] = []>(): Effect<
     __triggers: [],
     __store: getStore,
     isLoading: false,
+    error: undefined,
+    errors: [],
     trigger: async (...args: Args) => {
       const current = e.__store().getState()[e.__key] as Effect<Store, Args>;
       const promise = p.fn(...args);
@@ -122,7 +124,12 @@ export function effect<Store extends object, Args extends any[] = []>(): Effect<
         }
       } as Partial<Store>);
       setTimeout(async () => {
-        await promise;
+        let error;
+        try {
+          await promise;
+        } catch (e) {
+          error = e;
+        }
         const current = e.__store().getState()[e.__key] as Effect<Store, Args>;
         const fetches = current.__triggers.filter(f => f !== promise);
         e.__store().setState({
@@ -130,7 +137,9 @@ export function effect<Store extends object, Args extends any[] = []>(): Effect<
             ...current,
             __valueCounter: current.__valueCounter + 1,
             __triggers: fetches,
-            isLoading: fetches.length > 0
+            isLoading: fetches.length > 0,
+            error,
+            errors: [...current.errors, error],
           }
         } as Partial<Store>);
       });

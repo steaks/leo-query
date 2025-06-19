@@ -19,6 +19,10 @@ export interface Effect<State, Args extends any[] = []> {
     __store: () => StoreApi<State>;
     /** Indicates if the effect is currently executing. */
     isLoading: boolean;
+    /** Error from the most recent trigger attempt. Undefined if the most recent trigger succeeded or no trigger has been attempted. */
+    error: any | undefined;
+    /** History of all errors hit by the effect. Useful for debugging. */
+    readonly errors: any[];
     /** Triggers the effect manually. */
     trigger: (...args: Args) => Promise<void>;
 }
