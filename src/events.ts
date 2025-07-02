@@ -1,4 +1,4 @@
-import {Query, Effect, ErrorPayload, SuccessPayload, SettledPayload, LeoQueryEventTarget} from "./types";
+import {ErrorPayload, SuccessPayload, SettledPayload, LeoQueryEventTarget} from "./types";
 import {StoreApi, UseBoundStore} from "zustand";
 
 interface StoreEvent<T> {

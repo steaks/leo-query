@@ -9,12 +9,15 @@ import {
   SetValueOptions, 
   UseBoundAsyncStoreWithoutSuspense,
   UseBoundAsyncStoreWithSuspense,
-  UseBoundAsyncStoreOptions
+  UseBoundAsyncStoreOptions,
+  SuccessPayload,
+  ErrorPayload,
+  SettledPayload,
 } from "./types";
 import {wait} from "./util";
 import {setupRetries} from "./retry";
 import {useShallow} from "zustand/react/shallow";
-import {events, ErrorPayload, SuccessPayload, SettledPayload, TriggerPayload} from "./events";
+import {events} from "./events";
 
 export const isEffect = (v: any): v is Effect<any, any> =>
   v && (v as Effect<any, any>).__type === "Effect";
