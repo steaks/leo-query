@@ -13,4 +13,4 @@ Here are live examples to see Leo Query in action.
 | [Parallel Queries](https://codesandbox.io/p/sandbox/vy9292)                                                           | Parallel queries                                   |
 | [Slices](https://codesandbox.io/p/sandbox/gsfqs3)                                                                     | Slices with queries and effects                    |
 | [Todos](https://codesandbox.io/p/sandbox/todos-0-3-0-d75vj5)                                                          | A simple todos app                                 |
-| [Task Manager](https://zhzgv5.csb.app/)                                                                               | A more complex task manager app                    |
+| [Task Manager](https://stackblitz.com/edit/leo-query-task-manager?file=src%2FApp.tsx)                                 | A more complex task manager app                    |

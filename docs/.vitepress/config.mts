@@ -85,7 +85,7 @@ export default defineConfig({
             { text: "Next.js Integration", link: "https://codesandbox.io/p/devbox/next-js-example-0-3-0-y6w29t" },
             { text: "Next.js and Persist", link: "https://codesandbox.io/p/devbox/next-js--persist-example-0-3-0-forked-tcssj5" },
             { text: "Todos", link: "https://codesandbox.io/p/sandbox/todos-0-3-0-d75vj5" },
-            { text: "Task Manager", link: "https://zhzgv5.csb.app/" },
+            { text: "Task Manager", link: "https://stackblitz.com/edit/leo-query-task-manager?file=src%2FApp.tsx" },
           ]
         },
         {
@@ -143,7 +143,7 @@ export default defineConfig({
             { text: "Parallel Queries", link: "https://codesandbox.io/p/sandbox/vy9292" },
             { text: "Slices", link: "https://codesandbox.io/p/sandbox/gsfqs3" },
             { text: "Todos", link: "https://codesandbox.io/p/sandbox/todos-0-3-0-d75vj5" },
-            { text: "Task Manager", link: "https://zhzgv5.csb.app/" },
+            { text: "Task Manager", link: "https://stackblitz.com/edit/leo-query-task-manager?file=src%2FApp.tsx" },
           ]
         },
         {
@@ -201,7 +201,7 @@ export default defineConfig({
             { text: "Parallel Queries", link: "https://codesandbox.io/p/sandbox/vy9292" },
             { text: "Slices", link: "https://codesandbox.io/p/sandbox/gsfqs3" },
             { text: "Todos", link: "https://codesandbox.io/p/sandbox/todos-0-3-0-d75vj5" },
-            { text: "Task Manager", link: "https://zhzgv5.csb.app/" },
+            { text: "Task Manager", link: "https://stackblitz.com/edit/leo-query-task-manager?file=src%2FApp.tsx" },
           ]
         },
         {
