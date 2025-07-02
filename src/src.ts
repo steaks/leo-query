@@ -14,6 +14,7 @@ import {
 import {wait} from "./util";
 import {setupRetries} from "./retry";
 import {useShallow} from "zustand/react/shallow";
+import {events, ErrorPayload, SuccessPayload, SettledPayload, TriggerPayload} from "./events";
 
 export const isEffect = (v: any): v is Effect<any, any> =>
   v && (v as Effect<any, any>).__type === "Effect";
@@ -40,18 +41,18 @@ const bind = <T extends object>(store: UseBoundStore<StoreApi<T>>) => {
       const key = k as keyof T
       const v = state[key];
       const initV = init[key];
-      if (isQuery(v) && v.__key === "NOT_YET_SET") {
-        v.__key = key;
+      if (isQuery(v) && v.key === "NOT_YET_SET") {
+        v.key = key;
         v.__store = () => store;
-      } else if (isEffect(v) && v.__key === "NOT_SET_YET") {
-        v.__key = key;
+      } else if (isEffect(v) && v.key === "NOT_SET_YET") {
+        v.key = key;
         v.__store = () => store;
       }
-      if (v !== initV && isQuery(initV) && initV.__key === "NOT_YET_SET") {
-        initV.__key = key;
+      if (v !== initV && isQuery(initV) && initV.key === "NOT_YET_SET") {
+        initV.key = key;
         initV.__store = () => store;
-      } else if (v !== initV && isEffect(initV) && initV.__key === "NOT_SET_YET") {
-        initV.__key = key;
+      } else if (v !== initV && isEffect(initV) && initV.key === "NOT_SET_YET") {
+        initV.key = key;
         initV.__store = () => store;
       }
     });
@@ -106,18 +107,18 @@ export function effect<Store extends object, Args extends any[] = []>(): Effect<
   const e = {
     __id: crypto.randomUUID(),
     __type: "Effect" as "Effect",
-    __key: "NOT_SET_YET" as keyof Store,
     __valueCounter: 0,
     __triggers: [],
     __store: getStore,
+    key: "NOT_SET_YET" as keyof Store,
     isLoading: false,
     error: undefined,
     errors: [],
     trigger: async (...args: Args) => {
-      const current = e.__store().getState()[e.__key] as Effect<Store, Args>;
+      const current = e.__store().getState()[e.key] as Effect<Store, Args>;
       const promise = p.fn(...args);
       e.__store().setState({
-        [e.__key]: {
+        [e.key]: {
           ...current,
           __triggers: [...current.__triggers, promise],
           isLoading: true
@@ -127,13 +128,17 @@ export function effect<Store extends object, Args extends any[] = []>(): Effect<
         let error;
         try {
           await promise;
-        } catch (e) {
-          error = e;
+          events.__dispatchEvent(new CustomEvent<SuccessPayload>("success", {detail: {effect: e}}));
+        } catch (ee) {
+          error = ee;
+          events.__dispatchEvent(new CustomEvent<ErrorPayload>("error", {detail: {effect: e, error}}));
+        } finally {
+          events.__dispatchEvent(new CustomEvent<SettledPayload>("settled", {detail: {effect: e, error}}));
         }
-        const current = e.__store().getState()[e.__key] as Effect<Store, Args>;
+        const current = e.__store().getState()[e.key] as Effect<Store, Args>;
         const fetches = current.__triggers.filter(f => f !== promise);
         e.__store().setState({
-          [e.__key]: {
+          [e.key]: {
             ...current,
             __valueCounter: current.__valueCounter + 1,
             __triggers: fetches,
@@ -206,7 +211,7 @@ export const setSync = <Store extends object, R>(query: Query<Store, R>, value?:
 
   if (options.__updateStore || options.__updateStore === undefined) {
     query.__store().setState({
-      [query.__key]: next
+      [query.key]: next
     } as Partial<Store>);
   }
 
@@ -229,7 +234,6 @@ export function query<Store extends object, R>(): Query<Store, R> {
     __id: crypto.randomUUID(),
     __type: "Query" as "Query",
     __deps: p.deps,
-    __key: "NOT_YET_SET" as keyof Store,
     __trigger: undefined as undefined | Promise<R>,
     __triggerStart: 0,
     __valueTimestamp: p.options.initialValue === undefined ? 0 : Date.now(),
@@ -243,12 +247,13 @@ export function query<Store extends object, R>(): Query<Store, R> {
     __staleTime: p.options.staleTime,
     __staleTimeout: undefined as number | undefined,
     __isInitialized: p.options.initialValue !== undefined,
+    key: "NOT_YET_SET" as keyof Store,
     isLoading: false,
     value: p.options.initialValue as unknown as R,
     error: undefined,
     trigger: async (): Promise<R> => {
       const state = q.__store().getState();
-      const current = state[q.__key] as Query<Store, R>;
+      const current = state[q.key] as Query<Store, R>;
       const now = Date.now();
       if (current.__trigger && current.__triggerStart > now - current.__debounce) {
         return current.__trigger;
@@ -259,7 +264,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
       const initialPromise = Promise.all(queryDependencies).then(p.fn);
       const promise = setupRetries(p.fn, initialPromise, q);
       q.__store().setState({
-        [q.__key]: {
+        [q.key]: {
           ...current,
           __trigger: promise,
           __triggerStart: now,
@@ -274,10 +279,14 @@ export function query<Store extends object, R>(): Query<Store, R> {
         let error = undefined;
         try {
           value = await promise;
+          events.__dispatchEvent(new CustomEvent<SuccessPayload>("success", {detail: {query: q}}));
         } catch (e) {
           error = e;
+          events.__dispatchEvent(new CustomEvent<ErrorPayload>("success", {detail: {query: q, error}}));
+        } finally {
+          events.__dispatchEvent(new CustomEvent<ErrorPayload>("settled", {detail: {query: q, error}}));
         }
-        const next = q.__store().getState()[q.__key] as Query<Store, R>;
+        const next = q.__store().getState()[q.key] as Query<Store, R>;
         if (next.__trigger !== promise) {
           return;
         }
@@ -288,11 +297,11 @@ export function query<Store extends object, R>(): Query<Store, R> {
     },
     markStale: () => {
       const state = q.__store().getState();
-      const current = state[q.__key] as Query<Store, R>;
+      const current = state[q.key] as Query<Store, R>;
       const staleTimeout = clearTimeout(current.__staleTimeout);
 
       q.__store().setState({
-        [q.__key]: {
+        [q.key]: {
           ...current,
           __needsLoad: true,
           __staleTimeout: staleTimeout,
@@ -466,13 +475,13 @@ const subscribe = <T extends object>(store: UseBoundStore<StoreApi<T>>) => {
 
 const setInitialValue = <T>(query: Query<any, T>, value: T) => {
   const state = query.__store().getState();
-  const current = state[query.__key] as Query<any, T>;
+  const current = state[query.key] as Query<any, T>;
   setSync(current, value, /*error*/undefined, {__isInitialValue: true});
 };
 
 const setValue = <T>(query: Query<any, T>, value: T, timestamp: number) => {
   const state = query.__store().getState();
-  const current = state[query.__key] as Query<any, T>;
+  const current = state[query.key] as Query<any, T>;
   setSync(current, value, /*error*/undefined, {__timestamp: timestamp});
 };
 

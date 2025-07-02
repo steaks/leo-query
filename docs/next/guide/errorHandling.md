@@ -138,3 +138,15 @@ function App() {
   );
 }
 ```
+
+## Global Error Handling
+
+Sometimes having a global error handler can be useful to display notifications, log errors, etc. You can handle errors globally by using the [events api](/next/guide/events).
+
+```typescript
+import {events} from "leo-query";
+
+events.addEventListener("error", e => {
+  console.log("error", e.detail.query?.key ?? e.detail.effect?.key);
+});
+```
