@@ -90,8 +90,8 @@ Leo Query is simple, robust, and designed for Zustand. Read more about why Leo Q
 
 ## Examples
 
-| Example                                                                                           | Description                        |
-|---------------------------------------------------------------------------------------------------|------------------------------------|
+| Example                                                                                                               | Description                       |
+|-----------------------------------------------------------------------------------------------------------------------|-----------------------------------|
 | [Dogs JS](https://codesandbox.io/p/devbox/leo-query-dogs-demo-js-forked-tt6tq6?workspaceId=ws_CTu2uAaf7QNEGg4Jxmo6VN) | A simple dog counter (Javascript) |
 | [Dogs TS](https://codesandbox.io/p/devbox/leo-query-dogs-demo-ts-forked-wnxn3w?workspaceId=ws_CTu2uAaf7QNEGg4Jxmo6VN) | A simple dog counter (Typescript) |
-| [Task Manager](https://zhzgv5.csb.app/)                                                           | A more complex task manager app.   |
+| [Task Manager](https://stackblitz.com/edit/leo-query-task-manager?file=src%2FApp.tsx)                                 | A more complex task manager app.  |
