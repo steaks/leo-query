@@ -4,7 +4,7 @@ import {wait} from "./util";
 
 const isOutOfDate = <State, R>(nitialPromise: Promise<R>, query: Query<State, R>) => {
   const state = query.__store().getState();
-  const current = state[query.__key] as Query<State, R>;
+  const current = state[query.key] as Query<State, R>;
   return current.__initialPromise !== nitialPromise;
 };
 
