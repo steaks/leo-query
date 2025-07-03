@@ -4,7 +4,7 @@
 
 A simple library to connect async queries to Zustand stores.
 
-Try a live demo [here](https://codesandbox.io/p/sandbox/leo-query-dogs-demo-js-wmwlgt?file=%2Fsrc%2FApp.jsx). And see full documentation [here](https://leoquery.com). And chat on discord [here](https://discord.gg/aucYm6hMsJ).
+Try a live demo [here](https://codesandbox.io/p/devbox/leo-query-dogs-demo-ts-forked-wnxn3w?workspaceId=ws_CTu2uAaf7QNEGg4Jxmo6VN). And see full documentation [here](https://leoquery.com). And chat on discord [here](https://discord.gg/aucYm6hMsJ).
 
 ## Install 
 
