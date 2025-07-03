@@ -64,7 +64,7 @@ export const retry = async <State, R>(fn: () => Promise<R>, query: Query<State, 
       throw error;
     }
     const state = query.__store().getState();
-    const current = state[query.__key] as Query<State, R>;
+    const current = state[query.key] as Query<State, R>;
     if (current.__trigger !== promise) { //If the query has been re-triggered then we no longer need the data
       throw error;
     }

@@ -9,14 +9,14 @@ export interface Effect<State, Args extends any[] = []> {
     readonly __id: string;
     /** Type identifier for this effect. */
     readonly __type: "Effect";
-    /** Key of the store this effect is tied to. */
-    __key: keyof State;
     /** Tracks how many times the effect has been triggered. */
     readonly __valueCounter: number;
     /** Array of promises for managing concurrent triggers. */
      readonly __triggers: Promise<void>[];
     /** Function access to the store. */
     __store: () => StoreApi<State>;
+    /** Key of the store this effect is tied to. */
+    key: keyof State;
     /** Indicates if the effect is currently executing. */
     isLoading: boolean;
     /** Error from the most recent trigger attempt. Undefined if the most recent trigger succeeded or no trigger has been attempted. */
@@ -35,8 +35,6 @@ export interface Query<State, T> {
     readonly __id: string;
     /** Identifies the object as a query. */
     readonly __type: "Query";
-    /** The key in the store tied to the query. */
-    __key: keyof State;
     /** Dependencies that trigger the query when changed. */
     readonly __deps: Dependencies<State>;
     /**  A delay (in ms) between query triggers. */
@@ -71,6 +69,8 @@ export interface Query<State, T> {
     __isInitialized: boolean;
     /** Timestamp of when the value was set. */
     __valueTimestamp: number;
+    /** The key in the store tied to the query. */
+    key: keyof State;
     /** The current value returned by the query. */
     value: T | undefined;
     /** Indicates if the query is currently fetching data. */
@@ -334,4 +334,31 @@ export interface StoreProviderWithServerSideData<T, D> {
    * Hook to check if the store has been hydrated by the persist middleware.
    */
   readonly useHasHydrated: () => boolean;
+}
+
+export interface SuccessPayload {
+  query?: Query<any, any>;
+  effect?: Effect<any, any>;
+}
+
+export interface ErrorPayload {
+  query?: Query<any, any>;
+  effect?: Effect<any, any>;
+  error: any;
+}
+
+export interface SettledPayload {
+  query?: Query<any, any>;
+  effect?: Effect<any, any>;
+  error?: any;
+}
+
+export interface LeoQueryEventTarget {
+  addEventListener(type: "success", listener: (evt: CustomEvent<SuccessPayload>) => void, options?: AddEventListenerOptions | boolean): void;
+  addEventListener(type: "error", listener: (evt: CustomEvent<ErrorPayload>) => void, options?: AddEventListenerOptions | boolean): void;
+  addEventListener(type: "settled", listener: (evt: CustomEvent<SettledPayload>) => void, options?: AddEventListenerOptions | boolean): void;
+  removeEventListener(type: "success", listener: (evt: CustomEvent<SuccessPayload>) => void, options?: AddEventListenerOptions | boolean): void;
+  removeEventListener(type: "error", listener: (evt: CustomEvent<ErrorPayload>) => void, options?: AddEventListenerOptions | boolean): void;
+  removeEventListener(type: "settled", listener: (evt: CustomEvent<SettledPayload>) => void, options?: AddEventListenerOptions | boolean): void;
+  __dispatchEvent(evt: CustomEvent<ErrorPayload | SuccessPayload | SettledPayload>): void;
 }

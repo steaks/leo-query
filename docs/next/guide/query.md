@@ -128,6 +128,8 @@ An object representing the query, including methods and state information.
 
 ```typescript
 export interface Query<State, T> {
+    /** The key in the store tied to the query. */
+    key: keyof State;
     /** The current value returned by the query. */
     value: T | undefined;
     /** Indicates if the query is currently fetching data. */
