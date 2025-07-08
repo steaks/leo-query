@@ -1,5 +1,9 @@
 <p align="center">
   <img src="./assets/leo.png" height="300">
+  <br/>
+  <img alt="Build" src="https://img.shields.io/github/actions/workflow/status/steaks/leo-query/test.yml?branch=main">
+  <img alt="NPM Version" src="https://img.shields.io/npm/v/leo-query">
+  <img alt="NPM Downloads" src="https://img.shields.io/npm/d18m/leo-query">
 </p>
 
 A simple library to connect async queries to Zustand stores.
@@ -86,7 +90,7 @@ const App = () => {
 
 ## Why Leo?
 
-Leo Query is simple, robust, and designed for Zustand. Read more about why Leo Query is different from other libraries in [Why Leo Query?](/why).
+Leo Query is simple, robust, and designed for Zustand. Read more about why Leo Query is different from other libraries in [Why Leo Query?](https://leoquery.com/latest/introduction/why.html).
 
 ## Examples
 
