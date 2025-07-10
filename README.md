@@ -2,13 +2,17 @@
   <img src="./assets/leo.png" height="300">
   <br/>
   <img alt="Build" src="https://img.shields.io/github/actions/workflow/status/steaks/leo-query/test.yml?branch=main">
-  <img alt="NPM Version" src="https://img.shields.io/npm/v/leo-query">
-  <img alt="NPM Downloads" src="https://img.shields.io/npm/d18m/leo-query">
+  <a href="https://www.npmjs.com/package/leo-query">
+    <img alt="NPM Version" src="https://img.shields.io/npm/v/leo-query">
+  </a>
+  <a href="https://www.npmjs.com/package/leo-query">
+    <img alt="NPM Downloads" src="https://img.shields.io/npm/d18m/leo-query">
+  </a>
 </p>
 
-A simple library to connect async queries to Zustand stores.
+Async state management for Zustand.
 
-Try a live demo [here](https://codesandbox.io/p/devbox/leo-query-dogs-demo-ts-forked-wnxn3w?workspaceId=ws_CTu2uAaf7QNEGg4Jxmo6VN). And see full documentation [here](https://leoquery.com). And chat on discord [here](https://discord.gg/aucYm6hMsJ).
+Try a live demo [here](https://codesandbox.io/p/devbox/leo-query-dogs-demo-ts-forked-wnxn3w?workspaceId=ws_CTu2uAaf7QNEGg4Jxmo6VN). And read the docs [here](https://leoquery.com).
 
 ## Install 
 
@@ -56,7 +60,7 @@ const useDogStoreAsync = hook(useDogStore);
 
 ## Bind your components
 
-Use the async hook when you need to handle loading states and errors. Use the normal Zustand hook when you don't.
+Use the async hook and suspense to handle loading states.
 
 ```tsx
 const DogCounter = () => {
@@ -83,7 +87,7 @@ const App = () => {
 ```
 ## Try Leo Query
 <center>
-  <a href="https://codesandbox.io/p/sandbox/leo-query-dogs-demo-ts-7f2c34">Try it out in codesandbox.io</a>
+  <a href="https://codesandbox.io/p/devbox/leo-query-dogs-demo-ts-forked-wnxn3w?workspaceId=ws_CTu2uAaf7QNEGg4Jxmo6VN">Try it out in codesandbox.io</a>
 </center>
 
 

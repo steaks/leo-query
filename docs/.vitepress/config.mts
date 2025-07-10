@@ -5,7 +5,7 @@ import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({ 
   title: "Leo Query",
-  description: "A simple library to connect async queries to Zustand stores.",
+  description: "Async state management for Zustand",
   head: [
     [
       "script",
@@ -216,7 +216,8 @@ export default defineConfig({
     },
     socialLinks: [
       { icon: "github", link: "https://github.com/steaks/leo-query" },
-      { icon: "discord", link: "https://discord.gg/aucYm6hMsJ" }
+      { icon: "npm", link: "https://www.npmjs.com/package/leo-query" },
+      { icon: "discord", link: "https://discord.gg/aucYm6hMsJ" },
     ],
     search: {
       provider: "local"

@@ -48,7 +48,7 @@ const useDogStoreAsync = hook(useDogStore);
 
 ## Bind your components
 
-Use the async hook when you need to handle loading states and errors. Use the normal Zustand hook when you don't.
+Use the async hook and suspense to handle loading states.
 
 ```tsx
 const DogCounter = () => {

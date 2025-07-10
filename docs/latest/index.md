@@ -3,9 +3,9 @@
 layout: home
 
 hero:
-  name: "Leo Query"
-  text: "A simple library to connect async queries to Zustand stores."
-  tagline: Async Queries for Zustand
+  name: Leo Query
+  text: Async state management for Zustand
+  tagline: All state in one system
   actions:
     - theme: brand
       text: Why Leo Query?
