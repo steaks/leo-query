@@ -8,16 +8,19 @@ Leo Query provides an events api to hook into request lifecycle events. You can 
 ```typescript
 import {events} from "leo-query";
 
-events.addEventListener("success", (e) => {
-  console.log("success", e.detail.query?.key ?? e.detail.effect?.key);
+events.addEventListener("success", e => {
+  const payload = e.detail;
+  console.log("success", payload.query?.key ?? payload.effect?.key);
 });
 
 events.addEventListener("error", e => {
-  console.log("error", e.detail.query?.key ?? e.detail.effect?.key);
+  const payload = e.detail;
+  console.log("error", payload.query?.key ?? payload.effect?.key);
 });
 
 events.addEventListener("settled", e => {
-  console.log("settled", e.detail.query?.key ?? e.detail.effect?.key);
+  const payload = e.detail;
+  console.log("settled", payload.query?.key ?? payload.effect?.key);
 });
 ```
 
@@ -41,15 +44,18 @@ const useDogStore = create<DogState>(() => ({
 const dogStoreEvents = createEvents(useDogStore);
 
 dogStoreEvents.addEventListener("success", e => {
-  console.log("dog store success", e.detail.query?.key ?? e.detail.effect?.key);
+  const payload = e.detail;
+  console.log("dog store success", payload.query?.key ?? payload.effect?.key);
 });
 
 dogStoreEvents.addEventListener("error", e => {
-  console.log("dog store error", e.detail.query?.key ?? e.detail.effect?.key);
+  const payload = e.detail;
+  console.log("dog store error", payload.query?.key ?? payload.effect?.key);
 });
 
 dogStoreEvents.addEventListener("settled", e => {
-  console.log("dog store settled", e.detail.query?.key ?? e.detail.effect?.key);
+  const payload = e.detail;
+  console.log("dog store settled", payload.query?.key ?? payload.effect?.key);
 });
 ```
 
