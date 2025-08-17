@@ -285,9 +285,9 @@ export function query<Store extends object, R>(): Query<Store, R> {
           events.__dispatchEvent(new CustomEvent<SuccessPayload>("success", {detail: {query: q}}));
         } catch (e) {
           error = e;
-          events.__dispatchEvent(new CustomEvent<ErrorPayload>("success", {detail: {query: q, error}}));
+          events.__dispatchEvent(new CustomEvent<ErrorPayload>("error", {detail: {query: q, error}}));
         } finally {
-          events.__dispatchEvent(new CustomEvent<ErrorPayload>("settled", {detail: {query: q, error}}));
+          events.__dispatchEvent(new CustomEvent<SettledPayload>("settled", {detail: {query: q, error}}));
         }
         const next = q.__store().getState()[q.key] as Query<Store, R>;
         if (next.__trigger !== promise) {
