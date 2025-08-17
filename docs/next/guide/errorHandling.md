@@ -146,7 +146,7 @@ function App() {
 
 Having a global error handler can be useful to display notifications, log errors, etc. You can handle errors globally by using the [events api](/next/guide/events).
 
-### 
+### Example
 
 ```typescript
 import {events} from "leo-query";
@@ -154,10 +154,10 @@ import {events} from "leo-query";
 events.addEventListener("error", e => {
   const payload = e.detail;
   if (payload.query) {
-    console.log("query error", payload.error, payload.query);
+    console.error(payload.error, payload.query);
   }
   if (payload.effect) {
-    console.log("effect error", payload.error, payload.effect);
+    console.error(payload.error, payload.effect);
   }
 });
 ```
