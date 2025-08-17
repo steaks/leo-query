@@ -11,7 +11,7 @@ import {
   UseBoundAsyncStoreWithSuspense,
   UseBoundAsyncStoreOptions
 } from "./types";
-import {wait} from "./util";
+import {wait, generateUUID} from "./util";
 import {setupRetries} from "./retry";
 import {useShallow} from "zustand/react/shallow";
 
@@ -104,7 +104,7 @@ export function effect<Store extends object, Args extends any[] = []>(): Effect<
   const p = effectParams<Args>(arguments);
   const getStore: () => StoreApi<Store> = () => { throw new Error("Store not set yet"); };
   const e = {
-    __id: crypto.randomUUID(),
+    __id: generateUUID(),
     __type: "Effect" as "Effect",
     __key: "NOT_SET_YET" as keyof Store,
     __valueCounter: 0,
@@ -226,7 +226,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
   const p = queryParams<Store, R>(arguments);
   const getStore: () => StoreApi<Store> = () => { throw new Error("Store not set yet"); };
   const q = {
-    __id: crypto.randomUUID(),
+    __id: generateUUID(),
     __type: "Query" as "Query",
     __deps: p.deps,
     __key: "NOT_YET_SET" as keyof Store,
