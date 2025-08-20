@@ -104,7 +104,7 @@ export function effect<Store extends object, Args extends any[] = []>(): Effect<
   const p = effectParams<Args>(arguments);
   const getStore: () => StoreApi<Store> = () => { throw new Error("Store not set yet"); };
   const e = {
-    __id: generateUUID(),
+    __id: generateUUID(globalOptions),
     __type: "Effect" as "Effect",
     __key: "NOT_SET_YET" as keyof Store,
     __valueCounter: 0,
@@ -226,7 +226,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
   const p = queryParams<Store, R>(arguments);
   const getStore: () => StoreApi<Store> = () => { throw new Error("Store not set yet"); };
   const q = {
-    __id: generateUUID(),
+    __id: generateUUID(globalOptions),
     __type: "Query" as "Query",
     __deps: p.deps,
     __key: "NOT_YET_SET" as keyof Store,
