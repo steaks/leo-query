@@ -177,6 +177,7 @@ export default defineConfig({
             { text: "Error Handling", link: "/next/guide/errorHandling" },
             { text: "Parallel Queries", link: "/next/guide/parallelQueries" },
             { text: "Slices", link: "/next/guide/slices" },
+            { text: "Events", link: "/next/guide/events" },
           ]
         },
         {

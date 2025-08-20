@@ -2,7 +2,10 @@
 
 ## Queries
 
-There are two ways to handle query errors depending on whether you are using Suspense. If you are using Suspense, wrap your component in an error boundary component. We recommend [react-error-boundary](https://www.npmjs.com/package/react-error-boundary). If you are not using Suspense, handle errors directly in the component.
+There are three ways to handle query errors. You can use one or multiple approaches.
+- Error Handling with Suspense: If you are using Suspense, wrap your component in an error boundary component. We recommend [react-error-boundary](https://www.npmjs.com/package/react-error-boundary). 
+- Error Handling without Suspense: Handle errors directly in your component with the `error` property.
+- Global Error Handling: Handle errors at the global level with the events api.
 
 
 ## Error Handling with Suspense
@@ -86,7 +89,7 @@ function App() {
 
 ## Effects
 
-Effects provide two properties for error handling: `error` and `errors`. The `error` property contains the error from the most recent trigger if it failed. The `errors` property contains all errors encountered by the effect.
+Effects provide two properties for error handling: `error` and `errors`. The `error` property contains the error from the most recent trigger if it failed. The `errors` property contains all errors encountered by the effect. Additionally, effect errors can be handled at the global level with the events api.
 
 ```typescript {32-37}
 import React from 'react';
@@ -137,4 +140,24 @@ function App() {
     </>
   );
 }
+```
+
+## Global Error Handling
+
+Having a global error handler can be useful to display notifications, log errors, etc. You can handle errors globally by using the [events api](/next/guide/events).
+
+### Example
+
+```typescript
+import {events} from "leo-query";
+
+events.addEventListener("error", e => {
+  const payload = e.detail;
+  if (payload.query) {
+    console.error(payload.error, payload.query);
+  }
+  if (payload.effect) {
+    console.error(payload.error, payload.effect);
+  }
+});
 ```

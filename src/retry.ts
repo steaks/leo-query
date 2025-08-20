@@ -4,7 +4,7 @@ import {wait} from "./util";
 
 const isOutOfDate = <State, R>(nitialPromise: Promise<R>, query: Query<State, R>) => {
   const state = query.__store().getState();
-  const current = state[query.__key] as Query<State, R>;
+  const current = state[query.key] as Query<State, R>;
   return current.__initialPromise !== nitialPromise;
 };
 
@@ -16,9 +16,9 @@ export const defaultRetry = (attempt: number, error: any): boolean =>
  * @param attempt
  */
 export const defaultRetryDelay = (attempt: number): number => {
-  console.log(`Attempt ${attempt}`);
+  console.debug(`Attempt ${attempt}`);
   const delay = attempt === 0 ? 0 : Math.min((2 ** (attempt - 1)) * 1000, 30 * 1000);
-  console.log(`Delaying for ${delay}ms`);
+  console.debug(`Delaying for ${delay}ms`);
   return delay;
 }
 
