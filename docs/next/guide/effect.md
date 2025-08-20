@@ -62,6 +62,8 @@ An object representing the effect, including methods and state information.
 
 ```typescript
 export interface Effect<State, Args extends any[] = []> {
+    /** Key of the store this effect is tied to. */
+    key: keyof State;
     /** Indicates if the effect is currently executing. */
     isLoading: boolean;
     /** Triggers the effect manually. */
