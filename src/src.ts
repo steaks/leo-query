@@ -14,7 +14,7 @@ import {
   ErrorPayload,
   SettledPayload,
 } from "./types";
-import {wait} from "./util";
+import {wait, generateUUID} from "./util";
 import {setupRetries} from "./retry";
 import {useShallow} from "zustand/react/shallow";
 import {events} from "./events";
@@ -108,7 +108,7 @@ export function effect<Store extends object, Args extends any[] = []>(): Effect<
   const p = effectParams<Args>(arguments);
   const getStore: () => StoreApi<Store> = () => { throw new Error("Store not set yet"); };
   const e = {
-    __id: crypto.randomUUID(),
+    __id: generateUUID(globalOptions),
     __type: "Effect" as "Effect",
     __valueCounter: 0,
     __triggers: [],
@@ -234,7 +234,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
   const p = queryParams<Store, R>(arguments);
   const getStore: () => StoreApi<Store> = () => { throw new Error("Store not set yet"); };
   const q = {
-    __id: crypto.randomUUID(),
+    __id: generateUUID(globalOptions),
     __type: "Query" as "Query",
     __deps: p.deps,
     __trigger: undefined as undefined | Promise<R>,

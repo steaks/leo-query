@@ -178,6 +178,7 @@ export default defineConfig({
             { text: "Parallel Queries", link: "/next/guide/parallelQueries" },
             { text: "Slices", link: "/next/guide/slices" },
             { text: "Events", link: "/next/guide/events" },
+            { text: "React Native", link: "/next/guide/reactNative" },
           ]
         },
         {
