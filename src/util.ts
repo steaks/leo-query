@@ -22,5 +22,5 @@ export const generateUUID = (config: GlobalOptions): string => {
     return crypto.randomUUID();
   }
 
-  throw new Error('No UUID generator provided. Please provide a uuidv4 function in the config. If you are using React Native, see the React Native guide in the docs for more information.');
+  throw new Error('No UUID generator provided. Please provide a uuidv4 function in the global config. If you are using React Native, see the React Native guide in the docs for more information.');
 };

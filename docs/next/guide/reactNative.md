@@ -1,12 +1,15 @@
 # React Native
 
-Leo Query requires one extra step to work with React Native. React Native environments do not have access to `crypto.randomUUID` by default. Leo Query uses v4 uuids to uniquely identify queries and effects. So it needs a v4 uuid generator. Pass in a v4 uuid generator to the global config.
+Leo Query works with React Native with one additional setup step. 
 
-## Examples
+Leo Query uses v4 uuids. Since React Native environments don't typically have access to `crypto.randomUUID`, it requires that you provide a V4 UUID generator. 
 
-### UUID Generator with React Native
+Follow the normal [getting started](/next/introduction/gettingStarted). When you come to the `Connect your store` step first provide a `uuidv4` function to the global configuration. See examples below.
 
-#### React Native
+### Examples of UUID config
+
+V4 UUID function with `react-native-uuid`
+
 ```typescript
 //Vanilla React Native
 import {configure} from "leo-query";
@@ -16,6 +19,8 @@ configure({
   uuidv4: uuid.v4
 });
 ```
+
+V4 UUID function with Expo
 
 ```typescript
 //React Native with Expo

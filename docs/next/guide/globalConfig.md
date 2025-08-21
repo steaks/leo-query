@@ -16,31 +16,6 @@ configure({
 });
 ```
 
-### UUID Generator with React Native
-
-React Native doesn't have access to `crypto.randomUUID` (default v4 uuid generator for Leo Query). Provide your preferred v4 uuid generator. Below are a few examples.
-
-#### React Native
-```typescript
-//Vanilla React Native
-import uuid from 'react-native-uuid'; // https://www.npmjs.com/package/react-native-uuid
-
-configure({
-  uuid: uuid.v4
-});
-```
-
-```typescript
-//React Native with expo
-import {randomUUID} from 'expo-crypto';
-
-configure({
-  uuid: randomUUID
-});
-```
-
-### React Native 
-
 ## API Reference
 
 ```typescript
