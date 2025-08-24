@@ -26,7 +26,7 @@ events.addEventListener("settled", e => {
 
 
 ## Store Events
-```typescript {15-27}
+```typescript {15-30}
 import {effect, query, events, createEvents, Query, Effect} from "leo-query";
 
 interface DogState {
