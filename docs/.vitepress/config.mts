@@ -63,6 +63,8 @@ export default defineConfig({
             { text: "Optimistic Updates", link: "/prev/guide/optimisticUpdates" },
             { text: "Setup with Next.js", link: "/prev/guide/setupWithNextJs" },
             { text: "Error Handling", link: "/prev/guide/errorHandling" },
+            { text: "Parallel Queries", link: "/prev/guide/parallelQueries" },
+            { text: "Slices", link: "/prev/guide/slices" },
           ]
         },
         {
@@ -84,6 +86,8 @@ export default defineConfig({
             { text: "Persisting Data", link: "https://codesandbox.io/p/sandbox/xtq66z" },
             { text: "Next.js Integration", link: "https://codesandbox.io/p/devbox/next-js-example-0-3-0-y6w29t" },
             { text: "Next.js and Persist", link: "https://codesandbox.io/p/devbox/next-js--persist-example-0-3-0-forked-tcssj5" },
+            { text: "Parallel Queries", link: "https://codesandbox.io/p/sandbox/vy9292" },
+            { text: "Slices", link: "https://codesandbox.io/p/sandbox/gsfqs3" },
             { text: "Todos", link: "https://codesandbox.io/p/sandbox/todos-0-3-0-d75vj5" },
             { text: "Task Manager", link: "https://stackblitz.com/edit/leo-query-task-manager?file=src%2FApp.tsx" },
           ]
@@ -96,7 +100,7 @@ export default defineConfig({
             { text: "Delaying Execution with Wait", link: "/prev/blog/delayingExecutionWithWait" },
           ]
         }
-      ],
+      ], 
       "/latest/": [
         {
           text: "Introduction",
@@ -119,6 +123,8 @@ export default defineConfig({
             { text: "Error Handling", link: "/latest/guide/errorHandling" },
             { text: "Parallel Queries", link: "/latest/guide/parallelQueries" },
             { text: "Slices", link: "/latest/guide/slices" },
+            { text: "Events", link: "/latest/guide/events" },
+            { text: "React Native", link: "/latest/guide/reactNative" },
           ]
         },
         {
@@ -154,7 +160,7 @@ export default defineConfig({
             { text: "Delaying Execution with Wait", link: "/latest/blog/delayingExecutionWithWait" },
           ]
         }
-      ], 
+      ],
       "/next/": [
         {
           text: "Introduction",
