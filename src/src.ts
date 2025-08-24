@@ -18,6 +18,27 @@ import {wait, generateUUID} from "./util";
 import {setupRetries} from "./retry";
 import {useShallow} from "zustand/react/shallow";
 import {events} from "./events";
+import {useEffect} from "react";
+
+const mountedQueriesTracker = {} as Record<string, Set<string>>;
+
+const registerQuery = (queryId: string) => {
+  mountedQueriesTracker[queryId] = new Set<string>();
+};
+
+const mountQuery = (hookId: string, queryId: string) => {
+  mountedQueriesTracker[queryId].add(hookId); 
+};
+
+const unmountQueries = (hookId: string) => {
+  Object
+    .keys(mountedQueriesTracker)
+    .forEach(queryId => { mountedQueriesTracker[queryId].delete(hookId); });
+};
+
+const isQueryMounted = (queryId: string) => 
+  mountedQueriesTracker[queryId].size > 0;
+
 
 export const isEffect = (v: any): v is Effect<any, any> =>
   v && (v as Effect<any, any>).__type === "Effect";
@@ -316,6 +337,7 @@ export function query<Store extends object, R>(): Query<Store, R> {
     withValue: (value: R): Query<Store, R> => 
       setSync(q, value, /*error*/undefined, {__updateStore: false})
   };
+  registerQuery(q.__id);
   return q;
 }
 
@@ -341,6 +363,28 @@ const select = <T, R, Args extends any[]>(selector: (s: T) => QueryOrEffect<T>) 
   }
 }
 
+function useTrackMountedQueries<T extends object, R extends any[]>(selectors: { [K in keyof R]: ((state: T) => Query<T, R[K]>) | {selector: ((state: T) => Query<T, R[K]>), opts: UseBoundAsyncStoreOptions<R[K]>} }, store: UseBoundStore<StoreApi<T>>): void;
+function useTrackMountedQueries<T extends object, R>(selector: (state: T) => Query<T, R>, store: UseBoundStore<StoreApi<T>>): void;
+function useTrackMountedQueries<T extends object, Args extends any[] = []>(selector: (state: T) => Effect<T, Args>, store: UseBoundStore<StoreApi<T>>): void;
+function useTrackMountedQueries<T extends object>(selector: any, store: UseBoundStore<StoreApi<T>>): void {
+  useEffect(() => {
+    const hookId = generateUUID(globalOptions);
+    const state = store.getState();
+    if (Array.isArray(selector)) {
+      selector
+        .map(s => typeof s === "function" ? s : s.selector)
+        .map(s => s(state))
+        .forEach((q: Query<any, any>) => { mountQuery(hookId, q.__id); });
+    } else {
+      const query = selector(state);
+      if (isQuery(query)) {
+        mountQuery(hookId, query.__id);
+      }
+    }
+    return () => { unmountQueries(hookId); };
+  }, []);
+}
+
 /**
  * React hook to retrieve queries or effects from your store. This hook will automatically trigger Suspense when a query is loading.
  * @param store - Your Zustand store
@@ -351,6 +395,7 @@ const withSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>): 
   function useBoundAsyncStore<R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions<R>): R;
   function useBoundAsyncStore<Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): (() => Promise<void>); 
   function useBoundAsyncStore(s: any, o?: any): any {
+    useTrackMountedQueries(s, store);
     function single<R, Args extends any[] = []>(selector: (state: T) => Query<T, R> | Effect<T, Args>, opts?: UseBoundAsyncStoreOptions<R>): R | (() => Promise<void>) {
       const _opts = opts || {};
       const theSelector = select(selector);
@@ -402,6 +447,7 @@ const withoutSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>
   function useBoundAsyncStoreWithoutSuspense<R>(selector: (state: T) => Query<T, R>, opts?: UseBoundAsyncStoreOptions<R>): QueryValue<R>;
   function useBoundAsyncStoreWithoutSuspense<Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): (() => Promise<void>);
   function useBoundAsyncStoreWithoutSuspense(s: any, o?: any): any {
+    useTrackMountedQueries(s, store);
     function single<R, Args extends any[] = []>(selector: (state: T) => Query<T, R> | Effect<T, Args>, opts?: UseBoundAsyncStoreOptions<R>): QueryValue<R> | (() => Promise<void>) {
       const _opts = opts || {};
       const theSelector = select(selector);
@@ -466,10 +512,13 @@ const subscribe = <T extends object>(store: UseBoundStore<StoreApi<T>>) => {
           const currDeps = current.__deps(state);
           const prevDeps = prev.__deps(prevState);
           const dependencyChange = !equals(currDeps, prevDeps);
-          if (dependencyChange && current.__lazy) {
-            return current.markStale();
+          const isMounted = isQueryMounted(current.__id);
+          if (dependencyChange && isMounted) {
+            return current.trigger();
           } else if (dependencyChange && !current.__lazy) {
             return current.trigger();
+          } else if (dependencyChange && current.__lazy) {
+            return current.markStale();
           }
         }
       });
