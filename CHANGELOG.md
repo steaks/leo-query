@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v0.5.0
+
+### Changes
+
+🐶 Features
+* Events api to hook into successful queries/effects and errors (#110)
+* Performance improvements for queries in lazy mode (#116)
+
+🐝 Fixes
+* Provide uuidv4 option for react native environments where crypto.randomUUID doesn't exist (#115)
+
 ## v0.4.1
 
 ### Changes

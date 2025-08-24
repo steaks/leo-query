@@ -46,6 +46,10 @@ const useDogStore = create<DogState>(() => ({
 const useDogStoreAsync = hook(useDogStore);
 ```
 
+::: info React Native
+Use the [React Native guide](/latest/guide/reactNative) for an extra step when getting started.
+:::
+
 ## Bind your components
 
 Use the async hook when you need to handle loading states and errors. Use the normal Zustand hook when you don't.
@@ -73,6 +77,7 @@ const App = () => {
   );
 };
 ```
+
 ## Try Leo Query
 <center>
   <a href="https://codesandbox.io/p/sandbox/leo-query-dogs-demo-ts-7f2c34">Try it out in codesandbox.io</a>

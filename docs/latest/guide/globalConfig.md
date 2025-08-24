@@ -23,8 +23,19 @@ configure(options: GlobalOptions);
 ```
 
 ```typescript
-interface GlobalOptions {
-  query?: QueryOptions;
+/**
+ * Global options for Leo Query.
+ */
+export interface GlobalOptions {
+  /**
+   * Global query options.
+   */
+  query?: GlobalQueryOptions;
+  /**
+   * A function that generates a v4 UUID. If no function is provided Leo Query will fallback to crypto.randomUUID. Browsers typically have access to crypto.randomUUID, so this option is not needed. 
+   * React Native does not have access to crypto.randomUUID, so this option is usually required.
+   */
+  uuidv4?: () => string;
 }
 ```
 
