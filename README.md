@@ -83,7 +83,7 @@ const App = () => {
 ```
 ## Try Leo Query
 <center>
-  <a href="https://codesandbox.io/p/sandbox/leo-query-dogs-demo-ts-7f2c34">Try it out in codesandbox.io</a>
+  <a href="https://codesandbox.io/p/devbox/leo-query-dogs-demo-ts-forked-wnxn3w?workspaceId=ws_CTu2uAaf7QNEGg4Jxmo6VN">Try it out in codesandbox.io</a>
 </center>
 
 
