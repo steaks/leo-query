@@ -6,7 +6,7 @@ export const fetchDogs = (): Promise<number> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(db.dogs);
-    }, 5000);
+    }, 1000);
   });
 };
 
@@ -15,7 +15,7 @@ export const increasePopulation = (): Promise<void> => {
     setTimeout(() => {
       db.dogs = db.dogs + 1;
       resolve();
-    }, 5000);
+    }, 1000);
   });
 };
 
@@ -24,6 +24,6 @@ export const removeAllDogs = (): Promise<void> => {
     setTimeout(() => {
       db.dogs = db.dogs = 0;
       resolve();
-    }, 500);
+    }, 1000);
   });
 };

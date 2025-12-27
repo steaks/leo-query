@@ -59,3 +59,11 @@ body {
     margin-bottom: 20px;
     animation: float 3s ease-in-out infinite;
 }
+
+.response-message {
+    color: #264653;
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 20px;
+    animation: pop 0.3s ease-in-out;
+}
