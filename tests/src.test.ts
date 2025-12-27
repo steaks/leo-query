@@ -20,8 +20,12 @@ test("equal effects", () => {
     __triggers: [],
     key: "key1",
     isLoading: false,
+    isIdle: true,
     error: undefined,
     errors: [],
+    lastStartedRequest: undefined,
+    lastCompletedRequest: undefined,
+    requests: [],
     trigger: () => Promise.resolve(),
     __store: () => { return null as unknown as StoreApi<any>; }
   } as Effect<any, any>;
@@ -34,8 +38,12 @@ test("equal effects", () => {
     __triggers: [],
     key: "key2",
     isLoading: false,
+    isIdle: true,
     error: undefined,
     errors: [],
+    lastStartedRequest: undefined,
+    lastCompletedRequest: undefined,
+    requests: [],
     trigger: () => Promise.resolve(),
     __store: () => { return null as unknown as StoreApi<any>; }
   } as Effect<any>
@@ -52,8 +60,12 @@ test("not equal effects", () => {
     __triggers: [],
     key: "key1",
     isLoading: false,
+    isIdle: true,
     error: undefined,
     errors: [],
+    lastStartedRequest: undefined,
+    lastCompletedRequest: undefined,
+    requests: [],
     trigger: () => Promise.resolve(),
     __store: () => { return null as unknown as StoreApi<any>; }
   } as Effect<any, any>;
@@ -66,8 +78,12 @@ test("not equal effects", () => {
     __triggers: [],
     key: "key2",
     isLoading: false,
+    isIdle: true,
     error: undefined,
     errors: [],
+    lastStartedRequest: undefined,
+    lastCompletedRequest: undefined,
+    requests: [],
     trigger: () => Promise.resolve(),
     __store: () => { return null as unknown as StoreApi<any>; }
   } as Effect<any, any>
@@ -84,8 +100,12 @@ test("effect compared with non-effect", () => {
     __triggers: [],
     key: "key1",
     isLoading: false,
+    isIdle: true,
     error: undefined,
     errors: [],
+    lastStartedRequest: undefined,
+    lastCompletedRequest: undefined,
+    requests: [],
     trigger: () => Promise.resolve(),
     __store: () => { return null as unknown as StoreApi<any>; }
   } as Effect<any, any>;

@@ -1,6 +1,6 @@
-import React, {Suspense} from 'react';
 import {create} from "zustand";
-import {hook, effect, query, Query, Effect} from "leo-query";
+import { useShallow } from "zustand/react/shallow";
+import {hook, effect, query, Query, Effect, useMessageExpired} from "leo-query";
 import {fetchDogs, increasePopulation, removeAllDogs} from "./db";
 import "./App.css";
 
@@ -21,10 +21,19 @@ const useDogStoreAsync = hook(useDogStore, /*suspense*/false);
 function DogCounter() {
   console.log("Rendering DogCounter");
   const dogs = useDogStoreAsync(state => state.dogs);
+  const messageExpired = useMessageExpired(dogs.lastCompletedRequest, /*timeout*/3000);
   if (dogs.isLoading) {
     return <Loading />;
   }
-  return <h1 className="dog-counter">{dogs.value} around here...</h1>;
+  if (dogs.error && !messageExpired) {
+    return <h1 className="dog-counter">Error: {dogs.error.message}</h1>;
+  }
+  return (
+    <>
+      <h1 className="dog-counter">{dogs.value} around here...</h1>
+      {!messageExpired && <p className="response-message">Success!</p>}
+    </>
+  );
 }
 
 function Loading () {
@@ -32,9 +41,15 @@ function Loading () {
 }
 
 function Controls() {
-  console.log("Rendering Controls");
-  const increasePopulation = useDogStore(state => state.increasePopulation.trigger)
-  return <button className="cool-button" onClick={increasePopulation}>one up</button>;
+  const [increasePopulation, isLoading, lastCompletedRequest] = useDogStore(useShallow(s => [s.increasePopulation.trigger, s.increasePopulation.isLoading,s.increasePopulation.lastCompletedRequest]));
+  const messageExpired = useMessageExpired(lastCompletedRequest, /*timeout*/30000);
+  console.log("Rendering Controls", messageExpired);
+
+  return (
+    <>
+      <button className="cool-button" onClick={increasePopulation}>one up</button>
+    </>
+  );
 }
 
 function App() {
