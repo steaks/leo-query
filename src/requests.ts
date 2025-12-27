@@ -24,12 +24,13 @@ export const startQueryRequest = <T>(startTime: number, globalOptions: GlobalOpt
 };
 
 export const completeQueryRequest = <T>(request: QueryRequest<T>, value?: T, error?: any): QueryRequest<T> => {
-  const response = value ? {result: value} : {error: error!};
+  const response = value !== undefined ? {result: value} : {error: error!};
+  const status = value !== undefined ? 'success' as LeoRequestStatus : 'error' as LeoRequestStatus;
   return {
     ...request,
     timing: completeTiming(request.timing),
     response,
-    status: 'success' as LeoRequestStatus
+    status
   };
 };
 
@@ -46,11 +47,12 @@ export const startEffectRequest = <Args extends any[], R>(args: Args, globalOpti
 };
 
 export const completeEffectRequest = <Args extends any[], R>(request: EffectRequest<Args, R>, result?: R, error?: any): EffectRequest<Args, R> => {
-  const response = result  ? {result} : {error: error!};
+  const response = result !== undefined ? {result} : {error: error!};
+  const status = result !== undefined ? 'success' as LeoRequestStatus : 'error' as LeoRequestStatus;
   return {
     ...request,
     timing: completeTiming(request.timing),
     response,
-    status: 'success' as LeoRequestStatus
+    status
   };
 };
