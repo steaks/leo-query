@@ -1,10 +1,53 @@
 import { ReactNode } from "react";
 import {UseBoundStore, StoreApi} from "zustand";
 
+export type LeoRequestStatus = 'success' | 'error' | 'pending';
+
+export interface Timing {
+  /** The timestamp when the request started. */
+  startTime: number;
+  /** The timestamp when the request ended. */
+  endTime?: number;
+  /** The duration of the request. */
+  duration?: number;
+}
+
+export interface EffectRequestDetails<Args extends any[]> {
+  /** The arguments passed to the effect. */
+  args: Args;
+}
+
+export interface LeoResponse<T> {
+  /** The result of the effect. */
+  result?: T;
+  /** The error of the effect. */
+  error?: any | undefined;
+}
+
+export interface LeoRequest<R> {
+  /** The index of the request. */
+  id: string;
+  /** The response of the request. */
+  response?: LeoResponse<R>;
+  /** Timing information for the request. */
+  timing: Timing;
+  /** The status of the request. */
+  status: LeoRequestStatus;
+}
+
+export interface EffectRequest<Args extends any[], R> extends LeoRequest<R> {
+  type: "effect";
+  details: EffectRequestDetails<Args>;
+}
+
+export interface QueryRequest<T> extends LeoRequest<T> {
+  type: "query";
+}
+
 /**
  * Represents an asynchronous effect tied to a Zustand store.
  */
-export interface Effect<State, Args extends any[] = []> {
+export interface Effect<State, Args extends any[] = [], R = void> {
     /** Unique identifier for this effect. */
     readonly __id: string;
     /** Type identifier for this effect. */
@@ -12,19 +55,29 @@ export interface Effect<State, Args extends any[] = []> {
     /** Tracks how many times the effect has been triggered. */
     readonly __valueCounter: number;
     /** Array of promises for managing concurrent triggers. */
-     readonly __triggers: Promise<void>[];
+    readonly __triggers: Promise<void>[];
     /** Function access to the store. */
     __store: () => StoreApi<State>;
     /** Key of the store this effect is tied to. */
     key: keyof State;
     /** Indicates if the effect is currently executing. */
     isLoading: boolean;
-    /** Error from the most recent trigger attempt. Undefined if the most recent trigger succeeded or no trigger has been attempted. */
+    /** Indicates if the most recent trigger attempt by the effect has succeeded. */
+    isSuccess: boolean | undefined;
+    /** Indicates if the most recent trigger attempt by the effect has errored. */
+    isError: boolean | undefined;
+    /** Value from the most recently completed trigger attempt. Undefined if the most recent trigger succeeded or no trigger has been attempted. */
+    value: R | undefined;
+    /** Error from the most recently completed trigger attempt. Undefined if the most recent trigger succeeded or no trigger has been attempted. */
     error: any | undefined;
-    /** History of all errors hit by the effect. Useful for debugging. */
-    readonly errors: any[];
+    /** The most recently started request of the effect (may still be pending). */
+    lastStartedRequest: EffectRequest<Args, R> | undefined;
+    /** The most recently completed request of the effect. */
+    lastCompletedRequest: EffectRequest<Args, R> | undefined;
+    /** History of all requests made by the effect. Useful for debugging. */
+    readonly requests: EffectRequest<Args, R>[];
     /** Triggers the effect manually. */
-    trigger: (...args: Args) => Promise<void>;
+    trigger: (...args: Args) => Promise<R>;
 }
 
 /**
@@ -75,6 +128,10 @@ export interface Query<State, T> {
     value: T | undefined;
     /** Indicates if the query is currently fetching data. */
     isLoading: boolean;
+    /** Indicates if the most recent completed attempt by the query has succeeded. */
+    isSuccess: boolean | undefined;
+    /** Indicates if the most recent completed attempt by the query has errored. */
+    isError: boolean | undefined;
     /** Error caught in the promise. */
     error: any | undefined;
     /** Manually triggers the query. */
@@ -94,6 +151,10 @@ export interface Query<State, T> {
      * @returns The updated query.
      */
     withValue: (value: T) => Query<State, T>; 
+    /** The most recently started request of the query (may still be pending). */
+    lastStartedRequest: QueryRequest<T> | undefined;
+    /** The most recently completed request of the query. */
+    lastCompletedRequest: QueryRequest<T> | undefined;
 }
 
 export type Primitive = string | number | boolean | null | undefined | bigint | symbol;
@@ -101,10 +162,16 @@ export type Primitive = string | number | boolean | null | undefined | bigint | 
 export interface QueryValue<T> {
     /** The current value returned by the query. */
     value: T | undefined;
-    /** Indicates if the query is currently fetching data. */
-    isLoading: boolean;
     /** Error caught in the promise. */
     error: any | undefined;
+    /** Indicates if the query is currently fetching data. */
+    isLoading: boolean;
+    /** Indicates if the most recent completed attempt by the query has succeeded. */
+    isSuccess: boolean | undefined;
+    /** Indicates if the most recent completed attempt by the query has errored. */
+    isError: boolean | undefined;
+    /** The most recently completed request of the query. */
+    lastCompletedRequest: QueryRequest<T> | undefined;
 }
 
 
@@ -114,7 +181,7 @@ export interface QueryValue<T> {
  * @param s - The current store state.
  * @returns An array of `Query<Store, any> | Effect<Store, any> | Primitive`.
  */
-export type Dependencies<Store> = (s: Store) => (Query<Store, any> | Effect<Store, any> | Primitive)[];
+export type Dependencies<Store> = (s: Store) => (Query<Store, any> | Effect<Store, any, any> | Primitive)[];
 
 export interface GlobalQueryOptions {
     /** If set to `true`, the query will fetch data as needed. Default is `true`. */
@@ -217,7 +284,7 @@ export type UseBoundAsyncStoreWithSuspense<T> = {
    * @param selector Select the effect from the store.
    * @param opts Options
    */
-  <Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): () => Promise<void>
+  <Args extends any[], R>(selector: (state: T) => Effect<T, Args, R>): () => Promise<R>
 };
 
 export type UseBoundAsyncStoreWithoutSuspense<T> = {
@@ -247,7 +314,7 @@ export type UseBoundAsyncStoreWithoutSuspense<T> = {
    *   - Consider dependencies
    * @param selector Select the effect from the store.
    */
-  <Args extends any[] = []>(selector: (state: T) => Effect<T, Args>): () => Promise<void>
+  <Args extends any[], R>(selector: (state: T) => Effect<T, Args, R>): () => Promise<void>
 };
 
 export interface StoreProviderProps<T> {
@@ -347,29 +414,18 @@ export interface StoreProviderWithServerSideData<T, D> {
   readonly useHasHydrated: () => boolean;
 }
 
-export interface SuccessPayload {
+export interface RequestPayload {
   query?: Query<any, any>;
-  effect?: Effect<any, any>;
-}
-
-export interface ErrorPayload {
-  query?: Query<any, any>;
-  effect?: Effect<any, any>;
-  error: any;
-}
-
-export interface SettledPayload {
-  query?: Query<any, any>;
-  effect?: Effect<any, any>;
-  error?: any;
+  effect?: Effect<any, any, any>;
+  request: EffectRequest<any, any> | QueryRequest<any>;
 }
 
 export interface LeoQueryEventTarget {
-  addEventListener(type: "success", listener: (evt: CustomEvent<SuccessPayload>) => void, options?: AddEventListenerOptions | boolean): void;
-  addEventListener(type: "error", listener: (evt: CustomEvent<ErrorPayload>) => void, options?: AddEventListenerOptions | boolean): void;
-  addEventListener(type: "settled", listener: (evt: CustomEvent<SettledPayload>) => void, options?: AddEventListenerOptions | boolean): void;
-  removeEventListener(type: "success", listener: (evt: CustomEvent<SuccessPayload>) => void, options?: AddEventListenerOptions | boolean): void;
-  removeEventListener(type: "error", listener: (evt: CustomEvent<ErrorPayload>) => void, options?: AddEventListenerOptions | boolean): void;
-  removeEventListener(type: "settled", listener: (evt: CustomEvent<SettledPayload>) => void, options?: AddEventListenerOptions | boolean): void;
-  __dispatchEvent(evt: CustomEvent<ErrorPayload | SuccessPayload | SettledPayload>): void;
+  addEventListener(type: "success", listener: (evt: CustomEvent<RequestPayload>) => void, options?: AddEventListenerOptions | boolean): void;
+  addEventListener(type: "error", listener: (evt: CustomEvent<RequestPayload>) => void, options?: AddEventListenerOptions | boolean): void;
+  addEventListener(type: "settled", listener: (evt: CustomEvent<RequestPayload>) => void, options?: AddEventListenerOptions | boolean): void;
+  removeEventListener(type: "success", listener: (evt: CustomEvent<RequestPayload>) => void, options?: AddEventListenerOptions | boolean): void;
+  removeEventListener(type: "error", listener: (evt: CustomEvent<RequestPayload>) => void, options?: AddEventListenerOptions | boolean): void;
+  removeEventListener(type: "settled", listener: (evt: CustomEvent<RequestPayload>) => void, options?: AddEventListenerOptions | boolean): void;
+  __dispatchEvent(evt: CustomEvent<RequestPayload>): void;
 }
