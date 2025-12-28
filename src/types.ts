@@ -62,8 +62,14 @@ export interface Effect<State, Args extends any[] = [], R = void> {
     key: keyof State;
     /** Indicates if the effect is currently executing. */
     isLoading: boolean;
-    /** Indicates if the effect is currently idle. */
-    isIdle: boolean;
+    /** Indicates if the most recent trigger attempt by the effect has succeeded. */
+    isSuccess: boolean | undefined;
+    /** Indicates if the most recent trigger attempt by the effect has errored. */
+    isError: boolean | undefined;
+    /** Value from the most recently completed trigger attempt. Undefined if the most recent trigger succeeded or no trigger has been attempted. */
+    value: R | undefined;
+    /** Error from the most recently completed trigger attempt. Undefined if the most recent trigger succeeded or no trigger has been attempted. */
+    error: any | undefined;
     /** The most recently started request of the effect (may still be pending). */
     lastStartedRequest: EffectRequest<Args, R> | undefined;
     /** The most recently completed request of the effect. */
@@ -122,6 +128,10 @@ export interface Query<State, T> {
     value: T | undefined;
     /** Indicates if the query is currently fetching data. */
     isLoading: boolean;
+    /** Indicates if the most recent completed attempt by the query has succeeded. */
+    isSuccess: boolean | undefined;
+    /** Indicates if the most recent completed attempt by the query has errored. */
+    isError: boolean | undefined;
     /** Error caught in the promise. */
     error: any | undefined;
     /** Manually triggers the query. */
@@ -152,10 +162,14 @@ export type Primitive = string | number | boolean | null | undefined | bigint | 
 export interface QueryValue<T> {
     /** The current value returned by the query. */
     value: T | undefined;
-    /** Indicates if the query is currently fetching data. */
-    isLoading: boolean;
     /** Error caught in the promise. */
     error: any | undefined;
+    /** Indicates if the query is currently fetching data. */
+    isLoading: boolean;
+    /** Indicates if the most recent completed attempt by the query has succeeded. */
+    isSuccess: boolean | undefined;
+    /** Indicates if the most recent completed attempt by the query has errored. */
+    isError: boolean | undefined;
     /** The most recently completed request of the query. */
     lastCompletedRequest: QueryRequest<T> | undefined;
 }

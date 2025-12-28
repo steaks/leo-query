@@ -136,8 +136,11 @@ export function effect<Store extends object, Args extends any[], R>(): Effect<St
     __triggers: [],
     __store: getStore,
     key: "NOT_SET_YET" as keyof Store,
-    isIdle: true,
     isLoading: false,
+    isSuccess: undefined,
+    isError: undefined,
+    value: undefined,
+    error: undefined,
     lastStartedRequest: undefined,
     lastCompletedRequest: undefined,
     requests: [],
@@ -150,23 +153,25 @@ export function effect<Store extends object, Args extends any[], R>(): Effect<St
           ...current,
           __triggers: [...current.__triggers, promise],
           isLoading: true,
-          isIdle: false,
           lastStartedRequest: request,
           requests: [...current.requests, request]
         }
       } as Partial<Store>);
       setTimeout(async () => {
-        let result: R | undefined = undefined;
+        let value: R | undefined = undefined;
         let error: any | undefined = undefined;
         try {
-          result = await promise;
+          value = await promise;
         } catch (ee) {
           error = ee;
         }
-        const completedRequest = completeEffectRequest(request, result, error);
+        const current = e.__store().getState()[e.key] as Effect<Store, Args, R>;
+        const completedRequest = completeEffectRequest(request, value, error);
         events.__dispatchEvent(new CustomEvent<RequestPayload>(completedRequest.status, {detail: {effect: e, request: completedRequest}}));
         events.__dispatchEvent(new CustomEvent<RequestPayload>("settled", {detail: {effect: e, request: completedRequest}}));
         const fetches = current.__triggers.filter(f => f !== promise);
+        const isSuccess = completedRequest.status === "success";
+        const isError = completedRequest.status === "error";
         e.__store().setState({
           [e.key]: {
             ...current,
@@ -174,6 +179,10 @@ export function effect<Store extends object, Args extends any[], R>(): Effect<St
             __triggers: fetches,
             isLoading: fetches.length > 0,
             lastCompletedRequest: completedRequest,
+            isSuccess,
+            isError,
+            value,
+            error,
             requests: replaceRequest(current.requests, completedRequest)
           }
         } as Partial<Store>);
@@ -225,6 +234,8 @@ const setSyncWithRequest = <Store extends object, R>(query: Query<Store, R>, val
     return query;
   }
   const staleTimeout = setupStaleTimeout(query);
+  const isSuccess = error === undefined;
+  const isError = error !== undefined;
   const next = {
     ...query,
     __isInitialized: true,
@@ -235,7 +246,9 @@ const setSyncWithRequest = <Store extends object, R>(query: Query<Store, R>, val
     __staleTimeout: staleTimeout,
     __valueTimestamp: Date.now(),
     isLoading: false,
-    value: error === undefined ? value : undefined,
+    isSuccess,
+    isError,
+    value: value,
     error,
     lastCompletedRequest: request,
   };
@@ -284,6 +297,8 @@ export function query<Store extends object, R>(): Query<Store, R> {
     __isInitialized: p.options.initialValue !== undefined,
     key: "NOT_YET_SET" as keyof Store,
     isLoading: false,
+    isSuccess: undefined,
+    isError: undefined,
     value: p.options.initialValue as unknown as R,
     error: undefined,
     lastCompletedRequest: undefined,
@@ -478,6 +493,8 @@ const withoutSuspenseHook = <T extends object>(store: UseBoundStore<StoreApi<T>>
           return {
             value: firstValue.value,
             isLoading: true,
+            isSuccess: firstValue.isSuccess,
+            isError: firstValue.isError,
             error: firstValue.error,
             lastCompletedRequest: firstValue.lastCompletedRequest
           }
@@ -615,11 +632,32 @@ const withSuspenseQuery = <T>(firstValue: Query<any, T>, otherValues: QueryOrEff
   }
   const allTriggers = [...queryTrigger, ...depTriggers];
   if (_needsInitialValue) {
-    return {value: opts.initialValue!, error: undefined, isLoading: false, lastCompletedRequest: undefined};
+    return {
+      value: opts.initialValue!, 
+      error: undefined, 
+      isLoading: false, 
+      isSuccess: undefined,
+      isError: undefined,
+      lastCompletedRequest: undefined
+    };
   } else if (_needsValue) {
-    return {value: opts.value!, error: undefined, isLoading: false, lastCompletedRequest: undefined};
+    return {
+      value: opts.value!, 
+      error: undefined, 
+      isLoading: false, 
+      isSuccess: true,
+      isError: false,
+      lastCompletedRequest: undefined
+    };
   } else if (allTriggers.length === 0) {
-    return {value: firstValue.value, error: firstValue.error, isLoading: false, lastCompletedRequest: firstValue.lastCompletedRequest};
+    return {
+      value: firstValue.value, 
+      error: firstValue.error, 
+      isLoading: false, 
+      isSuccess: firstValue.isSuccess,
+      isError: firstValue.isError,
+      lastCompletedRequest: firstValue.lastCompletedRequest
+    };
   } else {
     throw Promise.all(allTriggers);
   }
